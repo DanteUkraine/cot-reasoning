@@ -146,7 +146,7 @@ def detect_domain(user_input, intent):
 
 #### Model Size Fit Scores
 
-| Thinking Type | 3B | 7B | 14B | 24B+ |
+| Thinking Type | LOW | MEDIUM | HIGH | VERY_HIGH |
 |---------------|----|----|-----|------|
 | ANALYTICAL | 0.8 | 0.9 | 0.9 | 0.9 |
 | CREATIVE | 0.7 | 0.8 | 0.9 | 0.9 |

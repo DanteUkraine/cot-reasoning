@@ -210,7 +210,7 @@ def select_pattern(complexity, tools_available, system_mode):
 ```
 
 **Best For:**
-- ✅ **granite-4 PRIMARY** - Debugging, analysis, investigation
+- ✅ **ANY MODEL - IDEAL** - Debugging, analysis, investigation
 - Tool-intensive tasks
 - Real-world data operations
 - Multi-step workflows
