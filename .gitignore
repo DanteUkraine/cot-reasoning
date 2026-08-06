@@ -1,0 +1,51 @@
+# System Reasoning Brain - Git Ignore Rules
+
+## System Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+## IDE Specific
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.user
+
+## Build and Distribution
+/dist/
+/build/
+*.tar.gz
+*.zip
+*.egg-info/
+
+## Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+## Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## Environment
+.env
+.env.local
+.env.*.local
+
+## Logs
+*.log
+logs/
+
+## OS
+*.un~\n\n## Testing\n.coverage\n.nyc_output\n.noseids\n
+## Documentation Build\n/docs/_build/\n
+## Temporary Files\n*.tmp\n*.temp\n*.bak\n
