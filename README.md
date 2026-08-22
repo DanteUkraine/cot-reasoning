@@ -1,23 +1,10 @@
-# System Reasoning Brain
-
-**The Universal Reasoning Framework for ANY Large Language Model**
+# Chain-of-thought Reasoning
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version: 5.0.0](https://img.shields.io/badge/Version-5.0.0-green.svg)]
-[![Agent Skills Open Standard](https://img.shields.io/badge/Agent_Skills-Open_Standard-orange.svg)](https://github.com/go official/agent-skills)
 
-## 🎯 Overview
+**The Universal Reasoning Framework for ANY Large Language Model**.
 
-**System Reasoning Brain (SRB)** is a **model-agnostic reasoning skill** that enables **ANY** Large Language Model to perform complex, multi-step reasoning by providing a complete thinking framework.
-
-### Core Principle
-
-```
-MODEL WITHOUT COMPLEX REASONING + COMPLEX TASK = Needs external thinking structure
-SYSTEM REASONING BRAIN + ANY MODEL = Capable reasoning agent
-```
-
-**The skill IS the brain. The model is the executor.**
+**Chain-of-thought Reasoning** is a **model-agnostic reasoning skill** that enables **ANY** Large Language Model to perform complex, multi-step reasoning by providing a complete thinking framework.
 
 ## ✨ Features
 
@@ -32,57 +19,8 @@ SYSTEM REASONING BRAIN + ANY MODEL = Capable reasoning agent
 
 ## 📦 Installation
 
-### Global Installation (Recommended)
-
-Installs the skill for all projects on your system:
-
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/system-reasoning-brain.git
-
-# Copy to global skills directory
-cp -r system-reasoning-brain/skill/* ~/.agents/skills/system-reasoning-brain/
-
-# Or for Mistral Vibe:
-cp -r system-reasoning-brain/skill/* ~/.vibe/skills/system-reasoning-brain/
-```
-
-### Project-Level Installation
-
-Installs the skill for a specific project only:
-
-```bash
-# From your project root:
-git clone https://github.com/your-username/system-reasoning-brain.git .vibe/skills/system-reasoning-brain
-```
-
-### Using Package Manager (Future)
-
-```bash
-# npm (planned)
-npm install -g @system-reasoning-brain/skill
-
-# pip (planned)
-pip install system-reasoning-brain
-```
-
-## 🗑️ Uninstallation
-
-### Global Uninstall
-
-```bash
-# Remove from global skills directory
-rm -rf ~/.agents/skills/system-reasoning-brain/
-
-# Or for Mistral Vibe:
-rm -rf ~/.vibe/skills/system-reasoning-brain/
-```
-
-### Project-Level Uninstall
-
-```bash
-# From your project root:
-rm -rf .vibe/skills/system-reasoning-brain/
+npx skills add DanteUkraine/cot-reasoning@cot-reasoning
 ```
 
 ## 🚀 Usage
@@ -103,28 +41,26 @@ User: "Our API is returning 500 errors, investigate and fix"
 
 ```bash
 # Using the skill command
-/srb "Analyze this complex system architecture"
+/cot-reasoning "Analyze this complex system architecture"
 
 # With specific mode
-/srb --mode=STANDARD "Debug the memory leak"
+/cot-reasoning --mode=STANDARD "Debug the memory leak"
 
 # With specific pattern
-/srb --pattern=ReAct "Investigate the database timeout issue"
+/cot-reasoning --pattern=ReAct "Investigate the database timeout issue"
 
 # With verbose output
-/srb --verbose "Design a scalable microservice architecture"
+/cot-reasoning --verbose "Design a scalable microservice architecture"
 ```
 
 ### Invocation Commands
 
 | Command | Description |
 |---------|-------------|
-| `/srb [query]` | Standard invocation |
-| `/srb --mode=STANDARD/BASIC/ENHANCED/MINIMAL [query]` | Force specific mode |
-| `/srb --pattern=[pattern] [query]` | Force specific CoT pattern |
-| `/srb --thinking-type=[type] [query]` | Force thinking type |
-| `/srb-validate` | Validate skill configuration |
-| `/srb-help` | Show help and examples |
+| `/cot-reasoning [query]` | Standard invocation |
+| `/cot-reasoning --mode=STANDARD/BASIC/ENHANCED/MINIMAL [query]` | Force specific mode |
+| `/cot-reasoning --pattern=[pattern] [query]` | Force specific CoT pattern |
+| `/cot-reasoning --thinking-type=[type] [query]` | Force thinking type |
 
 ## 🎯 When to Use
 
@@ -198,114 +134,8 @@ User: "Our API is returning 500 errors, investigate and fix"
 | **Tree of Thoughts** | Complex decisions | Medium-High |
 | **ReAct** | Tool-intensive tasks | High |
 
-## 📁 Directory Structure
-
-```
-system-reasoning-brain/
-├── SKILL.md                    # Main skill definition
-├── README.md                   # This file
-├── LICENSE                     # Apache 2.0 License
-├── CHANGELOG.md                # Version history
-├── CONTRIBUTING.md             # Contribution guidelines
-├── .gitignore                  # Git ignore rules
-├── skill/                      # Skill files
-│   ├── SKILL.md                # Skill metadata and instructions
-│   ├── references/             # Reference documents
-│   │   ├── intent-context-matrix.md
-│   │   ├── model-capabilities.md
-│   │   ├── reasoning-patterns-analysis.md
-│   │   └── reasoning-simulation.md
-│   ├── templates/              # Reasoning templates
-│   │   ├── adaptive-flows/
-│   │   │   └── unified-reasoning-flow.md
-│   │   ├── system-flows/
-│   │   │   ├── self-dialogue-template.md
-│   │   │   └── step-execution-template.md
-│   │   ├── tool-integration/
-│   │   └── thinking-types/
-│   │       ├── analytical.md
-│   │       ├── creative.md
-│   │       ├── critical.md
-│   │       ├── ethical.md
-│   │       ├── strategic.md
-│   │       └── systematic.md
-│   ├── assets/                 # Example flows and data
-│   │   └── system-examples.json
-│   └── scripts/                # Validation and utility scripts
-│       └── validate-system-flow.sh
-└── docs/                       # Additional documentation (future)
-```
-
-## 📊 Quality Metrics
-
-### Performance Benchmarks
-
-| Task Type | Quality | Success Rate |
-|-----------|---------|--------------|
-| Debugging | 85-95% | 98%+ |
-| Analysis | 80-90% | 95%+ |
-| Design | 75-85% | 90%+ |
-| Research | 90-95% | 98%+ |
-| Decision Making | 80-90% | 95%+ |
-| Code Review | 85-95% | 98%+ |
-
-### Complexity Performance
-
-| Complexity | Quality | Success Rate |
-|------------|---------|--------------|
-| LOW | 95-100% | 98%+ |
-| MEDIUM | 90-95% | 95%+ |
-| HIGH | 80-85% | 90%+ |
-| VERY_HIGH | 70-80% | 85%+ |
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Quick Start for Contributors
-
-```bash
-# Fork the repository
-git clone https://github.com/your-username/system-reasoning-brain.git
-cd system-reasoning-brain
-
-# Create a feature branch
-git checkout -b feature/your-feature
-
-# Make your changes
-# Add tests if applicable
-
-# Commit your changes
-git commit -m "Add your feature"
-
-# Push to the branch
-git push origin feature/your-feature
-
-# Open a Pull Request
-```
-
 ## 📜 License
 
 This project is licensed under the **Apache License 2.0** - see [LICENSE](LICENSE) for details.
-
-## 🆘 Support
-
-- **Documentation**: See the [docs/](docs/) directory
-- **Issues**: Report on GitHub Issues
-- **Discussions**: Join our Discord community
-- **Email**: support@systemreasoningbrain.org (future)
-
-## 🏆 Acknowledgments
-
-- Inspired by Chain of Thought prompting techniques
-- Compatible with Agent Skills Open Standard
-- Built for the AI reasoning community
-
----
-
-**Maintained by:** System Reasoning Consortium  
-**Version:** 5.0.0  
-**Last Updated:** 2026-08-06  
-**Compatibility:** All Agent Skills Open Standard v1 compliant systems
 
 *Made with ❤️ for the AI reasoning community*

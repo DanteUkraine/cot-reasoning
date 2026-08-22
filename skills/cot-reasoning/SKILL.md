@@ -4,8 +4,7 @@ description: A structured reasoning framework that provides step-by-step thinkin
 compatibility: ["mistral-vibe", "crewai", "autogen", "langchain", "llama-index"]
 metadata:
   author: DanteUkraine
-  version: "5.0.0"
-  last_updated: "2026-08-22"
+  version: "1.0.0"
   category: reasoning
   complexity: universal
   maturity: production-ready
@@ -13,16 +12,13 @@ metadata:
   invocation: both
   auto-detection: "(analyze|evaluate|assess|audit|diagnose|investigate|solve|fix|debug|troubleshoot|resolve|design|architect|validate|verify|compare|decide|prioritize|rank|optimize|forecast|estimate)"
   allowed-tools: ["web_search", "code_analyzer", "file_read", "file_write"]
-  model_requirements: "LLMs with tool-calling capability and reasoning abilities"
 ---
 
-<purpose>
-cot-reasoning: Provides a structured reasoning framework that enhances model capabilities for complex, multi-step problem-solving.
-
+<purpose>CoT-reasoning: Provides a structured reasoning framework that enhances model capabilities for complex, multi-step problem-solving.
 CORE VALUE PROPOSITION:
-- For models with tool-calling: Enables effective data gathering and analysis
-- For models with reasoning abilities: Provides structure for better organization and clarity
-- For all compatible models: Enhances complex task performance through guided reasoning
+- For models with tool-calling: Enables effective data gathering and analysis;
+- For models with reasoning abilities: Provides structure for better organization and clarity;
+- For all compatible models: Enhances complex task performance through guided reasoning;
 
 RESULT: Compatible models can perform multi-step reasoning tasks more effectively, building and analyzing complex systems through structured, auditable reasoning chains.
 
@@ -52,16 +48,14 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 6. Output Formatting — Structure results with full traceability
 7. Quality Validation — Verify completeness, consistency, and actionability
 </workflow>
-
 <instructions>
-
   <reasoning_framework>
-  **CORE CONCEPT: cot-reasoning ENHANCES Model Reasoning**
-  
+  CORE CONCEPT: Chain-of-thought Reasoning ENHANCES Model Reasoning
+
   **The Challenge:**
   Models vary in their ability to perform complex, multi-step reasoning. Some models struggle
   to connect multiple ideas, maintain context across steps, or structure their thinking process.
-  
+
   **The Solution:**
   cot-reasoning provides a structured framework that guides the model's reasoning. The skill
   generates step-by-step reasoning chains with self-dialogue, tool integration, and result
