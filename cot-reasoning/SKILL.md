@@ -3,7 +3,7 @@ name: cot-reasoning
 description: A structured reasoning framework that provides step-by-step thinking chains for complex problem-solving, enabling models to perform multi-step analysis with self-dialogue, tool integration, and intermediate result tracking.
 compatibility: ["mistral-vibe", "crewai", "autogen", "langchain", "llama-index"]
 metadata:
-  author: system-reasoning-consortium
+  author: DanteUkraine
   version: "5.0.0"
   last_updated: "2026-08-22"
   category: reasoning
@@ -32,13 +32,12 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 <references>
 | Reference | File | Purpose |
 |-----------|------|---------|
-| Core reasoning framework | `references/reasoning-simulation.md` | Framework architecture |
-| Intent detection and context classification | `references/intent-context-matrix.md` | Problem understanding |
-| Pattern organization | `references/reasoning-patterns-analysis.md` | Reasoning organization |
-| Step execution templates | `templates/system-flows/step-execution-template.md` | Executable reasoning steps |
-| Self-dialogue generation | `templates/system-flows/self-dialogue-template.md` | Transparent reasoning |
-| Tool integration patterns | `templates/tool-integration/` | Data operations |
-| Thinking type frameworks | `templates/thinking-types/` | Domain-specific reasoning |
+| Core reasoning framework | `references/reasoning-simulation.md` | Framework architecture and core principles |
+| Intent detection and context classification | `references/intent-context-matrix.md` | Intent classification system and context detection |
+| Pattern selection guidelines | `references/reasoning-patterns-analysis.md` | Pattern selection recommendations and use cases |
+| Step execution templates | `templates/system-flows/step-execution-template.md` | Executable reasoning step templates |
+| Self-dialogue generation | `templates/system-flows/self-dialogue-template.md` | Transparent reasoning dialogue templates |
+| Thinking type frameworks | `templates/thinking-types/` | Domain-specific thinking type frameworks |
 | Reasoning examples | `assets/system-examples.json` | Real-world usage patterns |
 | Validation and verification | `scripts/validate-system-flow.sh` | Quality assurance |
 </references>

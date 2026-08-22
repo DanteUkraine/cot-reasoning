@@ -1,5 +1,8 @@
 # Reasoning Framework - cot-reasoning
 
+**Version:** 5.0.0
+**Last Updated:** 2026-08-22
+
 ## Overview
 
 **Core Concept:** cot-reasoning provides a structured framework that enhances model reasoning capabilities for complex, multi-step tasks.
