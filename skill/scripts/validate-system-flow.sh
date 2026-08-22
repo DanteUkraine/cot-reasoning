@@ -173,7 +173,7 @@ validate_flow_metadata() {
     ((CHECKED++))
     
     # Check Agentic Mode
-    local valid_modes=("STANDARD" "BASIC" "ENHANCED" "MINIMAL")
+    local valid_modes=("STANDARD" "BASIC")
     if grep -q "Reasoning Mode:" <<< "$content"; then
         local mode=$(grep "Reasoning Mode:" <<< "$content" | head -1 | sed 's/.*Reasoning Mode: *//')
         if [[ " ${valid_modes[*]} " =~ " ${mode} " ]]; then

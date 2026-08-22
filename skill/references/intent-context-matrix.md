@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document provides the complete mapping between user intents, problem contexts, thinking types, and optimal reasoning patterns for the System Reasoning Brain v5.0.
+This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-resoning v5.0.
+
+---
 
 ## Primary Intent Categories
 
@@ -62,10 +64,8 @@ def detect_intent(user_input):
 | TECHNICAL | Technical/Engineering | code, algorithm, programming, database, API, server, latency, bug, error, debug, optimize, architecture, infrastructure, cloud, devops, deployment | System design, debugging, optimization, implementation | Medium-High |
 | BUSINESS | Business/Strategy | business, ROI, investment, strategy, market, customer, product, revenue, profit, competition, launch, growth, acquisition, merger, budget, forecast, KPI | Market analysis, strategy development, financial modeling | Medium-High |
 | CREATIVE | Creative/Innovation | creative, innovate, brainstorm, ideas, design, novel, new, original, unique, art, music, writing, story, concept, invention, prototype | Product design, idea generation, innovation, content creation | Medium |
-| ETHICAL | Ethical/Legal | ethical, moral, policy, compliance, legal, privacy, security, fairness, justice, bias, discrimination, impact, society, regulation | Policy development, compliance, social impact, moral dilemmas | High |
 | SYSTEMIC | System/Process | system, process, workflow, procedure, method, optimize, efficiency, bottleneck, throughput, automation, pipeline | Process optimization, workflow design, system troubleshooting | Medium-High |
 | SCIENTIFIC | Scientific/Research | research, hypothesis, experiment, data, analysis, theory, model, physics, chemistry, biology, mathematics, statistics, study | Experimental design, data analysis, theoretical modeling | High |
-| EDUCATIONAL | Learning/Education | learn, teach, educate, study, understand, explain, tutorial, guide, lesson, course, student | Knowledge transfer, curriculum design, learning materials | Medium |
 
 ### Domain Detection Rules
 
@@ -79,8 +79,6 @@ def detect_domain(user_input, intent):
                     'product', 'revenue', 'profit', 'competition', 'launch'],
         'CREATIVE': ['creative', 'innovate', 'brainstorm', 'ideas', 'design', 'novel',
                     'new', 'original', 'unique', 'concept', 'invention'],
-        'ETHICAL': ['ethical', 'moral', 'policy', 'compliance', 'legal', 'privacy',
-                   'security', 'fairness', 'justice', 'bias', 'discrimination', 'impact'],
         'SYSTEMIC': ['system', 'process', 'workflow', 'procedure', 'method', 'optimize',
                     'efficiency', 'bottleneck', 'throughput', 'automation'],
         'SCIENTIFIC': ['research', 'hypothesis', 'experiment', 'data', 'analysis', 'theory',
@@ -96,16 +94,12 @@ def detect_domain(user_input, intent):
     # Select primary domain
     primary_domain = max(domain_scores, key=domain_scores.get)
     
-    # Intent-domain compatibility check
-    if not is_compatible(intent, primary_domain):
-        return detect_secondary_domain(user_input)
-    
     return primary_domain
 ```
 
 ---
 
-## Thinking Type Selection Matrix
+## Thinking Type System
 
 ### Core Thinking Type Definitions
 
@@ -113,10 +107,8 @@ def detect_domain(user_input, intent):
 |---------------|----------------|----------|-----------|-------------|
 | **ANALYTICAL** | Systematic breakdown and evaluation | Business analysis, technical problems, strategic planning | Precision, thoroughness, objectivity | May lack creativity for novel problems |
 | **CREATIVE** | Innovative solution generation | Product development, brainstorming, reframing problems | Generates innovative ideas, explores multiple possibilities | May produce impractical solutions |
-| **CRITICAL** | Objective evaluation with skepticism | Decision validation, argument analysis, QA, risk assessment | Identifies weak points, prevents errors, ensures quality | May be overly negative or cautious |
-| **SYSTEMATIC** | Methodical step-by-step approach | Process improvement, troubleshooting, system design, workflow optimization | Reliable, repeatable, thorough | May miss innovative shortcuts |
-| **ETHICAL** | Moral implications consideration | Policy development, social impact, compliance, moral dilemmas | Ensures moral considerations, protects stakeholders, builds trust | May be subjective or culturally dependent |
-| **STRATEGIC** | Long-term planning and positioning | Business strategy, market entry, competitive analysis, resource allocation | Long-term focus, competitive awareness, resource optimization | May overlook short-term tactics |
+| **CRITICAL** | Objective evaluation with skepticism | Decision validation, argument analysis, QA, risk assessment, ethical considerations | Identifies weak points, prevents errors, ensures quality | May be overly negative or cautious |
+| **SYSTEMATIC** | Methodical step-by-step approach | Process improvement, troubleshooting, system design, strategic planning | Reliable, repeatable, thorough | May miss innovative shortcuts |
 
 ---
 
@@ -126,23 +118,19 @@ def detect_domain(user_input, intent):
 
 | Thinking Type | ANALYZE | DESIGN | SOLVE | VALIDATE | DECIDE | EXPLAIN | PREDICT | RESEARCH |
 |---------------|---------|--------|-------|----------|--------|---------|---------|----------|
-| **TECHNICAL** | 0.9 | 0.7 | 0.9 | 0.8 | 0.8 | 0.7 | 0.8 | 0.7 |
-| **BUSINESS** | 0.8 | 0.8 | 0.7 | 0.8 | 0.9 | 0.8 | 0.8 | 0.6 |
-| **CREATIVE** | 0.6 | 0.9 | 0.7 | 0.6 | 0.7 | 0.6 | 0.7 | 0.7 |
-| **ETHICAL** | 0.8 | 0.6 | 0.6 | 0.9 | 0.8 | 0.7 | 0.7 | 0.7 |
-| **SYSTEMIC** | 0.8 | 0.7 | 0.9 | 0.7 | 0.8 | 0.7 | 0.8 | 0.7 |
-| **SCIENTIFIC** | 0.9 | 0.7 | 0.8 | 0.8 | 0.8 | 0.8 | 0.9 | 0.8 |
+| **ANALYTICAL** | 0.9 | 0.7 | 0.8 | 0.9 | 0.8 | 0.8 | 0.8 | 0.7 |
+| **CREATIVE** | 0.6 | 0.9 | 0.7 | 0.6 | 0.7 | 0.6 | 0.7 | 0.8 |
+| **CRITICAL** | 0.8 | 0.7 | 0.7 | 0.9 | 0.8 | 0.7 | 0.7 | 0.8 |
+| **SYSTEMATIC** | 0.8 | 0.8 | 0.9 | 0.8 | 0.8 | 0.7 | 0.8 | 0.9 |
 
 #### Complexity Fit Scores
 
 | Thinking Type | LOW | MEDIUM | HIGH |
 |---------------|-----|--------|------|
-| ANALYTICAL | 0.8 | 0.9 | 0.7 |
+| ANALYTICAL | 0.9 | 0.9 | 0.8 |
 | CREATIVE | 0.6 | 0.8 | 0.9 |
 | CRITICAL | 0.7 | 0.8 | 0.8 |
 | SYSTEMATIC | 0.8 | 0.9 | 0.8 |
-| ETHICAL | 0.6 | 0.8 | 0.9 |
-| STRATEGIC | 0.6 | 0.8 | 0.9 |
 
 #### Model Size Fit Scores
 
@@ -152,8 +140,6 @@ def detect_domain(user_input, intent):
 | CREATIVE | 0.7 | 0.8 | 0.9 | 0.9 |
 | CRITICAL | 0.8 | 0.9 | 0.9 | 0.9 |
 | SYSTEMATIC | 0.9 | 0.9 | 0.9 | 0.9 |
-| ETHICAL | 0.7 | 0.8 | 0.9 | 0.9 |
-| STRATEGIC | 0.7 | 0.8 | 0.8 | 0.9 |
 
 ---
 
@@ -164,46 +150,52 @@ def select_thinking_type(intent, context, complexity):
     # Define weights
     INTENT_WEIGHT = 0.4
     CONTEXT_WEIGHT = 0.3
-    COMPLEXITY_WEIGHT = 0.3
+    COMPLEXITY_WEIGHT = 0.2
+    MODEL_WEIGHT = 0.1
     
     # Define mappings
     INTENT_MAPPING = {
         'ANALYZE': {'ANALYTICAL': 0.9, 'CRITICAL': 0.8, 'EXPLAIN': 0.7, 'DECIDE': 0.8},
-        'DESIGN': {'CREATIVE': 0.9, 'STRATEGIC': 0.8, 'ANALYTICAL': 0.7},
+        'DESIGN': {'CREATIVE': 0.9, 'SYSTEMATIC': 0.8, 'ANALYTICAL': 0.7},
         'SOLVE': {'SYSTEMATIC': 0.9, 'ANALYTICAL': 0.8, 'CREATIVE': 0.7},
-        'VALIDATE': {'CRITICAL': 0.9, 'ANALYTICAL': 0.8, 'VALIDATE': 0.8},
-        'DECIDE': {'ETHICAL': 0.8, 'ANALYTICAL': 0.8, 'STRATEGIC': 0.9},
-        'EXPLAIN': {'ANALYTICAL': 0.7, 'EXPLAIN': 0.7, 'CRITICAL': 0.6},
-        'PREDICT': {'ANALYTICAL': 0.8, 'CREATIVE': 0.6, 'STRATEGIC': 0.8},
-        'RESEARCH': {'ANALYTICAL': 0.7, 'SYSTEMATIC': 0.8, 'CREATIVE': 0.7}
+        'VALIDATE': {'CRITICAL': 0.9, 'ANALYTICAL': 0.8},
+        'DECIDE': {'CRITICAL': 0.8, 'ANALYTICAL': 0.8, 'SYSTEMATIC': 0.8},
+        'EXPLAIN': {'ANALYTICAL': 0.7, 'CRITICAL': 0.6},
+        'PREDICT': {'ANALYTICAL': 0.8, 'CREATIVE': 0.6, 'SYSTEMATIC': 0.8},
+        'RESEARCH': {'SYSTEMATIC': 0.8, 'ANALYTICAL': 0.7, 'CREATIVE': 0.7}
     }
     
     CONTEXT_MAPPING = {
         'TECHNICAL': {'ANALYTICAL': 0.9, 'SYSTEMATIC': 0.9, 'CRITICAL': 0.7},
-        'BUSINESS': {'STRATEGIC': 0.9, 'ANALYTICAL': 0.7, 'ETHICAL': 0.7},
-        'CREATIVE': {'CREATIVE': 0.9, 'ANALYTICAL': 0.6, 'STRATEGIC': 0.6},
-        'ETHICAL': {'ETHICAL': 0.9, 'CRITICAL': 0.8, 'ANALYTICAL': 0.7},
+        'BUSINESS': {'SYSTEMATIC': 0.8, 'ANALYTICAL': 0.7, 'CREATIVE': 0.7},
+        'CREATIVE': {'CREATIVE': 0.9, 'ANALYTICAL': 0.6, 'SYSTEMATIC': 0.6},
         'SYSTEMIC': {'SYSTEMATIC': 0.9, 'ANALYTICAL': 0.8, 'CREATIVE': 0.6},
         'SCIENTIFIC': {'ANALYTICAL': 0.8, 'SYSTEMATIC': 0.8, 'CREATIVE': 0.7}
     }
     
     COMPLEXITY_MAPPING = {
-        'LOW': {'ANALYTICAL': 0.8, 'SYSTEMATIC': 0.8, 'CRITICAL': 0.7, 
-                'CREATIVE': 0.6, 'ETHICAL': 0.6, 'STRATEGIC': 0.6},
-        'MEDIUM': {'ANALYTICAL': 0.9, 'SYSTEMATIC': 0.9, 'CRITICAL': 0.8,
-                  'CREATIVE': 0.8, 'ETHICAL': 0.8, 'STRATEGIC': 0.8},
-        'HIGH': {'CREATIVE': 0.9, 'ETHICAL': 0.9, 'STRATEGIC': 0.9,
-                 'ANALYTICAL': 0.7, 'SYSTEMATIC': 0.8, 'CRITICAL': 0.8}
+        'LOW': {'ANALYTICAL': 0.8, 'SYSTEMATIC': 0.8, 'CRITICAL': 0.7, 'CREATIVE': 0.6},
+        'MEDIUM': {'ANALYTICAL': 0.9, 'SYSTEMATIC': 0.9, 'CRITICAL': 0.8, 'CREATIVE': 0.8},
+        'HIGH': {'SYSTEMATIC': 0.9, 'ANALYTICAL': 0.8, 'CREATIVE': 0.9, 'CRITICAL': 0.8}
+    }
+    
+    MODEL_MAPPING = {
+        'LOW': {'ANALYTICAL': 0.8, 'SYSTEMATIC': 0.8, 'CRITICAL': 0.8, 'CREATIVE': 0.7},
+        'MEDIUM': {'ANALYTICAL': 0.9, 'SYSTEMATIC': 0.9, 'CRITICAL': 0.9, 'CREATIVE': 0.8},
+        'HIGH': {'ANALYTICAL': 0.9, 'SYSTEMATIC': 0.9, 'CRITICAL': 0.9, 'CREATIVE': 0.9},
+        'VERY_HIGH': {'ANALYTICAL': 0.9, 'SYSTEMATIC': 0.9, 'CRITICAL': 0.9, 'CREATIVE': 0.9}
     }
     
     # Calculate scores for each thinking type
+    thinking_types = ['ANALYTICAL', 'CREATIVE', 'CRITICAL', 'SYSTEMATIC']
     scores = {}
-    for thinking_type in ['ANALYTICAL', 'CREATIVE', 'CRITICAL', 'SYSTEMATIC', 'ETHICAL', 'STRATEGIC']:
+    for thinking_type in thinking_types:
         intent_score = INTENT_MAPPING.get(intent, {}).get(thinking_type, 0.5) * INTENT_WEIGHT
         context_score = CONTEXT_MAPPING.get(context, {}).get(thinking_type, 0.5) * CONTEXT_WEIGHT
         complexity_score = COMPLEXITY_MAPPING.get(complexity, {}).get(thinking_type, 0.5) * COMPLEXITY_WEIGHT
+        model_score = MODEL_MAPPING.get(complexity, {}).get(thinking_type, 0.5) * MODEL_WEIGHT
         
-        scores[thinking_type] = intent_score + context_score + complexity_score
+        scores[thinking_type] = intent_score + context_score + complexity_score + model_score
     
     # Select highest scoring thinking type
     best_type = max(scores, key=scores.get)
@@ -226,8 +218,8 @@ def select_thinking_type(intent, context, complexity):
         if 'design' in user_input.lower() or 'create' in user_input.lower():
             if scores.get('CREATIVE', 0) > 0.6:
                 return 'CREATIVE'
-            elif scores.get('STRATEGIC', 0) > 0.6:
-                return 'STRATEGIC'
+            elif scores.get('SYSTEMATIC', 0) > 0.6:
+                return 'SYSTEMATIC'
         elif 'validate' in user_input.lower() or 'verify' in user_input.lower():
             if scores.get('CRITICAL', 0) > 0.6:
                 return 'CRITICAL'
@@ -240,9 +232,9 @@ def select_thinking_type(intent, context, complexity):
 
 ---
 
-## CoT Pattern Selection by Thinking Type
+### CoT Pattern Selection by Thinking Type
 
-### Pattern-Selection Matrix
+#### Pattern-Selection Matrix
 
 | Thinking Type | LOW Complexity | MEDIUM Complexity | HIGH Complexity | Tool Available |
 |---------------|----------------|-------------------|-----------------|----------------|
@@ -250,8 +242,6 @@ def select_thinking_type(intent, context, complexity):
 | **CREATIVE** | Zero-Shot CoT | Auto-CoT | Tree of Thoughts | → ReAct if needed |
 | **CRITICAL** | Zero-Shot CoT | Few-Shot CoT | Auto-CoT | → ReAct if validation tools |
 | **SYSTEMATIC** | Zero-Shot CoT | ReAct | Tree of Thoughts | → ReAct preferred |
-| **ETHICAL** | Zero-Shot CoT | Few-Shot CoT | Tree of Thoughts | → ReAct for research |
-| **STRATEGIC** | Zero-Shot CoT | Tree of Thoughts | Auto-CoT + ToT | → ReAct for data |
 
 ---
 
@@ -288,7 +278,7 @@ Intent: SOLVE
 Context: TECHNICAL
 Complexity: HIGH (multiple entities, interdependencies, tool requirements)
 
-Thinking Type: SYSTEMATIC (SOLVE:0.9 * 0.4 + TECHNICAL:0.9 * 0.3 + HIGH:0.8 * 0.3 = 0.87)
+Thinking Type: SYSTEMATIC (SOLVE:0.9 * 0.4 + TECHNICAL:0.9 * 0.3 + HIGH:0.9 * 0.2 = 0.87)
 CoT Pattern: ReAct (SYSTEMATIC + HIGH + tool_availability=true)
 Configuration: max_iter=4, tool_budget=5
 ```
@@ -300,7 +290,7 @@ Intent: DESIGN + DECIDE
 Context: BUSINESS
 Complexity: HIGH (open-ended, multi-factor, long-term)
 
-Thinking Type: STRATEGIC (DESIGN:0.8 * 0.4 + BUSINESS:0.9 * 0.3 + HIGH:0.9 * 0.3 = 0.85)
+Thinking Type: SYSTEMATIC (DESIGN:0.8 * 0.4 + BUSINESS:0.8 * 0.3 + HIGH:0.9 * 0.2 = 0.83)
 CoT Pattern: Tree of Thoughts + Auto-CoT (hybrid)
 Configuration: branches=4, depth=5, num_examples=4
 ```
@@ -312,7 +302,7 @@ Intent: VALIDATE + ANALYZE
 Context: TECHNICAL
 Complexity: MEDIUM (domain-specific, multiple aspects)
 
-Thinking Type: ANALYTICAL (VALIDATE:0.9 * 0.4 + TECHNICAL:0.9 * 0.3 + MEDIUM:0.9 * 0.3 = 0.87)
+Thinking Type: ANALYTICAL (VALIDATE:0.9 * 0.4 + TECHNICAL:0.9 * 0.3 + MEDIUM:0.9 * 0.2 = 0.87)
 CoT Pattern: Few-Shot CoT (ANALYTICAL + MEDIUM)
 Configuration: num_examples=3
 ```
@@ -330,8 +320,8 @@ def is_compatible(intent, domain):
         'ANALYZE': ['TECHNICAL', 'BUSINESS', 'SCIENTIFIC', 'SYSTEMIC'],
         'DESIGN': ['TECHNICAL', 'CREATIVE', 'BUSINESS'],
         'SOLVE': ['TECHNICAL', 'SYSTEMIC', 'SCIENTIFIC'],
-        'VALIDATE': ['TECHNICAL', 'BUSINESS', 'ETHICAL'],
-        'DECIDE': ['BUSINESS', 'ETHICAL', 'STRATEGIC'],
+        'VALIDATE': ['TECHNICAL', 'BUSINESS'],
+        'DECIDE': ['BUSINESS', 'SYSTEMIC'],
         'EXPLAIN': ['ALL'],
         'PREDICT': ['BUSINESS', 'SCIENTIFIC', 'TECHNICAL'],
         'RESEARCH': ['SCIENTIFIC', 'TECHNICAL', 'BUSINESS']
@@ -344,7 +334,7 @@ def is_compatible(intent, domain):
 
 ## Version Information
 
-**Version**: 5.0.0
-**Last Updated**: 2026-08-06
-**Maintainer**: System Reasoning Consortium
-**Compatibility**: System Reasoning Brain v5.0+
+**Version:** 5.0.0
+**Last Updated:** 2026-08-22
+**Maintainer:** System Reasoning Consortium
+**Compatibility:** cot-resoning v5.0+

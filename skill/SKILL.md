@@ -123,14 +123,10 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   |------|-------------|----------|----------------|
   | STANDARD | Complete reasoning with self-dialogue and tool calls | Most problems | Full capability |
   | BASIC | Self-dialogue without tools | No tools available | Reasoning only |
-  | ENHANCED | Optimized for capable models | Models with reasoning | Enhanced patterns |
-  | MINIMAL | Simple step structure only | Simple problems | Basic guidance |
   
   **Mode Selection:**
   - STANDARD: Default for most problems (recommended)
-  - BASIC: When no tools are available
-  - ENHANCED: When model has native reasoning capability
-  - MINIMAL: For very simple problems
+  - BASIC: When no tools are available or for simpler reasoning tasks
   
   </reasoning_modes>
   
@@ -561,7 +557,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   
   **Flow ID:** [unique_identifier_timestamp]
   **Timestamp:** [ISO_8601_timestamp]
-  **Reasoning Mode:** [STANDARD|BASIC|ENHANCED|MINIMAL]
+  **Reasoning Mode:** [STANDARD|BASIC]
   **Thinking Type:** [ANALYTICAL|CREATIVE|CRITICAL|SYSTEMATIC]
   **Complexity:** [LOW|MEDIUM|HIGH|VERY_HIGH]
   **Steps:** [N]
