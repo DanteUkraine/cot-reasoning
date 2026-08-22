@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# System Flow Validator for System Reasoning Brain
+# System Flow Validator for cot-reasoning
 # 
 # Purpose: Validate that agentic reasoning flows conform to the required structure
 #          and quality standards for models without native reasoning (, etc.)
@@ -34,7 +34,7 @@ set -euo pipefail
 
 SCRIPT_NAME="validate-system-flow.sh"
 VERSION="5.0.0"
-SKILL_NAME="cot-resoning"
+SKILL_NAME="cot-reasoning"
 
 # Colors
 RED='\033[0;31m'
@@ -83,7 +83,7 @@ ${SKILL_NAME} - System Flow Validator v${VERSION}
 
 Usage: $SCRIPT_NAME [OPTIONS] <input>
 
-Validate agentic reasoning flows for the System Reasoning Brain.
+Validate agentic reasoning flows for the cot-reasoning.
 
 Options:
   -s, --single    Validate a single flow file (markdown)
@@ -464,15 +464,15 @@ validate_fallbacks() {
     ((CHECKED++))
 }
 
-# Validate for cot-resoning specific requirements
+# Validate for cot-reasoning specific requirements
 validate_cot_resoning_requirements() {
     local content="$1"
     
-    log_header "Checking cot-resoning Specific Requirements"
+    log_header "Checking cot-reasoning Specific Requirements"
     
     # Check if mode is STANDARD
     if grep -q "Agentic Mode: STANDARD" <<< "$content"; then
-        log_success "Mode is STANDARD (recommended for cot-resoning)"
+        log_success "Mode is STANDARD (recommended for cot-reasoning)"
         ((PASSED++))
         
         # For STANDARD, tools should be used
@@ -494,7 +494,7 @@ validate_cot_resoning_requirements() {
             fi
         fi
     else
-        log_warning "Mode is not STANDARD (not optimized for cot-resoning)"
+        log_warning "Mode is not STANDARD (not optimized for cot-reasoning)"
     fi
     
     ((CHECKED++))

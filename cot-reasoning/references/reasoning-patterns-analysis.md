@@ -1,8 +1,8 @@
-# Reasoning Patterns - cot-resoning
+# Reasoning Patterns - cot-reasoning
 
 ## Overview
 
-In cot-resoning, **patterns are optional organizing principles**. The core mechanism is step-by-step execution with self-dialogue. Patterns provide useful structures for organizing reasoning steps in specific scenarios.
+In cot-reasoning, **patterns are optional organizing principles**. The core mechanism is step-by-step execution with self-dialogue. Patterns provide useful structures for organizing reasoning steps in specific scenarios.
 
 **Key Principle:** Patterns are SECONDARY. The step structure with self-dialogue is PRIMARY.
 
@@ -74,7 +74,7 @@ def select_pattern(complexity, tools_available):
 
 ## Key Insight
 
-In cot-resoning, **the step-by-step execution framework is what truly enables effective reasoning**. Patterns simply provide organizing principles for specific use cases. The core power comes from:
+In cot-reasoning, **the step-by-step execution framework is what truly enables effective reasoning**. Patterns simply provide organizing principles for specific use cases. The core power comes from:
 
 1. Step-by-step execution
 2. Self-dialogue for transparency
@@ -89,4 +89,4 @@ Patterns are useful but not essential. Focus on the step structure first, then c
 
 **Version:** 5.0.0
 **Last Updated:** 2026-08-22
-**Compatibility:** cot-resoning v5.0+
+**Compatibility:** cot-reasoning v5.0+

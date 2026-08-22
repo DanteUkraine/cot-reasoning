@@ -1,10 +1,10 @@
-# cot-resoning Capabilities Reference
+# cot-reasoning Capabilities Reference
 
 ## Overview
 
-This document describes the cot-resoning framework's approach to enhancing model reasoning capabilities.
+This document describes the cot-reasoning framework's approach to enhancing model reasoning capabilities.
 
-cot-resoning v5.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
+cot-reasoning v5.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
 
 **Key Principle:** The skill provides a reasoning structure that guides the model's native capabilities; the model processes and enhances this structure using its own reasoning abilities.
 
@@ -31,7 +31,7 @@ For models without tool-calling:
 
 ---
 
-## cot-resoning Profile
+## cot-reasoning Profile
 
 ### Capabilities Provided
 - **Reasoning Structure:** Step-by-step framework for complex problem-solving
@@ -40,7 +40,7 @@ For models without tool-calling:
 - **Context Utilization:** Effective use of available context window
 - **Process Efficiency:** Streamlined step-by-step execution
 
-### Recommended Configuration for cot-resoning
+### Recommended Configuration for cot-reasoning
 ```yaml
 mode: STANDARD
 self_dialogue_depth: MEDIUM (4-5 exchanges)
@@ -50,9 +50,9 @@ validation: STRICT
 fallback: GRACEFUL
 ```
 
-### How cot-resoning Enhances Model Capabilities
+### How cot-reasoning Enhances Model Capabilities
 
-| Model Limitation | cot-resoning Enhancement |
+| Model Limitation | cot-reasoning Enhancement |
 |----------------|---------------------------|
 | Limited reasoning chain length | Step-by-step structure maintains reasoning across context |
 | Weak hypothesis generation | Explicit hypothesis generation prompts in analysis steps |
@@ -64,7 +64,7 @@ fallback: GRACEFUL
 
 ## Tool-Calling Capabilities
 
-| Tool | Purpose | cot-resoning Usage |
+| Tool | Purpose | cot-reasoning Usage |
 |------|---------|-------------------|
 | file_read | Read file contents | Data collection, document analysis |
 | file_write | Write file contents | Solution implementation, documentation |
@@ -98,8 +98,8 @@ For **compatible models** (those with tool-calling and reasoning capabilities):
 
 ## Key Insight
 
-With cot-resoning, **compatible models can perform complex reasoning tasks more effectively** by leveraging a structured framework that guides their native capabilities.
+With cot-reasoning, **compatible models can perform complex reasoning tasks more effectively** by leveraging a structured framework that guides their native capabilities.
 
-**For compatible models:** cot-resoning provides an enhancing reasoning structure that, combined with the model's native abilities, enables more effective complex task performance.
+**For compatible models:** cot-reasoning provides an enhancing reasoning structure that, combined with the model's native abilities, enables more effective complex task performance.
 
 **Core Principle:** The skill PROVIDES a reasoning framework. The model PROCESSES this framework using its native capabilities. Together, they achieve enhanced reasoning performance.

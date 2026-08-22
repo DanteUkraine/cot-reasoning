@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-resoning v5.0.
+This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.0.
 
 ---
 
@@ -337,4 +337,4 @@ def is_compatible(intent, domain):
 **Version:** 5.0.0
 **Last Updated:** 2026-08-22
 **Maintainer:** System Reasoning Consortium
-**Compatibility:** cot-resoning v5.0+
+**Compatibility:** cot-reasoning v5.0+

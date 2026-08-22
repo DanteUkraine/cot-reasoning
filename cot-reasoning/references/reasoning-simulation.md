@@ -1,8 +1,8 @@
-# Reasoning Framework - cot-resoning
+# Reasoning Framework - cot-reasoning
 
 ## Overview
 
-**Core Concept:** cot-resoning provides a structured framework that enhances model reasoning capabilities for complex, multi-step tasks.
+**Core Concept:** cot-reasoning provides a structured framework that enhances model reasoning capabilities for complex, multi-step tasks.
 
 **Primary Function:** Provide a reasoning framework that guides models through complex problem-solving, enabling them to leverage their native capabilities more effectively.
 
@@ -15,15 +15,15 @@
 
 ---
 
-## cot-resoning Framework
+## cot-reasoning Framework
 
 ### Core Principle
 
 ```
 MODEL WITH LIMITED REASONING + COMPLEX TASK = Benefits from external thinking structure
-cot-resoning + COMPATIBLE MODEL = Enhanced reasoning capability
+cot-reasoning + COMPATIBLE MODEL = Enhanced reasoning capability
 
-Solution: cot-resoning provides a structured reasoning framework
+Solution: cot-reasoning provides a structured reasoning framework
 Result: Compatible models perform complex reasoning tasks more effectively
 ```
 

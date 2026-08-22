@@ -1,15 +1,15 @@
 ---
-name: cot-resoning
+name: cot-reasoning
 description: A structured reasoning framework that provides step-by-step thinking chains for complex problem-solving, enabling models to perform multi-step analysis with self-dialogue, tool integration, and intermediate result tracking.
 compatibility: ["mistral-vibe", "crewai", "autogen", "langchain", "llama-index"]
 metadata:
   author: system-reasoning-consortium
   version: "5.0.0"
-  last_updated: "2026-08-06"
+  last_updated: "2026-08-22"
   category: reasoning
   complexity: universal
   maturity: production-ready
-  tags: "reasoning system-brain engineering complex-systems universal thinking-chain self-dialogue tool-integration"
+  tags: "reasoning cot-reasoning engineering complex-systems universal thinking-chain self-dialogue tool-integration"
   invocation: both
   auto-detection: "(analyze|evaluate|assess|audit|diagnose|investigate|solve|fix|debug|troubleshoot|resolve|design|architect|validate|verify|compare|decide|prioritize|rank|optimize|forecast|estimate)"
   allowed-tools: ["web_search", "code_analyzer", "file_read", "file_write"]
@@ -17,7 +17,7 @@ metadata:
 ---
 
 <purpose>
-cot-resoning: Provides a structured reasoning framework that enhances model capabilities for complex, multi-step problem-solving.
+cot-reasoning: Provides a structured reasoning framework that enhances model capabilities for complex, multi-step problem-solving.
 
 CORE VALUE PROPOSITION:
 - For models with tool-calling: Enables effective data gathering and analysis
@@ -32,9 +32,9 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 <references>
 | Reference | File | Purpose |
 |-----------|------|---------|
-| Core reasoning simulation mechanics | `references/reasoning-simulation.md` | Framework architecture |
+| Core reasoning framework | `references/reasoning-simulation.md` | Framework architecture |
 | Intent detection and context classification | `references/intent-context-matrix.md` | Problem understanding |
-| Pattern organization and flow structuring | `references/reasoning-patterns-analysis.md` | Reasoning organization |
+| Pattern organization | `references/reasoning-patterns-analysis.md` | Reasoning organization |
 | Step execution templates | `templates/system-flows/step-execution-template.md` | Executable reasoning steps |
 | Self-dialogue generation | `templates/system-flows/self-dialogue-template.md` | Transparent reasoning |
 | Tool integration patterns | `templates/tool-integration/` | Data operations |
@@ -57,14 +57,14 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 <instructions>
 
   <reasoning_framework>
-  **CORE CONCEPT: cot-resoning ENHANCES Model Reasoning**
+  **CORE CONCEPT: cot-reasoning ENHANCES Model Reasoning**
   
   **The Challenge:**
   Models vary in their ability to perform complex, multi-step reasoning. Some models struggle
   to connect multiple ideas, maintain context across steps, or structure their thinking process.
   
   **The Solution:**
-  cot-resoning provides a structured framework that guides the model's reasoning. The skill
+  cot-reasoning provides a structured framework that guides the model's reasoning. The skill
   generates step-by-step reasoning chains with self-dialogue, tool integration, and result
   tracking. The model uses its native capabilities to process and enhance this structure.
   
@@ -76,17 +76,17 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   4. **Result Integration:** Intermediate results build toward the final solution
   5. **Output Delivery:** Structured, auditable reasoning chain is produced
   
-  **cot-resoning Framework:**
+  **cot-reasoning Framework:**
   ```
-  cot-resoning = Step Structure + Self-Dialogue + Tool Integration + Result Tracking
+  cot-reasoning = Step Structure + Self-Dialogue + Tool Integration + Result Tracking
   
-  MODEL + cot-resoning = Enhanced Reasoning Capability
+  MODEL + cot-reasoning = Enhanced Reasoning Capability
   ```
   
   **Model Compatibility:**
-  - Models WITH tool-calling: cot-resoning enables effective tool use
-  - Models WITH strong reasoning: cot-resoning provides enhanced structure
-  - Models WITH limited context: cot-resoning helps maintain reasoning chains
+  - Models WITH tool-calling: cot-reasoning enables effective tool use
+  - Models WITH strong reasoning: cot-reasoning provides enhanced structure
+  - Models WITH limited context: cot-reasoning helps maintain reasoning chains
   - Result: Compatible models perform complex reasoning more effectively
   
   <framework_components>
@@ -504,7 +504,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   <reasoning_pattern_system>
   Select pattern for organizing reasoning steps.
   
-  **Note:** In cot-resoning, patterns are secondary to the step structure.
+  **Note:** In cot-reasoning, patterns are secondary to the step structure.
   Patterns provide organizing principles, but the step-by-step execution is primary.
   
   | Pattern | Best For | Step Structure | Tool Usage |
@@ -523,7 +523,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   </reasoning_pattern_system>
 
   <input_output_system>
-  **STANDARDIZED cot-resoning OUTPUT**
+  **STANDARDIZED cot-reasoning OUTPUT**
   
   <input_requirements>
   
@@ -630,7 +630,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   - **Actionability:** [X/10]
   
   ### Meta Information
-  **Generated By:** System Reasoning Brain v5.0.0
+  **Generated By:** cot-reasoning v5.0.0
   **Pattern:** [pattern_name]
   **Performance Notes:** [any_considerations]
   ```
@@ -668,14 +668,14 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 </verify>
 
 <notes>
-  - **cot-resoning Concept**: The skill provides a reasoning framework that enhances model capabilities
+  - **cot-reasoning Concept**: The skill provides a reasoning framework that enhances model capabilities
   - **Compatibility**: Works with compatible LLMs, particularly those with tool-calling support
   - **Step Structure**: Every problem decomposed into executable steps
   - **Self-Dialogue**: Makes reasoning process transparent and auditable
   - **Tool Integration**: Enables data operations for comprehensive analysis
   - **Result Tracking**: Maintains complete audit trail of reasoning process
   
-  **cot-resoning Benefits:**
+  **cot-reasoning Benefits:**
   - Compatible models perform complex reasoning tasks more effectively
   - Complete reasoning chains with full traceability
   - Structured output for easy parsing and integration

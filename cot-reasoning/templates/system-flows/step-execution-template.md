@@ -9,7 +9,7 @@ recommended_for: all-problems
 
 ## Purpose
 
-This template defines the **standard structure for all reasoning steps** in the System Reasoning Brain. Every complex problem is decomposed into steps following this universal format.
+This template defines the **standard structure for all reasoning steps** in the cot-reasoning. Every complex problem is decomposed into steps following this universal format.
 
 **Key Principle:** Each step is a **self-contained, executable unit** that contributes to the overall reasoning flow.
 

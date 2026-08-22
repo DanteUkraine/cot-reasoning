@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "skill": "system-reasoning-brain",
+    "skill": "cot-reasoning",
     "version": "5.0.0",
     "last_updated": "2026-08-06",
     "purpose": "Real-world examples demonstrating system reasoning for ANY model",
@@ -304,7 +304,7 @@
   },
   
   "compatibility": {
-    "cot-resoning": {
+    "cot-reasoning": {
       "total_examples": 4,
       "recommended_mode": "STANDARD or BASIC based on tool availability",
       "expected_improvement": "Better structured reasoning for compatible models",
