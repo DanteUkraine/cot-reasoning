@@ -1,51 +1,7 @@
 ---
-name: system-reasoning-brain
-description: |
-  SYSTEM REASONING BRAIN - The central thinking system that enables ANY model to perform
-  complex, multi-step reasoning by providing structured thinking chains with self-dialogue,
-  tool integration, and intermediate result tracking.
-  
-  CORE FUNCTION: Acts as the "system brain" that compensates for limitations in models
-  that cannot build complex reasoning chains natively. Provides the complete reasoning
-  structure that transforms any model into a capable reasoning agent.
-  
-  WHEN TO ACTIVATE:
-  - Complex problems requiring multi-step analysis, reasoning, or decision-making
-  - Tasks needing systematic thinking, decomposition, and structured execution
-  - Any request where the model would benefit from explicit reasoning guidance
-  - Engineering tasks requiring system-level thinking and planning
-  
-  WHEN NOT TO ACTIVATE:
-  - Simple factual questions with direct answers
-  - Trivial tasks requiring no analysis or reasoning
-  - Greetings, small talk, or single-word inputs
-  - Input shorter than 10 characters
-  
-  MANDATORY INPUTS:
-  - Problem statement, question, or task description (minimum 10 characters)
-  - Clear intent requiring reasoning, analysis, or problem-solving
-  
-  CORE ACTION:
-  - Analyze problem and generate structured reasoning flow
-  - Decompose into executable steps with explicit dependencies
-  - Generate self-dialogue for transparent reasoning process
-  - Integrate tool calls for data operations
-  - Track intermediate results for auditability
-  - Produce structured, actionable output
-  
-  SYSTEM BRAIN PRINCIPLE:
-  The skill IS the brain. The model is the executor.
-  The skill provides the complete reasoning structure; the model simply follows instructions.
-  Result: Any model can perform complex reasoning tasks as effectively as a system engineer.
-  
-  STATE-MUTATION: Generates structured reasoning flows and may invoke tools.
-  
-  UNIVERSAL COMPATIBILITY:
-  - Works with ANY LLM framework or system
-  - Provides reasoning structure for models that lack native reasoning
-  - Enhances reasoning for models with native capability
-  - No model-specific adaptations required
-compatibility: ALL Agent Skills Open Standard v1 compliant systems, any LLM framework, any agent system
+name: cot-resoning
+description: A structured reasoning framework that provides step-by-step thinking chains for complex problem-solving, enabling models to perform multi-step analysis with self-dialogue, tool integration, and intermediate result tracking.
+compatibility: ["mistral-vibe", "crewai", "autogen", "langchain", "llama-index"]
 metadata:
   author: system-reasoning-consortium
   version: "5.0.0"
@@ -55,37 +11,35 @@ metadata:
   maturity: production-ready
   tags: "reasoning system-brain engineering complex-systems universal thinking-chain self-dialogue tool-integration"
   invocation: both
-  auto-detection: "(analyze|evaluate|assess|review|examine|audit|diagnose|investigate|solve|fix|debug|troubleshoot|resolve|design|architect|create|build|develop|invent|draft|outline|validate|verify|test|confirm|check|ensure|compare|select|choose|decide|prioritize|rank|approve|explain|describe|understand|clarify|elaborate|define|predict|forecast|estimate|optimize|improve|enhance|research|explore|study|gather)"
-  allowed-tools: web_search,code_analyzer,file_read,file_write
-  model_requirements: "Any LLM - universal reasoning structure provider"
+  auto-detection: "(analyze|evaluate|assess|audit|diagnose|investigate|solve|fix|debug|troubleshoot|resolve|design|architect|validate|verify|compare|decide|prioritize|rank|optimize|forecast|estimate)"
+  allowed-tools: ["web_search", "code_analyzer", "file_read", "file_write"]
+  model_requirements: "LLMs with tool-calling capability and reasoning abilities"
 ---
 
 <purpose>
-SYSTEM REASONING BRAIN: Enable ANY Large Language Model to perform complex, system-level reasoning
-by providing a complete thinking framework that compensates for any limitations in native reasoning capability.
+cot-resoning: Provides a structured reasoning framework that enhances model capabilities for complex, multi-step problem-solving.
 
 CORE VALUE PROPOSITION:
-- For models that CANNOT reason natively: Provides the complete reasoning structure
-- For models that CAN reason natively: Enhances with better structure, transparency, and tool integration
-- For ALL models: Enables system-level thinking for complex engineering tasks
+- For models with tool-calling: Enables effective data gathering and analysis
+- For models with reasoning abilities: Provides structure for better organization and clarity
+- For all compatible models: Enhances complex task performance through guided reasoning
 
-RESULT: Every model can perform as a system engineer, building and analyzing complex systems
-through structured, auditable reasoning chains.
+RESULT: Compatible models can perform multi-step reasoning tasks more effectively, building and analyzing complex systems through structured, auditable reasoning chains.
 
-This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers reasoning for any model.
+This is a reasoning framework that enhances model capabilities, not a replacement for native reasoning.
 </purpose>
 
 <references>
 | Reference | File | Purpose |
 |-----------|------|---------|
-| Core reasoning simulation mechanics | `references/reasoning-simulation.md` | System brain architecture |
+| Core reasoning simulation mechanics | `references/reasoning-simulation.md` | Framework architecture |
 | Intent detection and context classification | `references/intent-context-matrix.md` | Problem understanding |
 | Pattern organization and flow structuring | `references/reasoning-patterns-analysis.md` | Reasoning organization |
 | Step execution templates | `templates/system-flows/step-execution-template.md` | Executable reasoning steps |
 | Self-dialogue generation | `templates/system-flows/self-dialogue-template.md` | Transparent reasoning |
 | Tool integration patterns | `templates/tool-integration/` | Data operations |
 | Thinking type frameworks | `templates/thinking-types/` | Domain-specific reasoning |
-| System reasoning examples | `assets/system-examples.json` | Real-world usage patterns |
+| Reasoning examples | `assets/system-examples.json` | Real-world usage patterns |
 | Validation and verification | `scripts/validate-system-flow.sh` | Quality assurance |
 </references>
 
@@ -102,38 +56,40 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
 
 <instructions>
 
-  <system_brain_architecture>
-  **CORE CONCEPT: The Skill IS the Brain, the Model is the Executor**
+  <reasoning_framework>
+  **CORE CONCEPT: cot-resoning ENHANCES Model Reasoning**
   
-  **The Problem:**
-  Some models cannot build complex reasoning chains, connect multiple ideas, or maintain
-  multi-step thinking processes. This limits their effectiveness for system engineering tasks.
+  **The Challenge:**
+  Models vary in their ability to perform complex, multi-step reasoning. Some models struggle
+  to connect multiple ideas, maintain context across steps, or structure their thinking process.
   
   **The Solution:**
-  The System Reasoning Brain provides the complete thinking structure. The model doesn't need
-  to reason - it just needs to follow the structured instructions provided by the skill.
+  cot-resoning provides a structured framework that guides the model's reasoning. The skill
+  generates step-by-step reasoning chains with self-dialogue, tool integration, and result
+  tracking. The model uses its native capabilities to process and enhance this structure.
   
   **How It Works:**
   
-  1. **System Brain Activation:** When a complex problem is detected, the skill activates
-  2. **Thinking Structure Generation:** The skill creates a complete reasoning flow
-  3. **Step Execution:** The model follows each step like a recipe
-  4. **Result Aggregation:** Intermediate results build toward final solution
+  1. **Input Analysis:** When a complex problem is detected, the skill analyzes the request
+  2. **Structure Generation:** The skill creates a reasoning flow with explicit steps
+  3. **Step Processing:** The model follows each step, applying its reasoning to the structure
+  4. **Result Integration:** Intermediate results build toward the final solution
   5. **Output Delivery:** Structured, auditable reasoning chain is produced
   
-  **System Brain Formula:**
+  **cot-resoning Framework:**
   ```
-  SYSTEM BRAIN = Step Structure + Self-Dialogue + Tool Integration + Result Tracking
+  cot-resoning = Step Structure + Self-Dialogue + Tool Integration + Result Tracking
   
-  MODEL + SYSTEM BRAIN = Capable Reasoning Agent
+  MODEL + cot-resoning = Enhanced Reasoning Capability
   ```
   
-  **For Any Model:**
-  - Models WITHOUT native reasoning: System Brain provides ALL reasoning capability
-  - Models WITH native reasoning: System Brain provides ENHANCED reasoning capability
-  - Result: ALL models can perform complex system engineering tasks
+  **Model Compatibility:**
+  - Models WITH tool-calling: cot-resoning enables effective tool use
+  - Models WITH strong reasoning: cot-resoning provides enhanced structure
+  - Models WITH limited context: cot-resoning helps maintain reasoning chains
+  - Result: Compatible models perform complex reasoning more effectively
   
-  <brain_components>
+  <framework_components>
   
   **Component 1: Reasoning Flow Generator**
   - Input: Problem statement
@@ -159,7 +115,7 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   - Building: Intermediate results carry forward to subsequent steps
   - Verification: Objective checks at each step ensure quality
   
-  </brain_components>
+  </framework_components>
   
   <reasoning_modes>
   
@@ -178,7 +134,7 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   
   </reasoning_modes>
   
-  </system_brain_architecture>
+  </reasoning_framework>
 
   <step_structure_system>
   **CORE: Universal Step Execution Framework**
@@ -511,10 +467,8 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   |------|----------|-----------|-------------------|
   | ANALYTICAL | Structured problems, data analysis, technical evaluation | Precision, thoroughness | Step-by-step data analysis |
   | CREATIVE | Innovation, design, brainstorming, novel solutions | Idea generation, exploration | Divergent thinking + convergence |
-  | CRITICAL | Validation, argument analysis, risk assessment, QA | Flaw detection, quality | Hypothesis testing + verification |
-  | SYSTEMATIC | Process optimization, troubleshooting, system design | Reliability, repeatability | Sequential cause-effect analysis |
-  | ETHICAL | Policy, compliance, social impact, moral decisions | Moral consideration | Stakeholder analysis + principles |
-  | STRATEGIC | Long-term planning, business strategy, resource allocation | Competitive awareness | Scenario analysis + trade-offs |
+  | CRITICAL | Validation, argument analysis, risk assessment, QA, ethical considerations | Flaw detection, quality assessment | Hypothesis testing + verification |
+  | SYSTEMATIC | Process optimization, troubleshooting, system design, strategic planning | Reliability, repeatability, long-term thinking | Sequential cause-effect analysis |
   
   <type_selection_algorithm>
   
@@ -528,20 +482,16 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   |------|---------|--------|-------|----------|--------|---------|---------|----------|
   | ANALYTICAL | 0.9 | 0.7 | 0.8 | 0.9 | 0.8 | 0.8 | 0.8 | 0.7 |
   | CREATIVE | 0.6 | 0.9 | 0.7 | 0.6 | 0.7 | 0.6 | 0.7 | 0.8 |
-  | CRITICAL | 0.8 | 0.6 | 0.7 | 0.9 | 0.8 | 0.7 | 0.7 | 0.8 |
-  | SYSTEMATIC | 0.8 | 0.7 | 0.9 | 0.8 | 0.7 | 0.7 | 0.8 | 0.9 |
-  | ETHICAL | 0.7 | 0.6 | 0.6 | 0.8 | 0.9 | 0.7 | 0.7 | 0.7 |
-  | STRATEGIC | 0.7 | 0.8 | 0.7 | 0.7 | 0.9 | 0.8 | 0.8 | 0.6 |
+  | CRITICAL | 0.8 | 0.7 | 0.7 | 0.9 | 0.8 | 0.7 | 0.7 | 0.8 |
+  | SYSTEMATIC | 0.8 | 0.8 | 0.9 | 0.8 | 0.8 | 0.7 | 0.8 | 0.9 |
   
   **Context Fit (0-1):**
-  | Type | TECHNICAL | BUSINESS | CREATIVE | ETHICAL | SYSTEMIC | SCIENTIFIC |
-  |------|-----------|----------|----------|---------|----------|-----------|
-  | ANALYTICAL | 0.9 | 0.8 | 0.6 | 0.8 | 0.8 | 0.9 |
-  | CREATIVE | 0.7 | 0.7 | 0.9 | 0.6 | 0.7 | 0.7 |
-  | CRITICAL | 0.8 | 0.8 | 0.6 | 0.9 | 0.7 | 0.8 |
-  | SYSTEMATIC | 0.9 | 0.7 | 0.6 | 0.7 | 0.9 | 0.8 |
-  | ETHICAL | 0.7 | 0.8 | 0.6 | 0.9 | 0.7 | 0.7 |
-  | STRATEGIC | 0.6 | 0.9 | 0.8 | 0.8 | 0.7 | 0.7 |
+  | Type | TECHNICAL | BUSINESS | CREATIVE | SYSTEMIC | SCIENTIFIC |
+  |------|-----------|----------|----------|----------|-----------|
+  | ANALYTICAL | 0.9 | 0.8 | 0.6 | 0.8 | 0.9 |
+  | CREATIVE | 0.7 | 0.7 | 0.9 | 0.7 | 0.7 |
+  | CRITICAL | 0.8 | 0.8 | 0.6 | 0.8 | 0.8 |
+  | SYSTEMATIC | 0.9 | 0.8 | 0.7 | 0.9 | 0.8 |
   
   **Complexity Fit (0-1):**
   | Type | LOW | MEDIUM | HIGH | VERY_HIGH |
@@ -550,8 +500,6 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   | CREATIVE | 0.6 | 0.8 | 0.9 | 0.9 |
   | CRITICAL | 0.7 | 0.8 | 0.9 | 0.8 |
   | SYSTEMATIC | 0.8 | 0.9 | 0.9 | 0.8 |
-  | ETHICAL | 0.6 | 0.8 | 0.9 | 0.9 |
-  | STRATEGIC | 0.6 | 0.8 | 0.9 | 0.9 |
   
   </type_selection_algorithm>
   
@@ -560,7 +508,7 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   <reasoning_pattern_system>
   Select pattern for organizing reasoning steps.
   
-  **Note:** In System Reasoning Brain, patterns are secondary to the step structure.
+  **Note:** In cot-resoning, patterns are secondary to the step structure.
   Patterns provide organizing principles, but the step-by-step execution is primary.
   
   | Pattern | Best For | Step Structure | Tool Usage |
@@ -579,7 +527,7 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   </reasoning_pattern_system>
 
   <input_output_system>
-  **STANDARDIZED SYSTEM BRAIN OUTPUT**
+  **STANDARDIZED cot-resoning OUTPUT**
   
   <input_requirements>
   
@@ -609,12 +557,12 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
   
   **MANDATORY STRUCTURE:**
   ```markdown
-  ## System Reasoning Flow: [Brief Problem Summary]
+  ## Reasoning Flow: [Brief Problem Summary]
   
   **Flow ID:** [unique_identifier_timestamp]
   **Timestamp:** [ISO_8601_timestamp]
   **Reasoning Mode:** [STANDARD|BASIC|ENHANCED|MINIMAL]
-  **Thinking Type:** [ANALYTICAL|CREATIVE|CRITICAL|SYSTEMATIC|ETHICAL|STRATEGIC]
+  **Thinking Type:** [ANALYTICAL|CREATIVE|CRITICAL|SYSTEMATIC]
   **Complexity:** [LOW|MEDIUM|HIGH|VERY_HIGH]
   **Steps:** [N]
   
@@ -712,32 +660,28 @@ This is not just a reasoning assistant - this is the SYSTEM BRAIN that powers re
 **Commands:**
 ```bash
 # Validate single flow
-/srb-validate --input="[user_request]"
+./scripts/validate-system-flow.sh -s [flow_file.md]
 
 # Validate complete flow
-/srb-validate --full
+./scripts/validate-system-flow.sh -d [directory/]
 
-# Force specific mode
-/srb --mode=STANDARD --input="[query]"
-
-# Force specific pattern
-/srb --pattern=ReAct --input="[query]"
+# Force specific mode (example)
+# Modes: STANDARD, BASIC
 ```
 
 </verify>
 
 <notes>
-  - **System Brain Concept**: The skill provides the complete reasoning structure for any model
-  - **Universal Compatibility**: Works with ANY LLM, regardless of native capabilities
+  - **cot-resoning Concept**: The skill provides a reasoning framework that enhances model capabilities
+  - **Compatibility**: Works with compatible LLMs, particularly those with tool-calling support
   - **Step Structure**: Every problem decomposed into executable steps
   - **Self-Dialogue**: Makes reasoning process transparent and auditable
   - **Tool Integration**: Enables data operations for comprehensive analysis
   - **Result Tracking**: Maintains complete audit trail of reasoning process
   
-  **SYSTEM BRAIN GUARANTEE:**
-  - ANY model can perform complex reasoning tasks
+  **cot-resoning Benefits:**
+  - Compatible models perform complex reasoning tasks more effectively
   - Complete reasoning chains with full traceability
-  - Universal compatibility - no model limitations
   - Structured output for easy parsing and integration
   - Quality metrics for every reasoning flow
   - Auditable reasoning process for all stakeholders

@@ -33,8 +33,8 @@ set -euo pipefail
 # =============================================================================
 
 SCRIPT_NAME="validate-system-flow.sh"
-VERSION="4.0.0"
-SKILL_NAME="System Reasoning Brain"
+VERSION="5.0.0"
+SKILL_NAME="cot-resoning"
 
 # Colors
 RED='\033[0;31m'
@@ -127,10 +127,10 @@ validate_required_sections() {
     log_header "Checking Required Sections"
     
     local required_sections=(
-        "Agentic Reasoning Flow:"
+        "Reasoning Flow:"
         "Flow ID:"
         "Timestamp:"
-        "Agentic Mode:"
+        "Reasoning Mode:"
         "Configuration"
         "Problem Analysis"
         "Reasoning Steps"
@@ -174,21 +174,21 @@ validate_flow_metadata() {
     
     # Check Agentic Mode
     local valid_modes=("STANDARD" "BASIC" "ENHANCED" "MINIMAL")
-    if grep -q "Agentic Mode:" <<< "$content"; then
-        local mode=$(grep "Agentic Mode:" <<< "$content" | head -1 | sed 's/.*Agentic Mode: *//')
+    if grep -q "Reasoning Mode:" <<< "$content"; then
+        local mode=$(grep "Reasoning Mode:" <<< "$content" | head -1 | sed 's/.*Reasoning Mode: *//')
         if [[ " ${valid_modes[*]} " =~ " ${mode} " ]]; then
-            log_success "Agentic Mode is valid: $mode"
+            log_success "Reasoning Mode is valid: $mode"
             ((PASSED++))
         else
-            log_error "Invalid Agentic Mode: $mode (must be one of: ${valid_modes[*]})"
+            log_error "Invalid Reasoning Mode: $mode (must be one of: ${valid_modes[*]})"
         fi
     else
-        log_error "Agentic Mode is missing"
+        log_error "Reasoning Mode is missing"
     fi
     ((CHECKED++))
     
     # Check Thinking Type
-    local valid_thinking_types=("ANALYTICAL" "CREATIVE" "CRITICAL" "SYSTEMATIC" "ETHICAL" "STRATEGIC")
+    local valid_thinking_types=("ANALYTICAL" "CREATIVE" "CRITICAL" "SYSTEMATIC")
     if grep -q "Thinking Type:" <<< "$content"; then
         local thinking_type=$(grep "Thinking Type:" <<< "$content" | head -1 | sed 's/.*Thinking Type: *//')
         if [[ " ${valid_thinking_types[*]} " =~ " ${thinking_type} " ]]; then
@@ -464,14 +464,15 @@ validate_fallbacks() {
     ((CHECKED++))
 }
 
-# Validate for  specific requirements
+# Validate for cot-resoning specific requirements
+validate_cot_resoning_requirements() {
     local content="$1"
     
-    log_header "Checking  Specific Requirements"
+    log_header "Checking cot-resoning Specific Requirements"
     
     # Check if mode is STANDARD
     if grep -q "Agentic Mode: STANDARD" <<< "$content"; then
-        log_success "Mode is STANDARD (recommended for )"
+        log_success "Mode is STANDARD (recommended for cot-resoning)"
         ((PASSED++))
         
         # For STANDARD, tools should be used
@@ -493,7 +494,7 @@ validate_fallbacks() {
             fi
         fi
     else
-        log_warning "Mode is not STANDARD (not optimized for )"
+        log_warning "Mode is not STANDARD (not optimized for cot-resoning)"
     fi
     
     ((CHECKED++))
@@ -571,6 +572,7 @@ validate_file() {
         validate_quality_metrics "$content"
         validate_recommendations "$content"
         validate_fallbacks "$content"
+        validate_cot_resoning_requirements "$content"
     else
         validate_json_structure "$file"
     fi

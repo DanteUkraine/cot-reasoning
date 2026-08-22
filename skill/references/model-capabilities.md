@@ -1,46 +1,46 @@
-# System Brain Capabilities Reference - System Reasoning Brain
+# cot-resoning Capabilities Reference
 
 ## Overview
 
-**IMPORTANT: This document defines the System Reasoning Brain's universal approach.**
+This document describes the cot-resoning framework's approach to enhancing model reasoning capabilities.
 
-The System Reasoning Brain (SRB) v5.0 provides a **universal reasoning framework** that works with ANY Large Language Model, regardless of its native reasoning capabilities.
+cot-resoning v5.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
 
-**Key Principle:** The skill provides the complete reasoning structure; the model executes the steps.
+**Key Principle:** The skill provides a reasoning structure that guides the model's native capabilities; the model processes and enhances this structure using its own reasoning abilities.
 
 ---
 
-## Universal Compatibility
+## Compatibility
 
 ### Supported Model Categories
 
-| Model Category | Reasoning Capability | Tool-Calling | System Mode | Optimization |
-|---------------|---------------------|--------------|-------------|--------------|
-| **Any LLM with Tool-Calling** | Varies | Yes | STANDARD | **OPTIMAL** |
-| **Any LLM without Tool-Calling** | Varies | No | BASIC | Works well |
-| **Models with Native Reasoning** | Yes | Varies | ENHANCED | Enhanced structure |
+| Model Category | Reasoning Capability | Tool-Calling | Recommended Mode | Expected Performance |
+|---------------|---------------------|--------------|------------------|-------------------|
+| **LLMs with Tool-Calling** | Varies | Yes | STANDARD | **Optimal** |
+| **LLMs without Tool-Calling** | Varies | No | BASIC | Works well |
+| **Models with Strong Native Reasoning** | High | Varies | STANDARD | Enhanced structure |
 
-### System Mode Selection Algorithm
+### Mode Selection Algorithm
 
 For models with tool-calling capability:
 - IF tools exist and are relevant → **STANDARD**
 - ELSE → **BASIC**
 
-For models with native reasoning:
-- → **ENHANCED**
+For models without tool-calling:
+- → **BASIC** (self-dialogue only, no tool integration)
 
 ---
 
-## System Brain Profile (PRIMARY FUNCTION)
+## cot-resoning Profile
 
-### Capabilities Provided by SRB
-- **Native Reasoning Compensation:** Complete reasoning structure for models without native capability
+### Capabilities Provided
+- **Reasoning Structure:** Step-by-step framework for complex problem-solving
 - **Tool-Calling Optimization:** Excellent tool integration and parameter generation
-- **Instruction Following:** Clear, structured instructions that any model can follow
-- **Context Utilization:** Maximum effective use of available context window
-- **Speed:** Efficient step-by-step execution
+- **Instruction Guidance:** Clear, structured guidance that models can follow
+- **Context Utilization:** Effective use of available context window
+- **Process Efficiency:** Streamlined step-by-step execution
 
-### Optimal Configuration for System Reasoning Brain
+### Recommended Configuration for cot-resoning
 ```yaml
 mode: STANDARD
 self_dialogue_depth: MEDIUM (4-5 exchanges)
@@ -50,13 +50,13 @@ validation: STRICT
 fallback: GRACEFUL
 ```
 
-### How System Reasoning Brain Compensates for Model Limitations
+### How cot-resoning Enhances Model Capabilities
 
-| Limitation | SRB Compensation |
-|------------|------------------|
-| No native reasoning | Step-by-step reasoning structure + self-dialogue |
-| No hypothesis generation | Explicit hypothesis generation in analysis steps |
-| No multi-step planning | Pre-defined step sequences for common patterns |
+| Model Limitation | cot-resoning Enhancement |
+|----------------|---------------------------|
+| Limited reasoning chain length | Step-by-step structure maintains reasoning across context |
+| Weak hypothesis generation | Explicit hypothesis generation prompts in analysis steps |
+| Poor multi-step planning | Pre-defined step sequences for common patterns |
 | Limited context understanding | Explicit context analysis in early steps |
 | Poor tool integration | Structured tool calls with complete parameters |
 
@@ -64,8 +64,8 @@ fallback: GRACEFUL
 
 ## Tool-Calling Capabilities
 
-| Tool | Purpose | SRB Usage |
-|------|---------|-----------|
+| Tool | Purpose | cot-resoning Usage |
+|------|---------|-------------------|
 | file_read | Read file contents | Data collection, document analysis |
 | file_write | Write file contents | Solution implementation, documentation |
 | code_analyzer | Analyze code | Code review, debugging |
@@ -77,30 +77,29 @@ fallback: GRACEFUL
 
 ## Performance Expectations
 
-### Task Type Performance (Any Model + SRB)
-| Task Type | Quality | Success Rate |
-|-----------|---------|--------------|
-| Debugging | 85-95% | 98%+ |
-| Analysis | 80-90% | 95%+ |
-| Design | 75-85% | 90%+ |
-| Research | 90-95% | 98%+ |
-| Decision Making | 80-90% | 95%+ |
-| Code Review | 85-95% | 98%+ |
+### Expected Performance Improvements
 
-### Complexity Performance
-| Complexity | Quality | Success Rate |
-|------------|---------|--------------|
-| LOW | 95-100% | 98%+ |
-| MEDIUM | 90-95% | 95%+ |
-| HIGH | 80-85% | 90%+ |
-| VERY_HIGH | 70-80% | 85%+ |
+For **compatible models** (those with tool-calling and reasoning capabilities):
+
+- **Debugging tasks:** Significant improvement through structured investigation
+- **Analysis tasks:** Better organization and completeness of findings
+- **Design tasks:** More thorough consideration of options and constraints
+- **Research tasks:** More effective data gathering and synthesis
+- **Decision-making:** More systematic evaluation of alternatives
+- **Code Review:** More comprehensive and consistent reviews
+
+**Note:** Actual performance depends on:
+- Model capabilities (context window size, reasoning ability)
+- Task complexity
+- Available tools
+- Quality of input
 
 ---
 
 ## Key Insight
 
-With System Reasoning Brain, **the limitation is not the model's capability, but the quality of the reasoning framework provided**. SRB ensures that framework is always optimal, enabling any model to perform complex reasoning tasks effectively.
+With cot-resoning, **compatible models can perform complex reasoning tasks more effectively** by leveraging a structured framework that guides their native capabilities.
 
-**For ALL models:** System Reasoning Brain provides the complete reasoning structure, transforming any model into a capable reasoning agent.
+**For compatible models:** cot-resoning provides an enhancing reasoning structure that, combined with the model's native abilities, enables more effective complex task performance.
 
-**Core Principle:** The skill IS the brain. The model is the executor. Together, they form a complete system engineering capability.
+**Core Principle:** The skill PROVIDES a reasoning framework. The model PROCESSES this framework using its native capabilities. Together, they achieve enhanced reasoning performance.

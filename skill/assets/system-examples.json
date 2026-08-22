@@ -304,11 +304,11 @@
   },
   
   "compatibility": {
-    "universal": {
+    "cot-resoning": {
       "total_examples": 4,
       "recommended_mode": "STANDARD or BASIC based on tool availability",
-      "success_rate": "80-95%+",
-      "notes": "Works with ANY model - provides complete reasoning structure"
+      "expected_improvement": "Better structured reasoning for compatible models",
+      "notes": "Works with compatible models - provides reasoning framework guidance"
     }
   },
   
@@ -325,18 +325,11 @@
   ],
   
   "quality_benchmarks": {
-    "with_tools": {
-      "system_simulation_quality": "9.0-9.8/10",
-      "actionability": "9.5-10.0/10",
-      "completeness": "9.0-9.5/10",
-      "clarity": "9.0-9.5/10"
+    "expected_improvements": {
+      "with_tools": "Significant improvement in structured reasoning and tool utilization",
+      "no_tools": "Moderate improvement in reasoning organization and clarity"
     },
-    "no_tools": {
-      "system_simulation_quality": "8.0-8.5/10",
-      "actionability": "8.5-9.0/10",
-      "completeness": "8.0-8.5/10",
-      "clarity": "8.5-9.0/10"
-    }
+    "note": "Actual quality depends on model capabilities, task complexity, and input quality"
   },
   
   "usage_tips": {
