@@ -27,44 +27,44 @@ npx skills add DanteUkraine/cot-reasoning@cot-reasoning
 
 ### Automatic Activation
 
-The skill **auto-detects** when complex reasoning is needed and activates automatically:
+The skill activates based on its **description** when your request genuinely needs
+multi-step structured reasoning:
 
 ```
-User: "Our API is returning 500 errors, investigate and fix"
-→ System Reasoning Brain activates automatically
-→ Generates structured reasoning flow
-→ Executes with tool integration
+User: "Our API is returning 500 errors, investigate and find the root cause"
+→ cot-reasoning activates automatically (incident investigation signal)
+→ Generates a structured reasoning flow at the right mode
+→ Executes with category-first tool integration
 → Returns complete analysis with recommendations
 ```
 
-### Manual Activation
+Activation is gated: greetings, simple factual questions, single-word inputs, and
+trivial tasks do **not** activate the skill, and domain-fact requests route to the
+relevant domain skill instead.
 
-```bash
-# Using the skill command
-/cot-reasoning "Analyze this complex system architecture"
+### Explicit Activation
 
-# With specific mode
-/cot-reasoning --mode=STANDARD "Debug the memory leak"
+Installed skills have no CLI flags. To invoke the skill explicitly, name it in your
+request — this phrasing is portable across agent environments (Mistral Vibe, Claude
+Code, OpenCode, and others):
 
-# With specific pattern
-/cot-reasoning --pattern=ReAct "Investigate the database timeout issue"
-
-# With verbose output
-/cot-reasoning --verbose "Design a scalable microservice architecture"
+```
+"Use cot-reasoning to investigate why our API is returning 500 errors"
+"Apply the cot-reasoning framework to this architecture decision"
+"Use cot-reasoning, BASIC mode, to review this diff for risks"
 ```
 
-### Invocation Commands
+### Activation Contract
 
-| Command | Description |
-|---------|-------------|
-| `/cot-reasoning [query]` | Standard invocation |
-| `/cot-reasoning --mode=STANDARD/BASIC/ENHANCED/MINIMAL [query]` | Force specific mode |
-| `/cot-reasoning --pattern=[pattern] [query]` | Force specific CoT pattern |
-| `/cot-reasoning --thinking-type=[type] [query]` | Force thinking type |
+| Mechanism | How it works |
+|-----------|--------------|
+| Description-based activation | The skill's frontmatter description (with explicit NOT-conditions) routes multi-step reasoning requests to it automatically |
+| Explicit invocation phrasing | Naming "cot-reasoning" in the request activates it directly, e.g. "Use cot-reasoning to ..." |
+| Configuration through input | State the desired mode/pattern/thinking type in the request text, e.g. "Use STANDARD mode with the ReAct pattern to debug this issue" |
 
 ## 🎯 When to Use
 
-### ✅ Use System Reasoning Brain for:
+### ✅ Use cot-reasoning for:
 
 - Complex problem solving requiring multi-step analysis
 - Technical debugging and troubleshooting
@@ -83,6 +83,7 @@ User: "Our API is returning 500 errors, investigate and fix"
 - Greetings or small talk
 - Single-word inputs
 - Tasks shorter than 10 characters
+- Domain-fact lookups (route to the relevant domain skill — only the reasoning procedure routes here)
 
 ## 🏗️ Architecture
 
@@ -98,7 +99,8 @@ User: "Our API is returning 500 errors, investigate and fix"
 
 3. **Tool Integration Layer**
    - Enables data operations for reasoning
-   - Automatic tool detection and parameter generation
+   - Category-first, environment-neutral tool taxonomy (filesystem read/write, shell execution, web search, code search)
+   - BASIC and MINIMAL modes are fully functional with no tools at all
 
 4. **Result Tracking System**
    - Maintains audit trail of reasoning process
@@ -106,12 +108,15 @@ User: "Our API is returning 500 errors, investigate and fix"
 
 ### Reasoning Modes
 
-| Mode | Self-Dialogue | Tool Usage | Best For |
-|------|---------------|------------|----------|
-| **STANDARD** | Required | As needed | Most problems (recommended) |
-| **BASIC** | Required | None | No tools available |
-| **ENHANCED** | Optional | Moderate | Advanced reasoning models |
-| **MINIMAL** | None | Minimal | Very simple problems |
+| Mode | Self-Dialogue | Tools | Output Tier | Selection Rule |
+|------|---------------|-------|-------------|----------------|
+| **MINIMAL** | None | None | Core only, hard boilerplate budget | Trivial problems answerable in 2-3 simple steps |
+| **BASIC** | Required | None | Core + Problem Analysis + Quality Metrics | No tools available in the environment |
+| **STANDARD** | Required | As needed | Full contract | Default for most problems |
+| **ENHANCED** | Reduced or omitted | As needed | Full contract, no fabricated dialogue display | Models with strong native reasoning |
+
+Mode selection scales ceremony to model capability: strong reasoners reduce
+self-dialogue via ENHANCED; weak reasoners get the full structure via STANDARD.
 
 ### Thinking Types
 
@@ -133,6 +138,29 @@ User: "Our API is returning 500 errors, investigate and fix"
 | **Auto-CoT** | Novel problems | Medium |
 | **Tree of Thoughts** | Complex decisions | Medium-High |
 | **ReAct** | Tool-intensive tasks | High |
+
+## ✅ Validation
+
+Every reasoning flow can be checked against the skill's output contract with the
+bundled validator (tier-aware: it checks the sections the flow's mode requires):
+
+```bash
+cd $(npx skills path cot-reasoning)
+
+# Validate a single markdown flow
+./scripts/validate-system-flow.sh -s flow_output.md
+
+# Validate the engineering example suite
+./scripts/validate-system-flow.sh -j assets/system-examples.json
+
+# Validate all flows in a directory
+./scripts/validate-system-flow.sh -d ./flows/
+```
+
+## 📜 Version
+
+**v5.0.0** — the version is stated consistently in the skill frontmatter, the
+validator, the templates, and the output contract.
 
 ## 📜 License
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.0.
+This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.0.0.
 
 ---
 
@@ -109,6 +109,8 @@ def detect_domain(user_input, intent):
 | **CREATIVE** | Innovative solution generation | Product development, brainstorming, reframing problems | Generates innovative ideas, explores multiple possibilities | May produce impractical solutions |
 | **CRITICAL** | Objective evaluation with skepticism | Decision validation, argument analysis, QA, risk assessment, ethical considerations | Identifies weak points, prevents errors, ensures quality | May be overly negative or cautious |
 | **SYSTEMATIC** | Methodical step-by-step approach | Process improvement, troubleshooting, system design, strategic planning | Reliable, repeatable, thorough | May miss innovative shortcuts |
+| **ETHICAL** | Structured moral evaluation | Policy review, compliance, social impact, harm/benefit analysis | Stakeholder fairness, harm prevention, value clarity | May not resolve genuine value conflicts |
+| **STRATEGIC** | Long-horizon positioning | Long-term planning, business strategy, competitive positioning, roadmapping | Competitive awareness, option generation, robustness across uncertainties | May undervalue short-term execution realities |
 
 ---
 
@@ -122,6 +124,8 @@ def detect_domain(user_input, intent):
 | **CREATIVE** | 0.6 | 0.9 | 0.7 | 0.6 | 0.7 | 0.6 | 0.7 | 0.8 |
 | **CRITICAL** | 0.8 | 0.7 | 0.7 | 0.9 | 0.8 | 0.7 | 0.7 | 0.8 |
 | **SYSTEMATIC** | 0.8 | 0.8 | 0.9 | 0.8 | 0.8 | 0.7 | 0.8 | 0.9 |
+| **ETHICAL** | 0.7 | 0.7 | 0.6 | 0.8 | 0.8 | 0.6 | 0.5 | 0.6 |
+| **STRATEGIC** | 0.8 | 0.9 | 0.7 | 0.7 | 0.9 | 0.7 | 0.9 | 0.7 |
 
 #### Complexity Fit Scores
 
@@ -131,6 +135,8 @@ def detect_domain(user_input, intent):
 | CREATIVE | 0.6 | 0.8 | 0.9 |
 | CRITICAL | 0.7 | 0.8 | 0.8 |
 | SYSTEMATIC | 0.8 | 0.9 | 0.8 |
+| ETHICAL | 0.7 | 0.8 | 0.9 |
+| STRATEGIC | 0.6 | 0.8 | 0.9 |
 
 #### Model Size Fit Scores
 
@@ -140,6 +146,8 @@ def detect_domain(user_input, intent):
 | CREATIVE | 0.7 | 0.8 | 0.9 | 0.9 |
 | CRITICAL | 0.8 | 0.9 | 0.9 | 0.9 |
 | SYSTEMATIC | 0.9 | 0.9 | 0.9 | 0.9 |
+| ETHICAL | 0.7 | 0.8 | 0.9 | 0.9 |
+| STRATEGIC | 0.7 | 0.8 | 0.9 | 0.9 |
 
 ---
 
@@ -187,7 +195,7 @@ def select_thinking_type(intent, context, complexity):
     }
     
     # Calculate scores for each thinking type
-    thinking_types = ['ANALYTICAL', 'CREATIVE', 'CRITICAL', 'SYSTEMATIC']
+    thinking_types = ['ANALYTICAL', 'CREATIVE', 'CRITICAL', 'SYSTEMATIC', 'ETHICAL', 'STRATEGIC']
     scores = {}
     for thinking_type in thinking_types:
         intent_score = INTENT_MAPPING.get(intent, {}).get(thinking_type, 0.5) * INTENT_WEIGHT
@@ -242,6 +250,8 @@ def select_thinking_type(intent, context, complexity):
 | **CREATIVE** | Zero-Shot CoT | Auto-CoT | Tree of Thoughts | → ReAct if needed |
 | **CRITICAL** | Zero-Shot CoT | Few-Shot CoT | Auto-CoT | → ReAct if validation tools |
 | **SYSTEMATIC** | Zero-Shot CoT | ReAct | Tree of Thoughts | → ReAct preferred |
+| **ETHICAL** | Zero-Shot CoT | Few-Shot CoT | Tree of Thoughts | → ReAct if stakeholder data needed |
+| **STRATEGIC** | Zero-Shot CoT | Auto-CoT | Tree of Thoughts | → ReAct if market/competitor data needed |
 
 ---
 
@@ -337,4 +347,4 @@ def is_compatible(intent, domain):
 **Version:** 5.0.0
 **Last Updated:** 2026-08-22
 **Maintainer:** System Reasoning Consortium
-**Compatibility:** cot-reasoning v5.0+
+**Compatibility:** cot-reasoning v5.0.0+

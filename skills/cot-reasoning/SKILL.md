@@ -1,17 +1,17 @@
 ---
 name: cot-reasoning
-description: A structured reasoning framework that provides step-by-step thinking chains for complex problem-solving, enabling models to perform multi-step analysis with self-dialogue, tool integration, and intermediate result tracking.
+description: "Structured chain-of-thought reasoning framework for complex, multi-step problems: decomposes the problem into auditable steps with self-dialogue, environment-neutral tool integration, and result tracking, then validates the output flow. Use for production incident investigation, root cause analysis, debugging that requires evidence before conclusions, architecture and design decisions, code review and risk assessment, and trade-off or option comparison. NOT for: greetings and small talk; simple factual or single-word questions; trivial tasks with a direct answer; formatting, rewriting, or translation; domain-fact lookup - route those to the relevant domain skill, only the reasoning procedure routes here. Activate only when the request genuinely needs multi-step analysis, not merely because it contains a word like analyze or fix."
 compatibility: ["mistral-vibe", "crewai", "autogen", "langchain", "llama-index"]
 metadata:
   author: DanteUkraine
-  version: "1.0.0"
+  version: "5.0.0"
   category: reasoning
   complexity: universal
   maturity: production-ready
   tags: "reasoning cot-reasoning engineering complex-systems universal thinking-chain self-dialogue tool-integration"
   invocation: both
-  auto-detection: "(analyze|evaluate|assess|audit|diagnose|investigate|solve|fix|debug|troubleshoot|resolve|design|architect|validate|verify|compare|decide|prioritize|rank|optimize|forecast|estimate)"
-  allowed-tools: ["web_search", "code_analyzer", "file_read", "file_write"]
+  auto-detection: "(root[- ]cause|production incident|post[- ]mortem|risk assessment|trade[- ]offs?|architecture (decision|review)|design (decision|options?)|decide between|compare [^.]*(options|alternatives|solutions)|investigate (why|and)|debug (why|this)|troubleshoot [^.]*(issue|failure|incident)|multi[- ]step)"
+  allowed-tools: ["filesystem-read", "filesystem-write", "shell-execution", "web-search", "code-search"]
 ---
 
 <purpose>CoT-reasoning: Provides a structured reasoning framework that enhances model capabilities for complex, multi-step problem-solving.
@@ -29,114 +29,189 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 | Reference | File | Purpose |
 |-----------|------|---------|
 | Core reasoning framework | `references/reasoning-simulation.md` | Framework architecture and core principles |
-| Intent detection and context classification | `references/intent-context-matrix.md` | Intent classification system and context detection |
+| Model capability adaptation | `references/model-capabilities.md` | Mode selection scaled to model reasoning capability |
+| Intent detection and context classification | `references/intent-context-matrix.md` | Intent classification, thinking-type scoring matrices |
 | Pattern selection guidelines | `references/reasoning-patterns-analysis.md` | Pattern selection recommendations and use cases |
-| Step execution templates | `templates/system-flows/step-execution-template.md` | Executable reasoning step templates |
-| Self-dialogue generation | `templates/system-flows/self-dialogue-template.md` | Transparent reasoning dialogue templates |
-| Thinking type frameworks | `templates/thinking-types/` | Domain-specific thinking type frameworks |
-| Reasoning examples | `assets/system-examples.json` | Real-world usage patterns |
-| Validation and verification | `scripts/validate-system-flow.sh` | Quality assurance |
+| Adaptive flow template | `templates/adaptive-flows/unified-reasoning-flow.md` | Universal adaptive reasoning flow with pattern configuration |
+| Step execution templates | `templates/system-flows/step-execution-template.md` | Executable reasoning step templates and worked step examples |
+| Self-dialogue generation | `templates/system-flows/self-dialogue-template.md` | Transparent reasoning dialogue templates and worked dialogue examples |
+| Thinking type frameworks | `templates/thinking-types/` (analytical, creative, critical, systematic, ethical, strategic) | Domain-specific thinking type frameworks |
+| Reasoning examples | `assets/system-examples.json` | Commercial engineering scenarios (incident, architecture, code review) |
+| Validation and verification | `scripts/validate-system-flow.sh` | Quality assurance for the output contract |
 </references>
+
+<activation>
+**Routing boundary — when this skill activates:**
+
+Activate when the request genuinely requires multi-step reasoning:
+- Production incident investigation, debugging, root cause analysis
+- Architecture or design decisions with options to evaluate
+- Code review, risk assessment, trade-off comparison
+- Any task where evidence must be gathered and chained before concluding
+
+Do NOT activate for:
+- Greetings, small talk, or single-word inputs
+- Simple factual questions with a direct answer
+- Trivial tasks (formatting, rewriting, translation, lookups)
+- Domain-fact requests (route to the relevant domain skill — only the reasoning procedure routes here)
+
+**Gating rule:** the auto-detection expression is a necessary signal, not a sufficient one.
+A keyword match activates the skill only when the request is also non-trivial and not
+excluded above. When in doubt, do not activate; the user can invoke explicitly.
+
+**Explicit invocation phrasing** (portable across agent environments):
+"Use cot-reasoning to investigate ..." / "Apply the cot-reasoning framework to ..."
+</activation>
 
 <workflow>
 0. Input Analysis — Parse request, extract problem, determine reasoning needs
 1. Problem Decomposition — Break complex problem into logical, executable components
-2. Step Generation — Create structured reasoning flow with dependencies
-3. Self-Dialogue Integration — Add transparent reasoning context to each step
-4. Tool Call Planning — Identify data needs and plan tool operations
-5. Flow Assembly — Combine into complete executable reasoning chain
-6. Output Formatting — Structure results with full traceability
-7. Quality Validation — Verify completeness, consistency, and actionability
+2. Mode Selection — Pick MINIMAL/BASIC/STANDARD/ENHANCED per the mode rules below
+3. Step Generation — Create structured reasoning flow with dependencies
+4. Self-Dialogue Integration — Add transparent reasoning context to each step (mode-dependent)
+5. Tool Call Planning — Identify data needs and plan tool operations (category-first)
+6. Flow Assembly — Combine into complete executable reasoning chain
+7. Output Formatting — Structure results at the tier the mode requires
+8. Quality Validation — Verify completeness, consistency, and actionability
 </workflow>
+
 <instructions>
   <reasoning_framework>
   CORE CONCEPT: Chain-of-thought Reasoning ENHANCES Model Reasoning
 
-  **The Challenge:**
-  Models vary in their ability to perform complex, multi-step reasoning. Some models struggle
-  to connect multiple ideas, maintain context across steps, or structure their thinking process.
+  **The Challenge:** Models vary in their ability to perform complex, multi-step reasoning.
+  Some struggle to connect ideas, maintain context across steps, or structure their thinking.
 
-  **The Solution:**
-  cot-reasoning provides a structured framework that guides the model's reasoning. The skill
-  generates step-by-step reasoning chains with self-dialogue, tool integration, and result
-  tracking. The model uses its native capabilities to process and enhance this structure.
-  
-  **How It Works:**
-  
-  1. **Input Analysis:** When a complex problem is detected, the skill analyzes the request
-  2. **Structure Generation:** The skill creates a reasoning flow with explicit steps
-  3. **Step Processing:** The model follows each step, applying its reasoning to the structure
-  4. **Result Integration:** Intermediate results build toward the final solution
-  5. **Output Delivery:** Structured, auditable reasoning chain is produced
-  
-  **cot-reasoning Framework:**
+  **The Solution:** cot-reasoning generates step-by-step reasoning chains with self-dialogue,
+  tool integration, and result tracking. The model uses its native capabilities to process
+  and enhance this structure.
+
   ```
   cot-reasoning = Step Structure + Self-Dialogue + Tool Integration + Result Tracking
-  
   MODEL + cot-reasoning = Enhanced Reasoning Capability
   ```
-  
-  **Model Compatibility:**
-  - Models WITH tool-calling: cot-reasoning enables effective tool use
-  - Models WITH strong reasoning: cot-reasoning provides enhanced structure
-  - Models WITH limited context: cot-reasoning helps maintain reasoning chains
-  - Result: Compatible models perform complex reasoning more effectively
-  
+
   <framework_components>
-  
-  **Component 1: Reasoning Flow Generator**
-  - Input: Problem statement
-  - Process: Decompose into logical steps
-  - Output: Ordered sequence of executable reasoning steps
-  - Key: Each step has single responsibility and clear dependencies
-  
-  **Component 2: Self-Dialogue Engine**
-  - Purpose: Make reasoning process transparent and followable
-  - Mechanism: Internal monologue simulating thinking
-  - Format: Thought → Analysis → Question → Answer → Conclusion → Decision
-  - Result: Users can follow and understand the reasoning chain
-  
-  **Component 3: Tool Integration Layer**
-  - Purpose: Enable data operations for reasoning
-  - Capability: Automatic tool detection and parameter generation
-  - Execution: Tool calls at appropriate steps with explicit parameters
-  - Handling: Response processing, validation, and error recovery
-  
-  **Component 4: Result Tracking System**
-  - Purpose: Maintain audit trail of reasoning process
-  - Tracking: Every step's input, output, status, and validation
-  - Building: Intermediate results carry forward to subsequent steps
-  - Verification: Objective checks at each step ensure quality
-  
+
+  **Component 1: Reasoning Flow Generator** — Decompose into ordered, executable steps;
+  each step has single responsibility and clear dependencies.
+
+  **Component 2: Self-Dialogue Engine** — Transparent internal monologue in the format
+  Thought → Analysis → Question → Answer → Conclusion → Decision; makes the chain followable.
+
+  **Component 3: Tool Integration Layer** — Category-first tool planning with explicit
+  parameters, response processing, and error recovery (see tool taxonomy below).
+
+  **Component 4: Result Tracking System** — Every step's input, output, status, and
+  validation tracked; intermediate results carry forward; objective checks at each step.
+
   </framework_components>
-  
-  <reasoning_modes>
-  
-  | Mode | Description | Use Case | Characteristics |
-  |------|-------------|----------|----------------|
-  | STANDARD | Complete reasoning with self-dialogue and tool calls | Most problems | Full capability |
-  | BASIC | Self-dialogue without tools | No tools available | Reasoning only |
-  
-  **Mode Selection:**
-  - STANDARD: Default for most problems (recommended)
-  - BASIC: When no tools are available or for simpler reasoning tasks
-  
-  </reasoning_modes>
-  
   </reasoning_framework>
 
+  <reasoning_modes>
+
+  | Mode | Self-Dialogue | Tools | Output Tier | Selection Rule |
+  |------|--------------|-------|-------------|----------------|
+  | MINIMAL | None | None | Core only, hard boilerplate budget | Trivial problem answerable in 2-3 simple steps |
+  | BASIC | Required | None | Core + Problem Analysis + Quality Metrics | No tools available in the environment |
+  | STANDARD | Required | As needed | Full contract (all sections) | Default for most problems |
+  | ENHANCED | Reduced or omitted | As needed | Full contract, no fabricated dialogue display | Model has strong native reasoning (see model-capabilities reference) |
+
+  **Mode Selection Algorithm (evaluate in order):**
+  1. Is the problem trivial (single question, 2-3 obvious steps, no evidence gathering)? → **MINIMAL**
+  2. Are no tools available in this environment? → **BASIC** (fully functional without tools)
+  3. Does the model reason natively and strongly (per `references/model-capabilities.md`)? → **ENHANCED**
+  4. Otherwise → **STANDARD** (recommended default)
+
+  **Model-capability adaptation:** mode selection scales ceremony to model capability.
+  Strong reasoners reduce self-dialogue via ENHANCED — the structure and validation remain,
+  the simulated dialogue display does not. Weak reasoners get the full structure via
+  STANDARD, where the self-dialogue scaffold carries the reasoning. See
+  `references/model-capabilities.md` for the capability table and selection algorithm.
+
+  </reasoning_modes>
+
+  <thinking_type_system>
+  Select optimal thinking type for the problem domain.
+
+  | Type | Best For | Strengths | Template |
+  |------|----------|-----------|----------|
+  | ANALYTICAL | Structured problems, data analysis, technical evaluation | Precision, thoroughness | `templates/thinking-types/analytical.md` |
+  | CREATIVE | Innovation, design, brainstorming, novel solutions | Idea generation, exploration | `templates/thinking-types/creative.md` |
+  | CRITICAL | Validation, argument analysis, risk assessment, QA | Flaw detection, quality assessment | `templates/thinking-types/critical.md` |
+  | SYSTEMATIC | Process optimization, troubleshooting, system design | Reliability, repeatability | `templates/thinking-types/systematic.md` |
+  | ETHICAL | Policy, compliance, social impact, harm/benefit analysis | Moral consideration, stakeholder fairness | `templates/thinking-types/ethical.md` |
+  | STRATEGIC | Long-term planning, business strategy, competitive positioning | Competitive awareness, long-term thinking | `templates/thinking-types/strategic.md` |
+
+  **Selection scoring:** Score = Intent_Fit(0.4) + Context_Fit(0.3) + Complexity_Fit(0.2) + Domain_Fit(0.1).
+  The full scoring matrices, intent keywords, and selection algorithm are in
+  `references/intent-context-matrix.md` — load it when the type choice is not obvious.
+  </thinking_type_system>
+
+  <reasoning_pattern_system>
+  Select a pattern for organizing reasoning steps. Patterns are secondary to the step
+  structure; the step-by-step execution is primary.
+
+  | Pattern | Best For | Step Structure | Tool Usage |
+  |---------|----------|----------------|------------|
+  | Zero-Shot CoT | Simple problems | Single step | Low |
+  | Few-Shot CoT | Example-based problems | Multiple steps with examples | Low-Medium |
+  | Auto-CoT | Novel problems without provided examples | Steps with self-generated examples | Medium |
+  | Tree of Thoughts | Complex decisions, multi-option evaluation | Branching steps | Medium-High |
+  | ReAct | Tool-intensive tasks, debugging, investigation | Action-Reasoning loops | High |
+
+  **Pattern selection:** Zero-Shot for simple direct reasoning; Few-Shot when examples help;
+  Auto-CoT when the model must generate its own examples for a novel problem;
+  Tree of Thoughts for multiple options to evaluate; ReAct for heavy tool usage.
+  Detailed guidance: `references/reasoning-patterns-analysis.md`.
+  </reasoning_pattern_system>
+
+  <tool_integration_layer>
+  **Environment-neutral tool taxonomy.** Plan tools by CATEGORY, then bind to whatever
+  the host environment exposes. Never invent a concrete tool name.
+
+  | Category | Purpose | How common environments expose it |
+  |----------|---------|-----------------------------------|
+  | filesystem-read | Read files, logs, configs | `read_file` (Mistral Vibe), `Read` (Claude Code), `cat` via shell |
+  | filesystem-write | Write or edit files | `write_file`/`edit` (Mistral Vibe), `Write`/`Edit` (Claude Code) |
+  | shell-execution | Run commands, verify state | `bash` (Mistral Vibe), `Bash` (Claude Code), terminal tool (OpenCode) |
+  | web-search | Gather external information | `web_search` (Mistral Vibe), `WebSearch` (Claude Code), search tools (LangChain) |
+  | code-search | Find patterns in code and logs | `grep`/`ripgrep` via shell, `Grep` (Claude Code), code search tools |
+
+  **Usage principles:**
+  1. Data-driven reasoning — tools gather data; reasoning analyzes it; never pass results through unexamined
+  2. Explicit parameters — every tool call states complete, exact parameters
+  3. Result processing — extract, validate, and integrate tool outputs into the chain
+  4. Error handling — every tool call has a fallback; reasoning continues with available data
+
+  **No-tools operation:** BASIC and MINIMAL are fully functional with no tools at all —
+  every step uses `Tool: None` and pure reasoning. Tool planning applies to
+  STANDARD and ENHANCED only.
+
+  **Standard tool call format:**
+  ```markdown
+  **Tool:** [category]
+  **Tool Parameters:**
+  ```json
+  { "parameter1": "value1" }
+  ```
+  **Expected Output:** [what the tool should return]
+  **Validation:** [how to verify success]
+  **Fallback:** [what to do if it fails]
+  ```
+  </tool_integration_layer>
+
   <step_structure_system>
-  **CORE: Universal Step Execution Framework**
-  
-  **Step Structure (Applies to ALL models, ALL problems):**
+  **Universal step framework (applies to all modes; field requirements vary by mode —
+  see the output contract):**
   ```markdown
   ### Step [N]: [Descriptive Step Name]
-  
+
   **Thought:** [Internal reasoning - what am I thinking about this step?]
-  **Why:** [Explanation of why this step is necessary in the overall reasoning]
+  **Why:** [Explanation of why this step is necessary]
   **Action:** [Specific, executable instruction for this step]
-  **Tool:** [Tool to use, or "None" if pure reasoning]
-  **Tool Parameters:** [Exact parameters if tool is used]
+  **Tool:** [Tool category, or "None" if pure reasoning]
+  **Tool Parameters:** [Exact parameters if a tool is used]
   **Input:** [Data/parameters coming into this step]
   **Expected Output:** [What this step should produce]
   **Validation:** [Objective criteria to verify step success]
@@ -145,169 +220,27 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   **Fallback:** [Alternative approach if this step fails]
   **Complexity:** [LOW/MEDIUM/HIGH - step difficulty]
   ```
-  
-  <step_design_principles>
-  
-  **Principle 1: Single Responsibility**
-  - Each step does ONE thing and does it well
-  - Complex operations are split into multiple steps
-  - Clear purpose for each step
-  
-  **Principle 2: Explicit Dependencies**
-  - Dependencies between steps are clearly stated
-  - Data flow between steps is documented
-  - No implicit or hidden dependencies
-  
-  **Principle 3: Objective Validation**
-  - Every step has measurable validation criteria
-  - Validation is objective, not subjective
-  - Failed validations trigger fallback paths
-  
-  **Principle 4: Graceful Degradation**
-  - Every step has at least one fallback option
-  - Fallbacks maintain reasoning continuity
-  - Limitations are clearly documented
-  
-  **Principle 5: Transparency**
-  - Self-dialogue explains reasoning behind each action
-  - Tool usage is justified and documented
-  - Assumptions are explicitly stated
-  
-  </step_design_principles>
 
-  <step_complexity_guidelines>
-  
-  **Complexity Levels:**
-  
-  | Complexity | Step Count | Use Case | Characteristics |
-  |------------|------------|----------|----------------|
-  | LOW | 2-3 steps | Simple problems | Direct reasoning, minimal dependencies |
-  | MEDIUM | 4-6 steps | Standard problems | Some dependencies, moderate tool usage |
-  | HIGH | 7-9 steps | Complex problems | Multiple dependencies, heavy tool usage |
-  | VERY_HIGH | 10+ steps | Very complex | Deep dependencies, maximum tool usage |
-  
-  **Complexity Determination:**
-  - Problem scope and impact
-  - Number of variables and unknowns
-  - Required depth of analysis
-  - Number of interdependent components
-  - Available time and resources
-  
-  </step_complexity_guidelines>
+  **Design principles:** single responsibility per step; explicit dependencies;
+  objective validation; graceful degradation (every step has a fallback); transparency
+  (self-dialogue explains each action; assumptions are stated).
 
-  <step_examples>
-  
-  **Example 1: System Debugging**
-  ```markdown
-  ### Step 1: Understand System State
-  - Thought: "Need to establish baseline system state before investigation"
-  - Why: Cannot debug without understanding normal operation
-  - Action: Gather current system metrics and status
-  - Tool: None (or system monitoring tool)
-  - Input: User request
-  - Expected Output: Current system state description
-  - Validation: System state is clearly defined
-  - Dependencies: None
-  - Next Step: Step 2
-  - Fallback: Use user-provided context
-  - Complexity: LOW
-  
-  ### Step 2: Identify Anomalies
-  - Thought: "With baseline established, can identify what's abnormal"
-  - Why: Anomalies indicate potential issues
-  - Action: Compare current state with expected/normal state
-  - Tool: code_analyzer (or similar)
-  - Input: System state from Step 1
-  - Expected Output: List of anomalies with severity
-  - Validation: Anomalies are clearly identified and prioritized
-  - Dependencies: Step 1 output
-  - Next Step: Step 3
-  - Fallback: Manual comparison with known good state
-  - Complexity: MEDIUM
-  
-  ### Step 3: Analyze Root Causes
-  - Thought: "Anomalies identified, need to find underlying causes"
-  - Why: Solutions require addressing root causes, not symptoms
-  - Action: Trace each anomaly to its potential root cause
-  - Tool: file_read, grep (for log analysis)
-  - Input: Anomalies from Step 2
-  - Expected Output: Hypothesized root causes with supporting evidence
-  - Validation: Each cause has compelling evidence
-  - Dependencies: Step 2 output
-  - Next Step: Step 4
-  - Fallback: Focus on highest-severity anomaly first
-  - Complexity: HIGH
-  ```
-  
-  **Example 2: System Design**
-  ```markdown
-  ### Step 1: Define Requirements
-  - Thought: "Need clear requirements before designing"
-  - Why: Design without requirements leads to rework
-  - Action: Extract and organize all requirements from input
-  - Tool: None
-  - Input: User request
-  - Expected Output: Complete requirement specification
-  - Validation: All requirements are captured and categorized
-  - Dependencies: None
-  - Next Step: Step 2
-  - Fallback: Ask user for clarification
-  - Complexity: LOW
-  
-  ### Step 2: Identify Constraints
-  - Thought: "Requirements defined, need to understand limitations"
-  - Why: Constraints shape the design space
-  - Action: Extract all constraints and limitations
-  - Tool: None
-  - Input: Requirements from Step 1
-  - Expected Output: Complete constraint list with impact assessment
-  - Validation: All constraints are documented
-  - Dependencies: Step 1 output
-  - Next Step: Step 3
-  - Fallback: Proceed with known constraints, note missing ones
-  - Complexity: LOW
-  
-  ### Step 3: Generate Design Options
-  - Thought: "With requirements and constraints, can generate viable designs"
-  - Why: Multiple options enable better decision making
-  - Action: Create 2-3 design options that meet requirements
-  - Tool: None (or web_search for inspiration)
-  - Input: Requirements and constraints
-  - Expected Output: Multiple design options with pros/cons
-  - Validation: Each option meets all requirements
-  - Dependencies: Steps 1-2 output
-  - Next Step: Step 4
-  - Fallback: Generate at least one viable option
-  - Complexity: HIGH
-  
-  ### Step 4: Evaluate and Select
-  - Thought: "Need to select best design based on criteria"
-  - Why: Objective evaluation leads to optimal choice
-  - Action: Evaluate options against criteria, select best
-  - Tool: None
-  - Input: Design options from Step 3
-  - Expected Output: Selected design with justification
-  - Validation: Selection criteria are objective and well-applied
-  - Dependencies: Step 3 output
-  - Next Step: None
-  - Fallback: Present options to user for selection
-  - Complexity: MEDIUM
-  ```
-  
-  </step_examples>
+  **Complexity guidelines:**
 
+  | Complexity | Step Count | Use Case |
+  |------------|------------|----------|
+  | LOW | 2-3 steps | Simple problems, direct reasoning |
+  | MEDIUM | 4-6 steps | Standard problems, some dependencies |
+  | HIGH | 7-9 steps | Complex problems, multiple dependencies |
+  | VERY_HIGH | 10+ steps | Deep dependencies, maximum tool usage |
+
+  Worked step examples (debugging, design, all step types) are in
+  `templates/system-flows/step-execution-template.md` — load them when assembling flows
+  for a new domain.
   </step_structure_system>
 
   <self_dialogue_system>
-  **TRANSPARENT REASONING THROUGH STRUCTURED INTERNAL MONOLOGUE**
-  
-  **Purpose:**
-  - Make reasoning process visible and understandable
-  - Enable users to follow the thinking chain
-  - Compensate for lack of native reasoning in models
-  - Provide audit trail of decision making
-  
-  **Dialogue Structure:**
+  **Transparent reasoning through structured internal monologue:**
   ```
   [Thought]: "Initial observation or question"
   [Analysis]: "Breakdown of the current situation"
@@ -317,319 +250,118 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   [Conclusion]: "Synthesis of findings"
   [Decision]: "Actionable next step"
   ```
-  
-  <dialogue_depth_guidelines>
-  
-  | Complexity | Exchanges | Depth | Use Case |
-  |------------|----------|-------|----------|
-  | LOW | 2-3 | Brief | Simple decisions |
-  | MEDIUM | 4-5 | Moderate | Standard problems |
-  | HIGH | 6-8 | Detailed | Complex analysis |
-  | VERY_HIGH | 9+ | Extensive | Multi-faceted problems |
-  
-  **Depth Selection:**
-  - Match depth to problem complexity
-  - More depth = more transparency but longer output
-  - Balance between clarity and conciseness
-  
-  </dialogue_depth_guidelines>
 
-  <dialogue_quality_criteria>
-  
-  **Good Self-Dialogue:**
-  - Relevant to the current step's purpose
-  - Logically flows from one exchange to the next
-  - Provides insights, not just restatements
-  - Leads to clear decision or action
-  - Transparent and easy to follow
-  
-  **Poor Self-Dialogue:**
-  - Vague or non-specific
-  - Not relevant to the step
-  - Circular reasoning
-  - Doesn't lead to action
-  - Artificial or forced
-  
-  </dialogue_quality_criteria>
+  **Depth guidelines:**
 
-  <dialogue_examples>
-  
-  **Debugging Dialogue:**
-  ```
-  [Thought]: "System is returning 500 errors for API endpoint"
-  [Analysis]: "500 errors indicate server-side failure. Could be: database, code, configuration, resources"
-  [Question]: "What are the most likely causes given the context?"
-  [Answer]: "Database connection issues are most likely because errors started after deployment"
-  [Question]: "What data would confirm this?"
-  [Answer]: "Need to check: database connection logs, deployment changes, resource usage"
-  [Conclusion]: "Primary hypothesis: database connection pool exhaustion"
-  [Decision]: "Retrieve database logs and check connection metrics"
-  ```
-  
-  **Design Dialogue:**
-  ```
-  [Thought]: "Need to design a scalable authentication system"
-  [Analysis]: "Scalability implies: high concurrency, low latency, distributed system, fault tolerance"
-  [Question]: "What are the key design decisions?"
-  [Answer]: "Main decisions: token vs session, stateless vs stateful, centralized vs distributed"
-  [Question]: "Which approach best meets the requirements?"
-  [Answer]: "JWT with distributed validation seems optimal for this scale"
-  [Consideration]: "But need to consider: security implications, revocation, performance"
-  [Conclusion]: "JWT with Redis for token storage is the baseline design"
-  [Decision]: "Propose JWT+Redis architecture with detailed specification"
-  ```
-  
-  </dialogue_examples>
+  | Complexity | Exchanges | Use Case |
+  |------------|----------|----------|
+  | LOW | 2-3 | Simple decisions |
+  | MEDIUM | 4-5 | Standard problems |
+  | HIGH | 6-8 | Complex analysis |
+  | VERY_HIGH | 9+ | Multi-faceted problems |
 
+  **Quality criteria:** relevant to the step, logically flowing, provides insight rather
+  than restatement, ends in a decision or action. Worked dialogue examples for debugging,
+  design, and decision domains are in `templates/system-flows/self-dialogue-template.md`.
+
+  **ENHANCED mode note:** for models that reason natively, do not fabricate a reasoning
+  display. Keep the step structure, validation, and result tracking; omit the simulated
+  dialogue unless it adds genuine explanatory value for the user.
   </self_dialogue_system>
 
-  <tool_integration_layer>
-  **ENABLE DATA OPERATIONS FOR REASONING**
-  
-  **Purpose:**
-  - Enable reasoning to access external data
-  - Provide data for analysis and decision making
-  - Extend model capabilities beyond its training data
-  - Verify assumptions and hypotheses
-  
-  <tool_usage_principles>
-  
-  **Principle 1: Data-Driven Reasoning**
-  - Use tools to gather data, not to replace reasoning
-  - Data informs reasoning, doesn't replace it
-  - Always analyze tool results, don't just pass them through
-  
-  **Principle 2: Explicit Parameters**
-  - Every tool call has complete, exact parameters
-  - Parameters are derived from context and previous steps
-  - No implicit or vague parameters
-  
-  **Principle 3: Result Processing**
-  - Extract relevant information from tool outputs
-  - Validate tool results for completeness and relevance
-  - Integrate results into the reasoning chain
-  
-  **Principle 4: Error Handling**
-  - Every tool call has fallback options
-  - Errors are documented and handled gracefully
-  - Reasoning continues with available data
-  
-  </tool_usage_principles>
-
-  <tool_classification>
-  
-  | Tool Category | Tools | Purpose | Usage Pattern |
-  |---------------|-------|---------|---------------|
-  | Data Retrieval | file_read, web_search | Get external data | Frequent for data collection |
-  | Data Analysis | grep, code_analyzer | Process and analyze | Moderate for analysis steps |
-  | Data Manipulation | file_write | Modify data | Occasional for solutions |
-  | System Operations | bash | Execute commands | As needed for verification |
-  
-  </tool_classification>
-
-  <tool_call_structure>
-  
-  **Standard Tool Call Format:**
-  ```markdown
-  **Tool:** tool_name
-  **Tool Parameters:**
-  ```json
-  {
-    "parameter1": "value1",
-    "parameter2": "value2"
-  }
-  ```
-  **Expected Output:** [What the tool should return]
-  **Validation:** [How to verify the tool succeeded]
-  **Fallback:** [What to do if tool fails]
-  ```
-  
-  </tool_call_structure>
-
-  </tool_integration_layer>
-
-  <thinking_type_system>
-  Select optimal thinking type for the problem domain.
-  
-  **Thinking Types:**
-  | Type | Best For | Strengths | Reasoning Approach |
-  |------|----------|-----------|-------------------|
-  | ANALYTICAL | Structured problems, data analysis, technical evaluation | Precision, thoroughness | Step-by-step data analysis |
-  | CREATIVE | Innovation, design, brainstorming, novel solutions | Idea generation, exploration | Divergent thinking + convergence |
-  | CRITICAL | Validation, argument analysis, risk assessment, QA, ethical considerations | Flaw detection, quality assessment | Hypothesis testing + verification |
-  | SYSTEMATIC | Process optimization, troubleshooting, system design, strategic planning | Reliability, repeatability, long-term thinking | Sequential cause-effect analysis |
-  
-  <type_selection_algorithm>
-  
-  **Scoring Formula:**
-  ```
-  Score = Intent_Fit(0.4) + Context_Fit(0.3) + Complexity_Fit(0.2) + Domain_Fit(0.1)
-  ```
-  
-  **Intent Fit (0-1):**
-  | Type | ANALYZE | DESIGN | SOLVE | VALIDATE | DECIDE | EXPLAIN | PREDICT | RESEARCH |
-  |------|---------|--------|-------|----------|--------|---------|---------|----------|
-  | ANALYTICAL | 0.9 | 0.7 | 0.8 | 0.9 | 0.8 | 0.8 | 0.8 | 0.7 |
-  | CREATIVE | 0.6 | 0.9 | 0.7 | 0.6 | 0.7 | 0.6 | 0.7 | 0.8 |
-  | CRITICAL | 0.8 | 0.7 | 0.7 | 0.9 | 0.8 | 0.7 | 0.7 | 0.8 |
-  | SYSTEMATIC | 0.8 | 0.8 | 0.9 | 0.8 | 0.8 | 0.7 | 0.8 | 0.9 |
-  
-  **Context Fit (0-1):**
-  | Type | TECHNICAL | BUSINESS | CREATIVE | SYSTEMIC | SCIENTIFIC |
-  |------|-----------|----------|----------|----------|-----------|
-  | ANALYTICAL | 0.9 | 0.8 | 0.6 | 0.8 | 0.9 |
-  | CREATIVE | 0.7 | 0.7 | 0.9 | 0.7 | 0.7 |
-  | CRITICAL | 0.8 | 0.8 | 0.6 | 0.8 | 0.8 |
-  | SYSTEMATIC | 0.9 | 0.8 | 0.7 | 0.9 | 0.8 |
-  
-  **Complexity Fit (0-1):**
-  | Type | LOW | MEDIUM | HIGH | VERY_HIGH |
-  |------|-----|--------|------|-----------|
-  | ANALYTICAL | 0.9 | 0.9 | 0.8 | 0.7 |
-  | CREATIVE | 0.6 | 0.8 | 0.9 | 0.9 |
-  | CRITICAL | 0.7 | 0.8 | 0.9 | 0.8 |
-  | SYSTEMATIC | 0.8 | 0.9 | 0.9 | 0.8 |
-  
-  </type_selection_algorithm>
-  
-  </thinking_type_system>
-
-  <reasoning_pattern_system>
-  Select pattern for organizing reasoning steps.
-  
-  **Note:** In cot-reasoning, patterns are secondary to the step structure.
-  Patterns provide organizing principles, but the step-by-step execution is primary.
-  
-  | Pattern | Best For | Step Structure | Tool Usage |
-  |---------|----------|----------------|------------|
-  | Zero-Shot CoT | Simple problems | Single step | Low |
-  | Few-Shot CoT | Example-based | Multiple steps with examples | Low-Medium |
-  | Tree of Thoughts | Complex decisions | Branching steps | Medium-High |
-  | ReAct | Tool-intensive tasks | Action-Reasoning loops | High |
-  
-  **Pattern Selection:**
-  - Zero-Shot CoT: Simple, direct reasoning
-  - Few-Shot CoT: When examples would help
-  - Tree of Thoughts: Multiple options to evaluate
-  - ReAct: Heavy tool usage required
-  
-  </reasoning_pattern_system>
-
   <input_output_system>
-  **STANDARDIZED cot-reasoning OUTPUT**
-  
-  <input_requirements>
-  
-  **Minimum:**
-  - Length: 10+ characters
-  - Clear problem or question
-  
-  **Optimal:**
-  ```
-  [Context/Background]
-  [Problem/Question]
-  [Available Tools]  # If known
-  [Constraints]
-  [Goal/Desired Outcome]
-  ```
-  
-  **Template Variables:**
-  - `{{USER_REQUEST}}`: Problem statement (required)
-  - `{{CONTEXT}}`: Additional background (optional)
-  - `{{AVAILABLE_TOOLS}}`: Available tools (optional)
-  - `{{CONSTRAINTS}}`: Limitations (optional)
-  - `{{GOAL}}`: Desired outcome (optional)
-  
-  </input_requirements>
+  **Input requirements:**
+  - Minimum: 10+ characters, a clear problem or question
+  - Optimal: [Context/Background] [Problem/Question] [Available Tools] [Constraints] [Goal]
 
-  <output_structure>
-  
-  **MANDATORY STRUCTURE:**
+  <output_contract>
+
+  **The output contract is COST-TIERED.** Every mode emits the CORE structure; extended
+  sections are conditional on mode. Never pay full ceremony for a trivial question, and
+  never skip the contract for a hard incident.
+
+  **CORE structure (mandatory in every mode):**
   ```markdown
   ## Reasoning Flow: [Brief Problem Summary]
-  
-  **Flow ID:** [unique_identifier_timestamp]
-  **Timestamp:** [ISO_8601_timestamp]
-  **Reasoning Mode:** [STANDARD|BASIC]
-  **Thinking Type:** [ANALYTICAL|CREATIVE|CRITICAL|SYSTEMATIC]
+
+  **Reasoning Mode:** [MINIMAL|BASIC|STANDARD|ENHANCED]
+  **Thinking Type:** [ANALYTICAL|CREATIVE|CRITICAL|SYSTEMATIC|ETHICAL|STRATEGIC]
   **Complexity:** [LOW|MEDIUM|HIGH|VERY_HIGH]
   **Steps:** [N]
-  
-  ### Configuration
-  - **Pattern:** [Zero-Shot|Few-Shot|Tree-of-Thoughts|ReAct]
-  - **Domain:** [technical|business|creative|etc.]
-  - **Intent:** [primary_intent]
-  
-  ### Problem Analysis
-  **Core Problem:** [one_sentence_summary]
-  
-  **Key Entities:**
-  - Entity 1: [description]
-  - Entity 2: [description]
-  
-  **Success Criteria:**
-  - [ ] Criterion 1: [measurable] - Priority: [High/Medium/Low]
-  - [ ] Criterion 2: [measurable] - Priority: [High/Medium/Low]
-  
-  **Constraints:**
-  - Hard: [cannot_violate]
-  - Soft: [should_respect]
-  
+
   ### Reasoning Steps
-  
-  **Step 1: [Step Name]**
-  - **Thought:** [Internal reasoning]
-  - **Why:** [Explanation]
+
+  ### Step 1: [Step Name]
   - **Action:** [Instruction]
-  - **Tool:** [tool_or_None]
-  - **Tool Parameters:** [if applicable]
-  - **Input:** [data]
   - **Expected Output:** [result]
   - **Validation:** [check]
-  - **Status:** [pending|completed|failed]
-  - **Actual Output:** [if completed]
-  - **Next Step:** [dependency]
-  - **Fallback:** [alternative]
-  - **Complexity:** [LOW|MEDIUM|HIGH]
-  
   [Additional steps...]
-  
-  ### Intermediate Results
-  **Step 1 Output:** [result]
-  **Step 2 Output:** [result]
-  [etc.]
-  
+
   ### Key Findings
   1. **Finding 1:** [insight] - Impact: [High/Medium/Low] - Confidence: [X/10]
-  2. **Finding 2:** [insight] - Impact: [High/Medium/Low] - Confidence: [X/10]
-  
-  **Root Causes:**
-  - Cause 1: [issue] - Evidence: [facts]
-  
+
   ### Recommendations
   1. **Action 1:** [what] - Priority: [High/Medium/Low] - Impact: [benefit]
-  2. **Action 2:** [what] - Priority: [High/Medium/Low] - Impact: [benefit]
-  
-  ### Execution Summary
+  ```
+
+  **EXTENDED sections (conditional on mode):**
+  ```markdown
+  **Flow ID:** [unique_identifier_timestamp]          <- STANDARD, ENHANCED
+  **Timestamp:** [ISO_8601_timestamp]                <- STANDARD, ENHANCED
+
+  ### Configuration                                   <- STANDARD, ENHANCED
+  - **Pattern:** [Zero-Shot CoT|Few-Shot CoT|Auto-CoT|Tree of Thoughts|ReAct]
+  - **Domain:** [technical|business|creative|etc.]
+  - **Intent:** [primary_intent]
+
+  ### Problem Analysis                                <- BASIC, STANDARD, ENHANCED
+  **Core Problem:** [one_sentence_summary]
+  **Key Entities:** [entities and description]
+  **Success Criteria:** [measurable criteria with priority]
+  **Constraints:** [Hard: cannot_violate; Soft: should_respect]
+
+  ### Intermediate Results                            <- STANDARD, ENHANCED
+  **Step 1 Output:** [result]
+
+  ### Execution Summary                               <- STANDARD, ENHANCED
   - **Steps Completed:** [X]/[N]
-  - **Tools Used:** [list]
+  - **Tools Used:** [category list]
   - **Tool Call Count:** [N]
-  
-  ### Quality Metrics
+
+  ### Quality Metrics                                 <- BASIC, STANDARD, ENHANCED
   - **Confidence Level:** [High:8-10 | Medium:5-7.9 | Low:<5] ([X.X/10])
   - **Reasoning Quality:** [X/10]
-  - **Tool Utilization:** [X%] (if tools used)
   - **Step Completion:** [X%]
   - **Actionability:** [X/10]
-  
-  ### Meta Information
+  - **Tool Utilization:** [X%] (only if tools were used)
+
+  ### Meta Information                                <- STANDARD, ENHANCED
   **Generated By:** cot-reasoning v5.0.0
   **Pattern:** [pattern_name]
   **Performance Notes:** [any_considerations]
   ```
-  
-  </output_structure>
 
+  **Tier summary:**
+
+  | Mode | Sections required | Step fields required | Boilerplate budget |
+  |------|-------------------|----------------------|--------------------|
+  | MINIMAL | Core only | Action, Expected Output, Validation | Hard cap: at most 12 structural (non-content) lines and at most 3 steps |
+  | BASIC | Core + Problem Analysis + Quality Metrics | Thought, Why, Action, Expected Output, Validation, Next Step, Fallback | None beyond core |
+  | STANDARD | Core + all Extended sections | All step fields (incl. Tool, Input, Status, Dependencies, Complexity) | None |
+  | ENHANCED | Core + all Extended sections | All step fields except Thought (optional — native reasoning) | None |
+
+  **MINIMAL hard boilerplate budget:** a MINIMAL flow must not exceed **12 structural
+  lines** (headings and header-field labels — lines that exist even with empty content)
+  and **3 steps**. If the problem needs more, it is not a MINIMAL problem; select BASIC.
+
+  **Anti-patterns:**
+
+  | Wrong pattern | Why it fails | Resolution |
+  |---------------|--------------|------------|
+  | Emitting the full STANDARD contract (Flow ID, timestamps, metrics, meta) for a trivial question | Fixed ceremony cost swamps the content; users stop reading the output; the framework feels heavier than the problem | Use MINIMAL: core only, at most 12 structural lines and 3 steps |
+  | Fabricating a [Thought]/[Question]/[Answer] reasoning display for a model that reasons natively | Simulated dialogue theater adds tokens, can misrepresent the actual computation, and adds no explanatory value | Use ENHANCED: keep structure, validation, and tracking; omit the fabricated dialogue display |
+
+  </output_contract>
   </input_output_system>
 
 </instructions>
@@ -638,25 +370,30 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 
 | Target | Method | Criteria |
 |--------|--------|----------|
-| Input validation | Length, clarity | Min 10 chars, clear problem |
-| Problem decomposition | Complexity analysis | Appropriate step count |
-| Step generation | Structure check | All required fields present |
-| Self-dialogue | Content check | Relevant and logical |
-| Tool integration | Placement check | Tools in appropriate steps |
-| Output format | Structure validation | All required sections |
-| Quality metrics | Calculation | All metrics computed |
+| Activation routing | Request inspection | Non-trivial, multi-step, not excluded by NOT-conditions |
+| Mode selection | Tier rules | Mode matches complexity, tool availability, and model capability |
+| Problem decomposition | Complexity analysis | Appropriate step count for the tier |
+| Step generation | Structure check | All tier-required fields present |
+| Self-dialogue | Content check | Relevant and logical (STANDARD/BASIC only) |
+| Tool integration | Category check | Tools planned by category; no invented tool names |
+| Output format | `scripts/validate-system-flow.sh` | All tier-required sections present; MINIMAL budget respected |
+| Quality metrics | Calculation | All tier-required metrics computed |
 
 **Commands:**
 ```bash
-# Validate single flow
+# Validate a single markdown flow (tier-aware: checks the contract the flow's mode requires)
 ./scripts/validate-system-flow.sh -s [flow_file.md]
 
-# Validate complete flow
-./scripts/validate-system-flow.sh -d [directory/]
+# Validate every example in the engineering example suite (JSON mode)
+./scripts/validate-system-flow.sh -j assets/system-examples.json
 
-# Force specific mode (example)
-# Modes: STANDARD, BASIC
+# Validate all flows in a directory
+./scripts/validate-system-flow.sh -d [directory/]
 ```
+
+Return codes: 0 = all validations passed, 1 = validation errors found, 2 = usage error.
+The validator enforces the tiered output contract, the four modes, the six thinking types,
+the five patterns, and the category-first tool taxonomy.
 
 </verify>
 
@@ -664,14 +401,8 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   - **cot-reasoning Concept**: The skill provides a reasoning framework that enhances model capabilities
   - **Compatibility**: Works with compatible LLMs, particularly those with tool-calling support
   - **Step Structure**: Every problem decomposed into executable steps
-  - **Self-Dialogue**: Makes reasoning process transparent and auditable
-  - **Tool Integration**: Enables data operations for comprehensive analysis
-  - **Result Tracking**: Maintains complete audit trail of reasoning process
-  
-  **cot-reasoning Benefits:**
-  - Compatible models perform complex reasoning tasks more effectively
-  - Complete reasoning chains with full traceability
-  - Structured output for easy parsing and integration
-  - Quality metrics for every reasoning flow
-  - Auditable reasoning process for all stakeholders
+  - **Self-Dialogue**: Makes reasoning transparent and auditable (STANDARD/BASIC)
+  - **Tool Integration**: Category-first, environment-neutral; BASIC and MINIMAL need no tools
+  - **Cost tiering**: Ceremony scales with problem complexity and model capability
+  - **Validation**: `scripts/validate-system-flow.sh` enforces the output contract
 </notes>

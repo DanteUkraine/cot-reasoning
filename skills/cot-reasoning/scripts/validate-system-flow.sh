@@ -1,32 +1,33 @@
 #!/bin/bash
 # =============================================================================
-# System Flow Validator for cot-reasoning
-# 
-# Purpose: Validate that agentic reasoning flows conform to the required structure
-#          and quality standards for models without native reasoning (, etc.)
-# 
+# System Flow Validator for cot-reasoning v5.0.0
+#
+# Purpose: Validate that reasoning flows conform to the cot-reasoning output
+#          contract, including the cost-tiered requirements per mode
+#          (MINIMAL / BASIC / STANDARD / ENHANCED).
+#
 # Usage: ./validate-system-flow.sh [OPTIONS] <input_file_or_directory>
-# 
+#
 # Options:
-#   -s, --single    Validate a single flow file
+#   -s, --single    Validate a single flow file (markdown)
 #   -d, --directory Validate all flow files in a directory
-#   -j, --json      Validate JSON output structure
-#   -m, --markdown  Validate Markdown output structure
+#   -j, --json      Validate JSON structure (single flow or examples wrapper)
+#   -m, --markdown  Validate Markdown structure (default)
 #   -v, --verbose   Show detailed validation messages
 #   -h, --help      Show this help message
-# 
+#
 # Examples:
 #   ./validate-system-flow.sh -s output.md
 #   ./validate-system-flow.sh -d ./flows/ -v
-#   ./validate-system-flow.sh -m example-flow.md
-# 
+#   ./validate-system-flow.sh -j assets/system-examples.json
+#
 # Returns:
 #   0 - All validations passed
 #   1 - Validation errors found
 #   2 - Usage error
 # =============================================================================
 
-set -euo pipefail
+set -uo pipefail
 
 # =============================================================================
 # Configuration
@@ -35,6 +36,18 @@ set -euo pipefail
 SCRIPT_NAME="validate-system-flow.sh"
 VERSION="5.0.0"
 SKILL_NAME="cot-reasoning"
+GENERATED_BY="cot-reasoning v${VERSION}"
+
+# Contract enums (must match SKILL.md)
+VALID_MODES=("MINIMAL" "BASIC" "STANDARD" "ENHANCED")
+VALID_TYPES=("ANALYTICAL" "CREATIVE" "CRITICAL" "SYSTEMATIC" "ETHICAL" "STRATEGIC")
+VALID_PATTERNS=("Zero-Shot CoT" "Few-Shot CoT" "Auto-CoT" "Tree of Thoughts" "ReAct")
+VALID_COMPLEXITIES=("LOW" "MEDIUM" "HIGH" "VERY_HIGH")
+VALID_TOOLS=("filesystem-read" "filesystem-write" "shell-execution" "web-search" "code-search")
+
+# MINIMAL mode hard boilerplate budget (must match SKILL.md)
+MINIMAL_STRUCTURAL_BUDGET=12
+MINIMAL_STEP_BUDGET=3
 
 # Colors
 RED='\033[0;31m'
@@ -43,7 +56,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Counters
+# Counters (reset per file)
 ERRORS=0
 WARNINGS=0
 CHECKED=0
@@ -53,28 +66,32 @@ PASSED=0
 # Helper Functions
 # =============================================================================
 
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-log_success() {
-    echo -e "${GREEN}[PASS]${NC} $1"
-}
-
-log_warning() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-    ((WARNINGS++))
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-    ((ERRORS++))
-}
+log_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[PASS]${NC} $1"; PASSED=$((PASSED + 1)); }
+log_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; WARNINGS=$((WARNINGS + 1)); }
+log_error()   { echo -e "${RED}[ERROR]${NC} $1"; ERRORS=$((ERRORS + 1)); }
 
 log_header() {
     echo -e "\n${BLUE}================================================================================${NC}"
     echo -e "${BLUE}$1${NC}"
     echo -e "${BLUE}================================================================================${NC}\n"
+}
+
+reset_counters() {
+    ERRORS=0
+    WARNINGS=0
+    CHECKED=0
+    PASSED=0
+}
+
+in_list() {
+    local value="$1"
+    shift
+    local item
+    for item in "$@"; do
+        [[ "$value" == "$item" ]] && return 0
+    done
+    return 1
 }
 
 show_help() {
@@ -83,28 +100,35 @@ ${SKILL_NAME} - System Flow Validator v${VERSION}
 
 Usage: $SCRIPT_NAME [OPTIONS] <input>
 
-Validate agentic reasoning flows for the cot-reasoning.
+Validate reasoning flows against the cot-reasoning output contract.
+Validation is COST-TIERED: the checks applied depend on the flow's
+Reasoning Mode (MINIMAL, BASIC, STANDARD, ENHANCED).
 
 Options:
   -s, --single    Validate a single flow file (markdown)
   -d, --directory Validate all flow files in a directory
-  -j, --json      Validate JSON structure
+  -j, --json      Validate JSON structure (a single flow object or an
+                  examples wrapper with an "examples" array)
   -m, --markdown  Validate Markdown structure (default)
   -v, --verbose   Show detailed validation messages
   -h, --help      Show this help message
 
 Examples:
   $SCRIPT_NAME -s flow_output.md
+  $SCRIPT_NAME -j assets/system-examples.json
   $SCRIPT_NAME -d ./test-flows/ -v
-  $SCRIPT_NAME --markdown --verbose example.md
 
 Validation Checks:
-  ✓ Required sections present
-  ✓ Step structure validity
-  ✓ Tool call formatting
-  ✓ Self-dialogue completeness
-  ✓ Fallback paths defined
-  ✓ Quality metrics present
+  - Core sections present (all modes)
+  - Mode-conditional extended sections (tier-aware)
+  - Step structure validity (fields required by the mode)
+  - Reasoning Mode / Thinking Type / Complexity / Pattern values valid
+  - Tool calls use the category-first taxonomy (no invented tool names)
+  - Fallback paths defined (BASIC/STANDARD/ENHANCED)
+  - Quality metrics present (BASIC/STANDARD/ENHANCED)
+  - MINIMAL boilerplate budget: at most ${MINIMAL_STRUCTURAL_BUDGET} structural
+    lines and at most ${MINIMAL_STEP_BUDGET} steps
+  - Version consistency ("Generated By: ${GENERATED_BY}")
 
 Return Codes:
   0 - All validations passed
@@ -116,432 +140,505 @@ EOF
 }
 
 # =============================================================================
-# Validation Functions
+# Markdown Validation
 # =============================================================================
 
-# Validate required top-level sections
-validate_required_sections() {
-    local file="$1"
-    local content="$2"
-    
-    log_header "Checking Required Sections"
-    
-    local required_sections=(
-        "Reasoning Flow:"
-        "Flow ID:"
-        "Timestamp:"
-        "Reasoning Mode:"
-        "Configuration"
-        "Problem Analysis"
-        "Reasoning Steps"
-        "Key Findings"
-        "Recommendations"
-        "Execution Summary"
-        "Quality Metrics"
-        "Meta Information"
-    )
-    
-    for section in "${required_sections[@]}"; do
-        if grep -q "$section" <<< "$content"; then
-            log_success "Found: $section"
-            ((PASSED++))
-        else
-            log_error "Missing required section: $section"
-        fi
-        ((CHECKED++))
-    done
+# Extract the value of a "**Label:** value" header field
+field_value() {
+    local content="$1"
+    local label="$2"
+    sed -n "s/.*\*\*${label}:\*\* *//p" <<< "$content" | head -1 | sed 's/ *$//'
 }
 
-# Validate flow metadata
-validate_flow_metadata() {
+# Count structural (non-content) lines: headings + header field labels
+count_structural_lines() {
     local content="$1"
-    
-    log_header "Checking Flow Metadata"
-    
-    # Check Flow ID
-    if grep -q "Flow ID:" <<< "$content"; then
-        local flow_id=$(grep "Flow ID:" <<< "$content" | head -1 | sed 's/.*Flow ID: *//')
-        if [[ -n "$flow_id" && ! "$flow_id" =~ \[[:space:]]*\] ]]; then
-            log_success "Flow ID is valid: $flow_id"
-            ((PASSED++))
-        else
-            log_error "Flow ID is empty or invalid"
+    local count=0
+    local line
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^# ]]; then
+            count=$((count + 1))
+        elif [[ "$line" =~ ^\*\*(Reasoning\ Mode|Thinking\ Type|Complexity|Steps):\*\* ]]; then
+            count=$((count + 1))
         fi
-    else
-        log_error "Flow ID is missing"
-    fi
-    ((CHECKED++))
-    
-    # Check Agentic Mode
-    local valid_modes=("STANDARD" "BASIC")
-    if grep -q "Reasoning Mode:" <<< "$content"; then
-        local mode=$(grep "Reasoning Mode:" <<< "$content" | head -1 | sed 's/.*Reasoning Mode: *//')
-        if [[ " ${valid_modes[*]} " =~ " ${mode} " ]]; then
-            log_success "Reasoning Mode is valid: $mode"
-            ((PASSED++))
+    done <<< "$content"
+    echo "$count"
+}
+
+validate_step_block() {
+    local step_number="$1"
+    local block="$2"
+    local mode="$3"
+    local required_fields=()
+
+    case "$mode" in
+        MINIMAL)
+            required_fields=("Action" "Expected Output" "Validation")
+            ;;
+        BASIC)
+            required_fields=("Thought" "Why" "Action" "Expected Output" "Validation" "Next Step" "Fallback")
+            ;;
+        ENHANCED)
+            required_fields=("Why" "Action" "Expected Output" "Validation" "Next Step" "Fallback")
+            ;;
+        *)
+            required_fields=("Thought" "Why" "Action" "Expected Output" "Validation" "Next Step" "Fallback")
+            ;;
+    esac
+
+    local field
+    for field in "${required_fields[@]}"; do
+        CHECKED=$((CHECKED + 1))
+        if grep -q "\*\*${field}:\*\*" <<< "$block"; then
+            log_success "Step $step_number: $field present"
         else
-            log_error "Invalid Reasoning Mode: $mode (must be one of: ${valid_modes[*]})"
+            log_error "Step $step_number: Missing field - $field (required in $mode mode)"
+        fi
+    done
+
+    # Tool field: category-first taxonomy
+    CHECKED=$((CHECKED + 1))
+    if grep -q "\*\*Tool:\*\*" <<< "$block"; then
+        local tool
+        tool=$(sed -n "s/.*\*\*Tool:\*\* *//p" <<< "$block" | head -1 | awk '{print $1}')
+        if [[ "$tool" == "None" ]] || [[ -z "$tool" ]]; then
+            log_success "Step $step_number: Tool is None (pure reasoning)"
+        elif in_list "$tool" "${VALID_TOOLS[@]}"; then
+            log_success "Step $step_number: Tool category valid - $tool"
+            if ! grep -q "\*\*Tool Parameters:\*\*" <<< "$block"; then
+                log_warning "Step $step_number: Tool specified but no Tool Parameters found"
+            fi
+        else
+            log_error "Step $step_number: '$tool' is not a tool category (allowed: ${VALID_TOOLS[*]} or None)"
+        fi
+    fi
+}
+
+validate_markdown() {
+    local file="$1"
+    local content
+    content=$(cat "$file" 2>/dev/null || "")
+
+    if [[ -z "$content" ]]; then
+        log_error "File is empty or unreadable: $file"
+        return
+    fi
+
+    # ---- Core sections (mandatory in every mode) ----
+    log_header "Checking Core Sections (all modes)"
+    local core_sections=("Reasoning Flow:" "Reasoning Mode:" "Thinking Type:" "Complexity:" "Reasoning Steps" "Key Findings" "Recommendations")
+    local section
+    for section in "${core_sections[@]}"; do
+        CHECKED=$((CHECKED + 1))
+        if grep -q "$section" <<< "$content"; then
+            log_success "Found: $section"
+        else
+            log_error "Missing core section: $section (required in every mode)"
+        fi
+    done
+
+    # ---- Flow metadata values ----
+    log_header "Checking Flow Metadata"
+    local mode type complexity pattern
+
+    CHECKED=$((CHECKED + 1))
+    mode=$(field_value "$content" "Reasoning Mode")
+    if [[ -n "$mode" ]]; then
+        if in_list "$mode" "${VALID_MODES[@]}"; then
+            log_success "Reasoning Mode is valid: $mode"
+        else
+            log_error "Invalid Reasoning Mode: '$mode' (must be one of: ${VALID_MODES[*]})"
+            mode="STANDARD"
         fi
     else
         log_error "Reasoning Mode is missing"
+        mode="STANDARD"
     fi
-    ((CHECKED++))
-    
-    # Check Thinking Type
-    local valid_thinking_types=("ANALYTICAL" "CREATIVE" "CRITICAL" "SYSTEMATIC")
-    if grep -q "Thinking Type:" <<< "$content"; then
-        local thinking_type=$(grep "Thinking Type:" <<< "$content" | head -1 | sed 's/.*Thinking Type: *//')
-        if [[ " ${valid_thinking_types[*]} " =~ " ${thinking_type} " ]]; then
-            log_success "Thinking Type is valid: $thinking_type"
-            ((PASSED++))
+
+    CHECKED=$((CHECKED + 1))
+    type=$(field_value "$content" "Thinking Type")
+    if [[ -n "$type" ]]; then
+        if in_list "$type" "${VALID_TYPES[@]}"; then
+            log_success "Thinking Type is valid: $type"
         else
-            log_error "Invalid Thinking Type: $thinking_type"
+            log_error "Invalid Thinking Type: '$type' (must be one of: ${VALID_TYPES[*]})"
         fi
     else
         log_error "Thinking Type is missing"
     fi
-    ((CHECKED++))
-    
-    # Check Complexity
-    local valid_complexities=("LOW" "MEDIUM" "HIGH" "VERY_HIGH")
-    if grep -q "Complexity:" <<< "$content"; then
-        local complexity=$(grep "Complexity:" <<< "$content" | head -1 | sed 's/.*Complexity: *//')
-        if [[ " ${valid_complexities[*]} " =~ " ${complexity} " ]]; then
+
+    CHECKED=$((CHECKED + 1))
+    complexity=$(field_value "$content" "Complexity")
+    if [[ -n "$complexity" ]]; then
+        if in_list "$complexity" "${VALID_COMPLEXITIES[@]}"; then
             log_success "Complexity is valid: $complexity"
-            ((PASSED++))
         else
-            log_error "Invalid Complexity: $complexity"
+            log_error "Invalid Complexity: '$complexity' (must be one of: ${VALID_COMPLEXITIES[*]})"
         fi
     else
         log_error "Complexity is missing"
     fi
-    ((CHECKED++))
-}
 
-# Validate step structure
-validate_step_structure() {
-    local content="$1"
-    
-    log_header "Checking Step Structure"
-    
-    # Extract all steps
-    local steps=()
+    CHECKED=$((CHECKED + 1))
+    pattern=$(field_value "$content" "Pattern")
+    if [[ -n "$pattern" ]]; then
+        if in_list "$pattern" "${VALID_PATTERNS[@]}"; then
+            log_success "Pattern is valid: $pattern"
+        else
+            log_error "Invalid Pattern: '$pattern' (must be one of: ${VALID_PATTERNS[*]})"
+        fi
+    else
+        log_warning "No Pattern field found (recommended)"
+    fi
+
+    # ---- Mode-conditional extended sections ----
+    log_header "Checking Extended Sections (mode: $mode)"
+    local extended_sections=()
+    case "$mode" in
+        MINIMAL)
+            ;;
+        BASIC)
+            extended_sections=("Problem Analysis" "Quality Metrics")
+            ;;
+        *)
+            extended_sections=("Flow ID:" "Timestamp:" "Configuration" "Problem Analysis" "Intermediate Results" "Execution Summary" "Quality Metrics" "Meta Information")
+            ;;
+    esac
+    for section in "${extended_sections[@]}"; do
+        CHECKED=$((CHECKED + 1))
+        if grep -q "$section" <<< "$content"; then
+            log_success "Found: $section (required in $mode)"
+        else
+            log_error "Missing section: $section (required in $mode mode)"
+        fi
+    done
+
+    # ---- Quality metrics (BASIC and above) ----
+    if [[ "$mode" != "MINIMAL" ]]; then
+        log_header "Checking Quality Metrics"
+        local metrics=("Confidence Level" "Reasoning Quality" "Step Completion" "Actionability")
+        local metric
+        for metric in "${metrics[@]}"; do
+            CHECKED=$((CHECKED + 1))
+            if grep -q "\*\*${metric}:\*\*" <<< "$content"; then
+                log_success "Found metric: $metric"
+            else
+                log_error "Missing quality metric: $metric (required in $mode mode)"
+            fi
+        done
+    fi
+
+    # ---- Version consistency ----
+    log_header "Checking Version Consistency"
+    CHECKED=$((CHECKED + 1))
+    local generated_by
+    generated_by=$(sed -n "s/.*\*\*Generated By:\*\* *//p" <<< "$content" | head -1)
+    if [[ -n "$generated_by" ]]; then
+        if [[ "$generated_by" == "$GENERATED_BY" ]]; then
+            log_success "Generated By is consistent: $generated_by"
+        else
+            log_error "Generated By mismatch: '$generated_by' (expected: $GENERATED_BY)"
+        fi
+    else
+        log_warning "No Generated By field found"
+    fi
+
+    # ---- Step structure ----
+    log_header "Checking Step Structure (mode: $mode)"
+    local step_count
+    step_count=$(grep -c "^### Step [0-9]" <<< "$content" || true)
+
+    CHECKED=$((CHECKED + 1))
+    if [[ "$step_count" -eq 0 ]]; then
+        log_error "No steps found in flow"
+    else
+        log_success "Found $step_count steps"
+    fi
+
+    if [[ "$mode" == "MINIMAL" && "$step_count" -gt "$MINIMAL_STEP_BUDGET" ]]; then
+        CHECKED=$((CHECKED + 1))
+        log_error "MINIMAL mode allows at most $MINIMAL_STEP_BUDGET steps; found $step_count"
+    fi
+
+    # Validate each step block
+    local blocks=()
+    local cur=""
+    local line
     while IFS= read -r line; do
-        if [[ "$line" =~ ^\#\#\#\ Step\ [0-9]+: ]]; then
-            steps+=("$line")
+        if [[ "$line" =~ ^###\ Step\ [0-9]+: ]]; then
+            if [[ -n "$cur" ]]; then
+                blocks+=("$cur")
+            fi
+            cur="$line"$'\n'
+        elif [[ -n "$cur" ]]; then
+            if [[ "$line" =~ ^#{2,3}\  ]]; then
+                blocks+=("$cur")
+                cur=""
+            else
+                cur+="$line"$'\n'
+            fi
         fi
     done <<< "$content"
-    
-    if [[ ${#steps[@]} -eq 0 ]]; then
-        log_error "No steps found in flow"
-        return
+    if [[ -n "$cur" ]]; then
+        blocks+=("$cur")
     fi
-    
-    log_success "Found ${#steps[@]} steps"
-    ((PASSED++))
-    ((CHECKED++))
-    
-    # Validate each step
-    local step_count=${#steps[@]}
-    for ((i=0; i<step_count; i++)); do
-        local step_section="${steps[$i]}"
-        local step_number=$(echo "$step_section" | grep -oP 'Step \K[0-9]+')
-        
-        # Extract step content (from this step to next step or section)
-        local step_content=$(sed -n "/^${step_section}/,/^\#\#\#/p" <<< "$content" | head -n -1)
-        
-        validate_single_step "$step_number" "$step_content"
+
+    local i
+    for i in "${!blocks[@]}"; do
+        validate_step_block "$((i + 1))" "${blocks[$i]}" "$mode"
     done
-}
 
-# Validate a single step
-validate_single_step() {
-    local step_number="$1"
-    local step_content="$2"
-    
-    local required_fields=(
-        "Thought:"
-        "Why:"
-        "Action:"
-        "Expected Output:"
-        "Validation:"
-        "Next Step:"
-        "Fallback:"
-    )
-    
-    for field in "${required_fields[@]}"; do
-        if grep -q "$field" <<< "$step_content"; then
-            log_success "Step $step_number: $field present"
-            ((PASSED++))
+    # ---- MINIMAL boilerplate budget ----
+    if [[ "$mode" == "MINIMAL" ]]; then
+        log_header "Checking MINIMAL Boilerplate Budget"
+        local structural
+        structural=$(count_structural_lines "$content")
+        CHECKED=$((CHECKED + 1))
+        log_info "Structural (non-content) lines: $structural (budget: $MINIMAL_STRUCTURAL_BUDGET)"
+        if [[ "$structural" -le "$MINIMAL_STRUCTURAL_BUDGET" ]]; then
+            log_success "MINIMAL flow within boilerplate budget ($structural <= $MINIMAL_STRUCTURAL_BUDGET)"
         else
-            log_error "Step $step_number: Missing field - $field"
+            log_error "MINIMAL flow exceeds boilerplate budget ($structural > $MINIMAL_STRUCTURAL_BUDGET)"
         fi
-        ((CHECKED++))
-    done
-    
-    # Check Tool field (optional but recommended for data steps)
-    if grep -q "Tool:" <<< "$step_content"; then
-        local tool=$(grep "Tool:" <<< "$step_content" | head -1 | sed 's/.*Tool: *//')
-        if [[ "$tool" != "None" ]]; then
-            # Check for Tool Parameters if tool is not None
-            if grep -q "Tool Parameters:" <<< "$step_content"; then
-                log_success "Step $step_number: Tool Parameters present for $tool"
-                ((PASSED++))
-            else
-                log_warning "Step $step_number: Tool specified but no Tool Parameters found"
-            fi
-        fi
-        ((CHECKED++))
     fi
-    
-    # Check Status field
-    if grep -q "Status:" <<< "$step_content"; then
-        local status=$(grep "Status:" <<< "$step_content" | head -1 | sed 's/.*Status: *//')
-        local valid_statuses=("pending" "completed" "failed" "skipped")
-        if [[ " ${valid_statuses[*]} " =~ " ${status} " ]]; then
-            log_success "Step $step_number: Status is valid - $status"
-            ((PASSED++))
-        else
-            log_error "Step $step_number: Invalid Status - $status"
-        fi
-    else
-        log_warning "Step $step_number: Status field missing (recommended)"
-    fi
-    ((CHECKED++))
-    
-    # Check Complexity field
-    if grep -q "Complexity:" <<< "$step_content"; then
-        local step_complexity=$(grep "Complexity:" <<< "$step_content" | head -1 | sed 's/.*Complexity: *//')
-        local valid_complexities=("LOW" "MEDIUM" "HIGH")
-        if [[ " ${valid_complexities[*]} " =~ " ${step_complexity} " ]]; then
-            log_success "Step $step_number: Complexity is valid - $step_complexity"
-            ((PASSED++))
-        else
-            log_error "Step $step_number: Invalid Complexity - $step_complexity"
-        fi
-    else
-        log_warning "Step $step_number: Complexity field missing (recommended)"
-    fi
-    ((CHECKED++))
 }
 
-# Validate self-dialogue quality
-validate_self_dialogue() {
-    local content="$1"
-    
-    log_header "Checking Self-Dialogue Quality"
-    
-    # Check for dialogue components in steps
-    local dialogue_components=("Thought:" "Analysis:" "Question:" "Answer:" "Conclusion:" "Decision:")
-    
-    for component in "${dialogue_components[@]}"; do
-        local count=$(grep -c "$component" <<< "$content" || true)
-        if [[ $count -gt 0 ]]; then
-            log_success "Found $count instances of $component"
-            ((PASSED++))
-        else
-            log_warning "No instances of $component found (may be intentional)"
-        fi
-        ((CHECKED++))
-    done
-}
+# =============================================================================
+# JSON Validation
+# =============================================================================
 
-# Validate tool integration
-validate_tool_integration() {
-    local content="$1"
-    
-    log_header "Checking Tool Integration"
-    
-    # Check if tools are used
-    if grep -q "Tool:" <<< "$content"; then
-        log_success "Tools are used in flow"
-        ((PASSED++))
-        
-        # Validate tool calls
-        local tool_calls=$(grep -c "Tool:" <<< "$content" || true)
-        log_success "Found $tool_calls tool calls"
-        
-        # Check for valid tools
-        local valid_tools=("file_read" "file_write" "code_analyzer" "web_search" "grep" "bash")
-        while IFS= read -r line; do
-            if [[ "$line" =~ Tool:\ *([^[:space:]]+) ]]; then
-                local tool="${BASH_REMATCH[1]}"
-                if [[ "$tool" != "None" && " ${valid_tools[*]} " != *" ${tool} "* ]]; then
-                    log_warning "Potentially invalid tool: $tool"
-                fi
-            fi
-        done <<< "$content"
-    else
-        log_warning "No tools used in flow (may be intentional for BASIC mode)"
-    fi
-    ((CHECKED++))
-}
-
-# Validate quality metrics
-validate_quality_metrics() {
-    local content="$1"
-    
-    log_header "Checking Quality Metrics"
-    
-    local required_metrics=(
-        "Confidence Level:"
-        "Agentic Simulation Quality:"
-        "Tool Utilization:"
-        "Step Completion Rate:"
-        "Actionability Score:"
-    )
-    
-    for metric in "${required_metrics[@]}"; do
-        if grep -q "$metric" <<< "$content"; then
-            log_success "Found: $metric"
-            ((PASSED++))
-        else
-            log_error "Missing quality metric: $metric"
-        fi
-        ((CHECKED++))
-    done
-}
-
-# Validate recommendations
-validate_recommendations() {
-    local content="$1"
-    
-    log_header "Checking Recommendations"
-    
-    if grep -q "## Recommendations" <<< "$content"; then
-        log_success "Recommendations section found"
-        ((PASSED++))
-        
-        # Check for recommendation items
-        if grep -q "^\s*1\." <<< "$content"; then
-            local rec_count=$(grep -c "^\s*[0-9]\+\." <<< "$content" || true)
-            log_success "Found $rec_count recommendations"
-            ((PASSED++))
-        else
-            log_warning "No numbered recommendations found"
-        fi
-        
-        # Check for priority/impact/effort in recommendations
-        local priority_check=$(grep -c "Priority:" <<< "$content" || true)
-        local impact_check=$(grep -c "Impact:" <<< "$content" || true)
-        
-        if [[ $priority_check -gt 0 ]]; then
-            log_success "Recommendations include Priority"
-            ((PASSED++))
-        else
-            log_warning "Recommendations missing Priority field"
-        fi
-        
-        if [[ $impact_check -gt 0 ]]; then
-            log_success "Recommendations include Impact"
-            ((PASSED++))
-        else
-            log_warning "Recommendations missing Impact field"
-        fi
-    else
-        log_error "Recommendations section missing"
-    fi
-    ((CHECKED++))
-}
-
-# Validate fallback paths
-validate_fallbacks() {
-    local content="$1"
-    
-    log_header "Checking Fallback Paths"
-    
-    local fallback_count=$(grep -c "Fallback:" <<< "$content" || true)
-    local step_count=$(grep -c "^### Step" <<< "$content" || true)
-    
-    if [[ $fallback_count -eq $step_count ]]; then
-        log_success "All $step_count steps have Fallback defined"
-        ((PASSED++))
-    elif [[ $fallback_count -gt 0 ]]; then
-        log_warning "Only $fallback_count of $step_count steps have Fallback defined"
-    else
-        log_error "No Fallback paths defined"
-    fi
-    ((CHECKED++))
-}
-
-# Validate for cot-reasoning specific requirements
-validate_cot_resoning_requirements() {
-    local content="$1"
-    
-    log_header "Checking cot-reasoning Specific Requirements"
-    
-    # Check if mode is STANDARD
-    if grep -q "Agentic Mode: STANDARD" <<< "$content"; then
-        log_success "Mode is STANDARD (recommended for cot-reasoning)"
-        ((PASSED++))
-        
-        # For STANDARD, tools should be used
-        if grep -q "Tool:" <<< "$content"; then
-            log_success "Tools are used (required for STANDARD)"
-            ((PASSED++))
-        else
-            log_error "STANDARD mode but no tools used"
-        fi
-        
-        # Check tool utilization metric
-        if grep -q "Tool Utilization:" <<< "$content"; then
-            local utilization=$(grep "Tool Utilization:" <<< "$content" | sed 's/.*Tool Utilization: *//' | sed 's/%//')
-            if [[ "$utilization" =~ ^[0-9]+(\.[0-9]+)?$ ]] && (( $(echo "$utilization > 50" | bc -l) )); then
-                log_success "Tool Utilization is high: ${utilization}%"
-                ((PASSED++))
-            else
-                log_warning "Tool Utilization could be higher: ${utilization}%"
-            fi
-        fi
-    else
-        log_warning "Mode is not STANDARD (not optimized for cot-reasoning)"
-    fi
-    
-    ((CHECKED++))
-}
-
-# Validate JSON structure (for JSON output)
-validate_json_structure() {
+json_has() {
+    # json_has <file> <jq-path> -> exit 0 if the path exists and is not null/false
     local file="$1"
-    
+    local path="$2"
+    jq -e "$path" "$file" > /dev/null 2>&1
+}
+
+json_has_key() {
+    # json_has_key <file> <object-path> <key>
+    local file="$1"
+    local path="$2"
+    local key="$3"
+    jq -e "${path} | has(\"${key}\")" "$file" > /dev/null 2>&1
+}
+
+validate_json_step() {
+    local file="$1"
+    local prefix="$2"
+    local index="$3"
+    local mode="$4"
+    local step_path="${prefix}.flow.steps[${index}]"
+    local required_fields=()
+
+    case "$mode" in
+        MINIMAL)
+            required_fields=("action" "expected_output" "validation")
+            ;;
+        BASIC)
+            required_fields=("thought" "why" "action" "expected_output" "validation" "next_step" "fallback")
+            ;;
+        ENHANCED)
+            required_fields=("why" "action" "expected_output" "validation" "next_step" "fallback")
+            ;;
+        *)
+            required_fields=("thought" "why" "action" "tool" "input" "expected_output" "validation" "status" "next_step" "fallback")
+            ;;
+    esac
+
+    local field
+    for field in "${required_fields[@]}"; do
+        CHECKED=$((CHECKED + 1))
+        if json_has_key "$file" "$step_path" "$field"; then
+            log_success "Step $((index + 1)): field '$field' present"
+        else
+            log_error "Step $((index + 1)): missing field '$field' (required in $mode mode)"
+        fi
+    done
+
+    # Tool category check
+    CHECKED=$((CHECKED + 1))
+    local tool
+    tool=$(jq -r "${step_path}.tool" "$file" 2>/dev/null)
+    if [[ "$tool" == "null" || -z "$tool" ]]; then
+        log_success "Step $((index + 1)): tool is null (pure reasoning)"
+    elif in_list "$tool" "${VALID_TOOLS[@]}"; then
+        log_success "Step $((index + 1)): tool category valid - $tool"
+    else
+        log_error "Step $((index + 1)): '$tool' is not a tool category (allowed: ${VALID_TOOLS[*]} or null)"
+    fi
+}
+
+validate_json_example() {
+    local file="$1"
+    local prefix="$2"
+    local label="$3"
+
+    log_header "Validating JSON ${label}"
+
+    # ---- Enum fields ----
+    local mode type complexity pattern
+
+    CHECKED=$((CHECKED + 1))
+    mode=$(jq -r "${prefix}.mode // empty" "$file" 2>/dev/null)
+    if in_list "$mode" "${VALID_MODES[@]}"; then
+        log_success "mode is valid: $mode"
+    else
+        log_error "Invalid mode: '$mode' (must be one of: ${VALID_MODES[*]})"
+        mode="STANDARD"
+    fi
+
+    CHECKED=$((CHECKED + 1))
+    type=$(jq -r "${prefix}.thinking_type // empty" "$file" 2>/dev/null)
+    if in_list "$type" "${VALID_TYPES[@]}"; then
+        log_success "thinking_type is valid: $type"
+    else
+        log_error "Invalid thinking_type: '$type' (must be one of: ${VALID_TYPES[*]})"
+    fi
+
+    CHECKED=$((CHECKED + 1))
+    complexity=$(jq -r "${prefix}.complexity // empty" "$file" 2>/dev/null)
+    if in_list "$complexity" "${VALID_COMPLEXITIES[@]}"; then
+        log_success "complexity is valid: $complexity"
+    else
+        log_error "Invalid complexity: '$complexity' (must be one of: ${VALID_COMPLEXITIES[*]})"
+    fi
+
+    CHECKED=$((CHECKED + 1))
+    pattern=$(jq -r "${prefix}.pattern // empty" "$file" 2>/dev/null)
+    if in_list "$pattern" "${VALID_PATTERNS[@]}"; then
+        log_success "pattern is valid: $pattern"
+    else
+        log_error "Invalid pattern: '$pattern' (must be one of: ${VALID_PATTERNS[*]})"
+    fi
+
+    # ---- Steps ----
+    CHECKED=$((CHECKED + 1))
+    local step_count
+    step_count=$(jq -r "${prefix}.flow.steps | length" "$file" 2>/dev/null || echo 0)
+    if [[ "$step_count" -gt 0 ]]; then
+        log_success "Found $step_count steps"
+    else
+        log_error "No steps found in flow"
+    fi
+
+    if [[ "$mode" == "MINIMAL" && "$step_count" -gt "$MINIMAL_STEP_BUDGET" ]]; then
+        CHECKED=$((CHECKED + 1))
+        log_error "MINIMAL mode allows at most $MINIMAL_STEP_BUDGET steps; found $step_count"
+    fi
+
+    local i
+    for ((i = 0; i < step_count; i++)); do
+        validate_json_step "$file" "$prefix" "$i" "$mode"
+    done
+
+    # ---- Findings and recommendations ----
+    CHECKED=$((CHECKED + 1))
+    local findings_count
+    findings_count=$(jq -r "${prefix}.flow.key_findings | length" "$file" 2>/dev/null || echo 0)
+    if [[ "$findings_count" -gt 0 ]]; then
+        log_success "Found $findings_count key findings"
+    else
+        log_error "key_findings is empty or missing"
+    fi
+
+    CHECKED=$((CHECKED + 1))
+    local rec_count
+    rec_count=$(jq -r "${prefix}.flow.recommendations | length" "$file" 2>/dev/null || echo 0)
+    if [[ "$rec_count" -gt 0 ]]; then
+        log_success "Found $rec_count recommendations"
+    else
+        log_error "recommendations is empty or missing"
+    fi
+
+    # ---- Mode-conditional sections ----
+    if [[ "$mode" != "MINIMAL" ]]; then
+        CHECKED=$((CHECKED + 1))
+        if json_has "$file" "${prefix}.flow.problem_analysis"; then
+            log_success "problem_analysis present (required in $mode)"
+        else
+            log_error "problem_analysis missing (required in $mode mode)"
+        fi
+
+        CHECKED=$((CHECKED + 1))
+        if json_has "$file" "${prefix}.flow.quality_metrics"; then
+            log_success "quality_metrics present (required in $mode)"
+        else
+            log_error "quality_metrics missing (required in $mode mode)"
+        fi
+
+        local metric_keys=("confidence_level" "reasoning_quality" "step_completion" "actionability")
+        local key
+        for key in "${metric_keys[@]}"; do
+            CHECKED=$((CHECKED + 1))
+            if json_has_key "$file" "${prefix}.flow.quality_metrics" "$key"; then
+                log_success "quality_metrics.$key present"
+            else
+                log_error "quality_metrics.$key missing (required in $mode mode)"
+            fi
+        done
+    fi
+
+    if [[ "$mode" == "STANDARD" || "$mode" == "ENHANCED" ]]; then
+        local extended=("flow_id" "timestamp" "configuration" "intermediate_results" "execution_summary" "meta")
+        local field
+        for field in "${extended[@]}"; do
+            CHECKED=$((CHECKED + 1))
+            if json_has "$file" "${prefix}.flow.${field}"; then
+                log_success "flow.$field present (required in $mode)"
+            else
+                log_error "flow.$field missing (required in $mode mode)"
+            fi
+        done
+
+        CHECKED=$((CHECKED + 1))
+        local generated_by
+        generated_by=$(jq -r "${prefix}.flow.meta.generated_by // empty" "$file" 2>/dev/null)
+        if [[ "$generated_by" == "$GENERATED_BY" ]]; then
+            log_success "meta.generated_by is consistent: $generated_by"
+        else
+            log_error "meta.generated_by mismatch: '$generated_by' (expected: $GENERATED_BY)"
+        fi
+    fi
+}
+
+validate_json_file() {
+    local file="$1"
+
     log_header "Checking JSON Structure"
-    
-    if ! command -v jq &> /dev/null; then
+
+    if ! command -v jq > /dev/null 2>&1; then
         log_error "jq is required for JSON validation. Install with: sudo apt-get install jq"
         return
     fi
-    
-    # Try to parse JSON
-    if jq empty "$file" 2>/dev/null; then
+
+    CHECKED=$((CHECKED + 1))
+    if jq empty "$file" > /dev/null 2>&1; then
         log_success "Valid JSON structure"
-        ((PASSED++))
     else
         log_error "Invalid JSON structure"
         return
     fi
-    
-    # Check required JSON fields
-    local required_fields=("flow_id" "agentic_mode" "steps" "key_findings" "recommendations")
-    
-    for field in "${required_fields[@]}"; do
-        if jq -e ".$field" "$file" > /dev/null 2>&1; then
-            log_success "JSON field '$field' present"
-            ((PASSED++))
+
+    # Examples wrapper or single flow object?
+    if json_has "$file" ".examples"; then
+        CHECKED=$((CHECKED + 1))
+        local wrapper_version
+        wrapper_version=$(jq -r ".metadata.version // empty" "$file" 2>/dev/null)
+        if [[ "$wrapper_version" == "$VERSION" ]]; then
+            log_success "Wrapper metadata.version is consistent: $wrapper_version"
         else
-            log_error "JSON field '$field' missing"
+            log_error "Wrapper metadata.version mismatch: '$wrapper_version' (expected: $VERSION)"
         fi
-        ((CHECKED++))
-    done
-    
-    # Validate steps array
-    local step_count=$(jq '.steps | length' "$file" 2>/dev/null || echo "0")
-    if [[ $step_count -gt 0 ]]; then
-        log_success "Found $step_count steps in JSON"
-        ((PASSED++))
+
+        local count
+        count=$(jq -r ".examples | length" "$file" 2>/dev/null || echo 0)
+        local i
+        for ((i = 0; i < count; i++)); do
+            validate_json_example "$file" ".examples[${i}]" "example[$i] ($(jq -r ".examples[${i}].id // \"?\"" "$file"))"
+        done
     else
-        log_error "No steps found in JSON"
+        validate_json_example "$file" "" "flow"
     fi
-    ((CHECKED++))
 }
 
 # =============================================================================
@@ -551,32 +648,22 @@ validate_json_structure() {
 validate_file() {
     local file="$1"
     local is_json="$2"
-    local verbose="$3"
-    
+
     if [[ ! -f "$file" ]]; then
         log_error "File not found: $file"
         return 1
     fi
-    
+
     log_header "Validating: $file"
-    
-    local content=$(cat "$file")
-    
-    # Markdown validation
-    if [[ "$is_json" != "true" ]]; then
-        validate_required_sections "$file" "$content"
-        validate_flow_metadata "$content"
-        validate_step_structure "$content"
-        validate_self_dialogue "$content"
-        validate_tool_integration "$content"
-        validate_quality_metrics "$content"
-        validate_recommendations "$content"
-        validate_fallbacks "$content"
-        validate_cot_resoning_requirements "$content"
+
+    reset_counters
+
+    if [[ "$is_json" == "true" ]]; then
+        validate_json_file "$file"
     else
-        validate_json_structure "$file"
+        validate_markdown "$file"
     fi
-    
+
     # Summary
     echo ""
     log_header "Validation Summary for: $file"
@@ -585,12 +672,12 @@ validate_file() {
     echo -e "  Warnings:   ${YELLOW}$WARNINGS${NC}"
     echo -e "  Errors:     ${RED}$ERRORS${NC}"
     echo ""
-    
+
     if [[ $ERRORS -eq 0 ]]; then
-        echo -e "${GREEN}✓ All validations passed!${NC}"
+        echo -e "${GREEN}OK: All validations passed!${NC}"
         return 0
     else
-        echo -e "${RED}✗ Validation failed with $ERRORS error(s)${NC}"
+        echo -e "${RED}FAIL: Validation failed with $ERRORS error(s)${NC}"
         return 1
     fi
 }
@@ -600,23 +687,18 @@ validate_file() {
 # =============================================================================
 
 main() {
-    # Parse arguments
     local mode="markdown"
     local verbose="false"
     local target=""
-    
+
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -s|--single)
                 mode="single"
                 shift
-                target="$1"
-                shift
                 ;;
             -d|--directory)
                 mode="directory"
-                shift
-                target="$1"
                 shift
                 ;;
             -j|--json)
@@ -635,7 +717,6 @@ main() {
                 show_help
                 ;;
             *)
-                # Assume it's a positional argument
                 if [[ -z "$target" ]]; then
                     target="$1"
                 fi
@@ -643,31 +724,30 @@ main() {
                 ;;
         esac
     done
-    
-    # If no target specified, show help
+
     if [[ -z "$target" ]]; then
         show_help
     fi
-    
-    # Check if target exists
+
     if [[ ! -e "$target" ]]; then
         log_error "Target does not exist: $target"
         exit 2
     fi
-    
+
     log_header "${SKILL_NAME} - System Flow Validator v${VERSION}"
     echo -e "Mode:       $mode"
     echo -e "Target:     $target"
     echo -e "Verbose:    $verbose"
     echo ""
-    
-    # Process based on mode
+
     case "$mode" in
         "single")
             if [[ "$target" == *.json ]]; then
-                validate_file "$target" "true" "$verbose"
+                validate_file "$target" "true"
+                exit $?
             else
-                validate_file "$target" "false" "$verbose"
+                validate_file "$target" "false"
+                exit $?
             fi
             ;;
         "directory")
@@ -675,44 +755,42 @@ main() {
             local total_checks=0
             local total_passed=0
             local files_processed=0
-            
+            local file
+
             while IFS= read -r -d "" file; do
                 if [[ -f "$file" ]]; then
                     files_processed=$((files_processed + 1))
                     if [[ "$file" == *.json ]]; then
-                        validate_file "$file" "true" "$verbose" || true
+                        validate_file "$file" "true" || true
                     else
-                        validate_file "$file" "false" "$verbose" || true
+                        validate_file "$file" "false" || true
                     fi
                     total_errors=$((total_errors + ERRORS))
                     total_checks=$((total_checks + CHECKED))
                     total_passed=$((total_passed + PASSED))
-                    ERRORS=0
-                    CHECKED=0
-                    PASSED=0
-                    WARNINGS=0
                     echo ""
                 fi
             done < <(find "$target" -type f \( -name "*.md" -o -name "*.json" \) -print0)
-            
+
             log_header "Directory Validation Summary"
             echo -e "  Files:      $files_processed"
             echo -e "  Checks:     $total_checks"
             echo -e "  Passed:     ${GREEN}$total_passed${NC}"
             echo -e "  Errors:     ${RED}$total_errors${NC}"
             echo ""
-            
+
             if [[ $total_errors -eq 0 ]]; then
-                echo -e "${GREEN}✓ All files passed validation!${NC}"
+                echo -e "${GREEN}OK: All files passed validation!${NC}"
                 exit 0
             else
-                echo -e "${RED}✗ $total_errors validation errors found${NC}"
+                echo -e "${RED}FAIL: $total_errors validation error(s) found${NC}"
                 exit 1
             fi
             ;;
         "json")
             if [[ -f "$target" && "$target" == *.json ]]; then
-                validate_file "$target" "true" "$verbose"
+                validate_file "$target" "true"
+                exit $?
             else
                 log_error "JSON validation requires a .json file"
                 exit 2
@@ -720,24 +798,23 @@ main() {
             ;;
         "markdown")
             if [[ -f "$target" && "$target" == *.md ]]; then
-                validate_file "$target" "false" "$verbose"
+                validate_file "$target" "false"
+                exit $?
             else
                 log_error "Markdown validation requires a .md file"
                 exit 2
             fi
             ;;
         *)
-            # Default: try to auto-detect
             if [[ "$target" == *.json ]]; then
-                validate_file "$target" "true" "$verbose"
+                validate_file "$target" "true"
+                exit $?
             else
-                validate_file "$target" "false" "$verbose"
+                validate_file "$target" "false"
+                exit $?
             fi
             ;;
     esac
-    
-    exit $?
 }
 
-# Run main function
 main "$@"

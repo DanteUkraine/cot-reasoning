@@ -1,6 +1,6 @@
 ---
 template_id: step-execution-template
-version: "5.0"
+version: "5.0.0"
 category: system-core
 recommended_for: all-problems
 ---
@@ -193,7 +193,7 @@ Self-dialogue and explanations make the reasoning process understandable.
 
 **Action:** Retrieve all relevant data using available tools
 
-**Tool:** file_read
+**Tool:** filesystem-read
 
 **Tool Parameters:**
 ```json
@@ -241,7 +241,7 @@ Self-dialogue and explanations make the reasoning process understandable.
 
 **Action:** Apply analytical methods: pattern recognition, trend analysis, correlation
 
-**Tool:** grep
+**Tool:** code-search
 
 **Tool Parameters:**
 ```json
@@ -289,7 +289,7 @@ Self-dialogue and explanations make the reasoning process understandable.
 
 **Action:** Test hypothesis against available data or constraints
 
-**Tool:** code_analyzer
+**Tool:** code-search
 
 **Tool Parameters:**
 ```json
