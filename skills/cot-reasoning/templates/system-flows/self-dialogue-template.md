@@ -1,6 +1,6 @@
 ---
 template_id: self-dialogue-template
-version: "5.0"
+version: "5.0.0"
 category: system-core
 recommended_for: reasoning-transparency
 domain: universal

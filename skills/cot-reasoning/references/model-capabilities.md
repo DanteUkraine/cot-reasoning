@@ -4,7 +4,7 @@
 
 This document describes the cot-reasoning framework's approach to enhancing model reasoning capabilities.
 
-cot-reasoning v5.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
+cot-reasoning v5.0.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
 
 **Key Principle:** The skill provides a reasoning structure that guides the model's native capabilities; the model processes and enhances this structure using its own reasoning abilities.
 
@@ -18,16 +18,23 @@ cot-reasoning v5.0 provides a **structured reasoning framework** that works with
 |---------------|---------------------|--------------|------------------|-------------------|
 | **LLMs with Tool-Calling** | Varies | Yes | STANDARD | **Optimal** |
 | **LLMs without Tool-Calling** | Varies | No | BASIC | Works well |
-| **Models with Strong Native Reasoning** | High | Varies | STANDARD | Enhanced structure |
+| **Models with Strong Native Reasoning** | High | Varies | ENHANCED | Structure without dialogue overhead |
+| **Models with Limited Native Reasoning** | Low | Varies | STANDARD | Full scaffold carries the reasoning |
 
-### Mode Selection Algorithm
+### Mode Selection Algorithm (capability-scaled)
 
-For models with tool-calling capability:
-- IF tools exist and are relevant → **STANDARD**
-- ELSE → **BASIC**
+Ceremony scales to model capability:
+- IF the problem is trivial (2-3 obvious steps, no evidence gathering) → **MINIMAL**
+- ELSE IF no tools exist in the environment → **BASIC** (fully functional without tools)
+- ELSE IF the model reasons natively and strongly → **ENHANCED** (structure and validation
+  retained; the fabricated self-dialogue display is omitted — see the anti-patterns in
+  SKILL.md's output contract)
+- ELSE → **STANDARD** (full structure; the self-dialogue scaffold carries the reasoning)
 
-For models without tool-calling:
-- → **BASIC** (self-dialogue only, no tool integration)
+**Why capability scaling matters:** for a strong native reasoner, a simulated
+[Thought]/[Question]/[Answer] display adds tokens and can misrepresent the actual
+computation. For a weak reasoner, that same scaffold is load-bearing. The mode choice
+moves the ceremony to where it pays for itself.
 
 ---
 
@@ -64,14 +71,17 @@ fallback: GRACEFUL
 
 ## Tool-Calling Capabilities
 
-| Tool | Purpose | cot-reasoning Usage |
-|------|---------|-------------------|
-| file_read | Read file contents | Data collection, document analysis |
-| file_write | Write file contents | Solution implementation, documentation |
-| code_analyzer | Analyze code | Code review, debugging |
-| web_search | Search web | Research, information gathering |
-| grep | Search in files | Pattern identification, log analysis |
-| bash | Execute commands | System operations, verification |
+Tools are planned by **category**, then bound to whatever the host environment exposes
+(see the tool taxonomy in SKILL.md). BASIC and MINIMAL modes are fully functional with
+no tools at all.
+
+| Category | Purpose | cot-reasoning Usage |
+|----------|---------|-------------------|
+| filesystem-read | Read files, logs, configs | Data collection, document analysis |
+| filesystem-write | Write or edit files | Solution implementation, documentation |
+| shell-execution | Run commands, verify state | System operations, verification |
+| web-search | Search the web | Research, information gathering |
+| code-search | Find patterns in code and logs | Code review, debugging, log analysis |
 
 ---
 

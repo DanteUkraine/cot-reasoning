@@ -52,13 +52,13 @@ User Request
 [Step 2: Data Collection]
     → Thought: "What data is needed?"
     → Action: Gather required information
-    → Tool: file_read, web_search, etc.
+    → Tool: filesystem-read, web-search, etc.
     → Output: Raw data for analysis
     ↓
 [Step 3: Analysis]
     → Thought: "What patterns exist?"
     → Action: Process and analyze data
-    → Tool: code_analyzer, grep, etc.
+    → Tool: code-search, shell-execution, etc.
     → Output: Identified patterns and insights
     ↓
 ... [Additional steps as needed] ...

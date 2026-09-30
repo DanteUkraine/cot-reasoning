@@ -2,343 +2,593 @@
   "metadata": {
     "skill": "cot-reasoning",
     "version": "5.0.0",
-    "last_updated": "2026-08-06",
-    "purpose": "Real-world examples demonstrating system reasoning for ANY model",
-    "primary_target": "Universal reasoning structure for all LLMs"
+    "last_updated": "2026-09-30",
+    "purpose": "Commercial engineering scenarios demonstrating the cot-reasoning output contract across all four modes",
+    "tool_taxonomy": "environment-neutral categories: filesystem-read, filesystem-write, shell-execution, web-search, code-search"
   },
-  
+
   "examples": [
     {
-      "id": "system-debugging-full-flow",
-      "title": "API 500 Errors - Full System Flow",
-      "description": "Complete debugging workflow showing how ANY model can perform multi-step reasoning with tool integration",
-      "system_mode": "STANDARD",
-      "complexity": "HIGH",
-      "tools_used": ["file_read", "grep", "code_analyzer"],
+      "id": "production-incident-connection-pool",
+      "title": "Production Incident: API 500 Errors After Deployment",
+      "description": "Full STANDARD-mode debugging workflow with tool integration, self-dialogue, and root cause confirmation",
+      "scenario_type": "production-incident-debugging",
+      "mode": "STANDARD",
       "thinking_type": "SYSTEMATIC",
-      "cot_pattern": "ReAct",
-      
+      "complexity": "HIGH",
+      "pattern": "ReAct",
+
       "input": {
-        "user_request": "Our production API is returning 500 errors for 5% of requests. The issue started after yesterday's deployment. Available Tools: file_read, grep, code_analyzer.",
-        "context": "Production Node.js API, microservices architecture, PostgreSQL database",
+        "user_request": "Our production API is returning 500 errors for 5% of requests. The issue started after yesterday's deployment. Investigate and identify the root cause.",
+        "context": "Production Node.js API, microservices architecture, PostgreSQL database. Error rate was 0.1% before the deployment.",
         "constraints": ["Cannot restart service during peak hours (9AM-9PM)", "Must identify root cause within 2 hours"],
-        "goal": "Identify root cause and propose fix with minimal downtime"
+        "goal": "Identify root cause and propose a fix with minimal downtime"
       },
-      
-      "output_structure": {
-        "flow_id": "flow_20260806_system_001",
-        "system_mode": "STANDARD",
-        "tool_capability": "YES",
-        "thinking_type": "SYSTEMATIC",
-        "complexity": "HIGH",
+
+      "flow": {
+        "flow_id": "flow_20260930_incident_001",
+        "timestamp": "2026-09-30T09:12:00Z",
+        "configuration": {
+          "domain": "technical",
+          "intent": "SOLVE"
+        },
+        "problem_analysis": {
+          "core_problem": "5% of production API requests fail with 500 errors, starting immediately after deployment v2.3.4",
+          "key_entities": {
+            "api": "Node.js production API",
+            "database": "PostgreSQL with connection pooling",
+            "deployment": "v2.3.4, deployed yesterday"
+          },
+          "success_criteria": [
+            "Root cause identified with supporting evidence - Priority: High",
+            "Fix proposed with rollback plan - Priority: High",
+            "No restart during peak hours - Priority: High"
+          ],
+          "constraints": {
+            "hard": "No service restart 9AM-9PM; root cause within 2 hours",
+            "soft": "Prefer a config-only fix over a code change"
+          }
+        },
         "steps": [
           {
             "step_number": 1,
-            "name": "Understand Problem Scope",
-            "thought": "User reports 500 errors on 5% of API requests. This started after deployment. Need to establish severity and impact.",
+            "name": "Establish Problem Scope",
+            "thought": "User reports 500 errors on 5% of requests since a deployment. Before touching anything, I need to quantify the blast radius: which endpoints, which time window, and how the 5% compares to the pre-deployment baseline of 0.1%.",
             "why": "Cannot investigate without understanding scope and business impact",
             "action": "Analyze error rate, identify affected endpoints, assess user impact",
-            "tool": "None",
-            "input": "User request",
+            "tool": null,
+            "input": "User request and stated baseline",
             "expected_output": "Problem definition with severity assessment and affected endpoints",
             "validation": "Error rate quantified, affected endpoints identified, business impact assessed",
             "status": "completed",
-            "actual_output": "5% error rate = ~500 errors/hour at current traffic. Primary affected endpoint: POST /api/orders. Business impact: Users cannot complete purchases.",
+            "actual_output": "5% error rate = ~500 errors/hour at current traffic. Primary affected endpoint: POST /api/orders. Business impact: users cannot complete purchases.",
+            "next_step": 2,
             "fallback": "If error rate unclear, estimate based on typical traffic patterns",
             "complexity": "LOW"
           },
           {
             "step_number": 2,
             "name": "Collect Error Log Data",
-            "thought": "To identify error patterns, I need actual log data. User mentioned production API, so I should check the main error log.",
+            "thought": "To find error patterns I need the raw error data. The API writes errors to a log file, so filesystem-read on the error log is the direct evidence source.",
             "why": "Cannot analyze error patterns without the raw error data",
-            "action": "Retrieve the most recent error logs from the production API",
-            "tool": "file_read",
-            "tool_parameters": {
-              "path": "api/logs/errors.log",
-              "limit": 1000,
-              "offset": 0
-            },
+            "action": "Retrieve the most recent error entries from the production API error log",
+            "tool": "filesystem-read",
+            "tool_parameters": { "path": "api/logs/errors.log", "limit": 1000 },
             "input": "None",
-            "expected_output": "Last 1000 error entries from production API with timestamps, endpoints, error codes, messages",
-            "validation": "File exists, readable, contains at least 100 error entries, timestamps in chronological order",
+            "expected_output": "Recent error entries with timestamps, endpoints, error codes, messages",
+            "validation": "Log readable, contains entries covering the incident window, timestamps chronological",
             "status": "completed",
             "actual_output": "Retrieved 1500 error entries from last 24 hours. 850 entries for POST /api/orders with 500 status code.",
-            "fallback": [
-              "Try alternative path: file_read(\"var/log/api/errors.log\")",
-              "Use sample error data and note limitation",
-              "Request user to provide error log excerpt"
-            ],
+            "next_step": 3,
+            "fallback": ["Try alternative log path", "Ask the user to paste an error excerpt"],
             "complexity": "MEDIUM"
           },
           {
             "step_number": 3,
             "name": "Identify 500 Error Patterns",
-            "thought": "Now I have error logs. I need to find all 500 errors and group them by type to identify patterns.",
+            "thought": "Now I have raw logs. Grouping the 500 errors by message will show whether this is one failure mode or several. One dominant message points to a single root cause; a spread points to something systemic.",
             "why": "Pattern identification reveals root cause categories and common characteristics",
-            "action": "Search for all 500 errors in the log data and categorize by error message",
-            "tool": "grep",
-            "tool_parameters": {
-              "pattern": " 500 ",
-              "file": "[from Step 2 output]",
-              "options": ["-n", "-A 3", "-B 1"]
-            },
+            "action": "Search the log data for 500 errors and group them by error message",
+            "tool": "code-search",
+            "tool_parameters": { "pattern": " 500 ", "path": "api/logs/errors.log", "options": ["-n", "-A 3"] },
             "input": "Error log data from Step 2",
-            "expected_output": "List of all 500 errors for POST /api/orders with context, grouped by error message type, count of each type",
-            "validation": "All 500 errors captured, context sufficient, grouping accurate, error types clearly identified",
+            "expected_output": "All 500 errors grouped by message type with counts",
+            "validation": "All 500 errors captured, grouping accurate, top error types identified",
             "status": "completed",
-            "actual_output": "Found 850 entries. Top error: 'Connection timeout to database' (680 occurrences, 80%). Other: 'Invalid request body' (120), 'Payment gateway timeout' (50).",
-            "fallback": [
-              "Use manual search through log data",
-              "If no 500 errors found, expand search to all errors",
-              "Note that pattern identification may be incomplete"
-            ],
+            "actual_output": "850 entries for POST /api/orders. Top error: 'Connection timeout to database' (680 occurrences, 80%). Others: 'Invalid request body' (120), 'Payment gateway timeout' (50).",
+            "next_step": 4,
+            "fallback": ["Manual scan of the log excerpt", "Widen the search to all error codes"],
             "complexity": "HIGH"
           },
           {
             "step_number": 4,
-            "name": "Analyze Deployment Correlation",
-            "thought": "80% of errors are database connection timeouts. User mentioned it started after deployment. Need to check what changed.",
-            "why": "Correlation with deployments strongly suggests code or configuration changes as root cause",
-            "action": "Compare error timeline with deployment history to identify correlations",
-            "tool": "file_read",
-            "tool_parameters": {
-              "path": "deployments.log",
-              "limit": 50
-            },
+            "name": "Correlate with Deployment",
+            "thought": "80% of errors are database connection timeouts and the user says it started after a deployment. The strongest hypothesis is a configuration change in that deployment. I need the deployment record to confirm what changed.",
+            "why": "Correlation with the deployment strongly suggests a specific change as root cause",
+            "action": "Compare the error timeline with the deployment history",
+            "tool": "filesystem-read",
+            "tool_parameters": { "path": "deployments.log", "limit": 50 },
             "input": "Error timeline from Step 3",
-            "expected_output": "List of recent deployments with timestamps, versions, and changes. Correlation with error spike at deployment time.",
-            "validation": "Deployments retrieved, timestamps align with error spike, changes are documented",
+            "expected_output": "Recent deployments with timestamps, versions, and change descriptions",
+            "validation": "Deployment retrieved, timestamp aligns with error spike, changes documented",
             "status": "completed",
-            "actual_output": "Deployment v2.3.4 at 2026-08-05 14:00. Changes: Updated database connection pool from 20 to 10 connections, added new order validation. Error spike began at 14:05.",
-            "fallback": [
-              "Check git history if deployments.log unavailable",
-              "Ask user for deployment details",
-              "Proceed with error pattern analysis only"
-            ],
+            "actual_output": "Deployment v2.3.4 at 2026-09-29 14:00. Changes: database connection pool reduced from 20 to 10 connections; new order validation added. Error spike began at 14:05.",
+            "next_step": 5,
+            "fallback": ["Check version control history if the deployment log is unavailable", "Ask the user for deployment details"],
             "complexity": "HIGH"
           },
           {
             "step_number": 5,
             "name": "Verify Root Cause Hypothesis",
-            "thought": "Hypothesis: Connection pool reduction from 20 to 10 caused timeouts under load. Need to verify current pool size and usage.",
-            "why": "Must confirm hypothesis before proposing solution",
-            "action": "Check current database connection pool configuration and active connections",
-            "tool": "bash",
-            "tool_parameters": {
-              "command": "grep -r 'connection_pool' api/config/ && ps aux | grep postgres | wc -l"
-            },
+            "thought": "Hypothesis: the pool reduction from 20 to 10 causes timeouts under load. Before proposing a fix I must verify the current pool configuration and the live connection count — otherwise I am guessing.",
+            "why": "Must confirm the hypothesis before proposing a solution",
+            "action": "Check the current database connection pool configuration and active connection count",
+            "tool": "shell-execution",
+            "tool_parameters": { "command": "grep -r 'connection_pool' api/config/ && psql -c 'SELECT count(*) FROM pg_stat_activity;'" },
             "input": "Root cause hypothesis from Step 4",
             "expected_output": "Current pool size configuration and count of active PostgreSQL connections",
-            "validation": "Pool size confirmed as 10, active connections count retrieved",
+            "validation": "Pool size confirmed as 10, active connection count retrieved",
             "status": "completed",
             "actual_output": "Connection pool configured to 10. Current active connections: 15 (exceeds pool size).",
-            "fallback": [
-              "Try alternative command to check connections",
-              "Check database configuration directly",
-              "Accept hypothesis based on circumstantial evidence"
-            ],
+            "next_step": 6,
+            "fallback": ["Read the config file directly with filesystem-read", "Accept the hypothesis on the deployment-log evidence alone and note lower confidence"],
             "complexity": "HIGH"
           },
           {
             "step_number": 6,
             "name": "Propose Solution",
-            "thought": "Root cause confirmed: Connection pool exhaustion. Pool size reduced from 20 to 10, but load requires 15+ connections. Solution: Increase pool size back to 20-25.",
-            "why": "Need to provide actionable recommendation that addresses identified root cause",
-            "action": "Synthesize all findings into clear, testable solution with implementation steps",
-            "tool": "None",
+            "thought": "Root cause confirmed: pool exhaustion. Pool was reduced to 10 but load requires 15+ connections. The fix is to raise the pool size back above the observed demand, applied outside peak hours, with a rollback.",
+            "why": "Need an actionable recommendation that addresses the verified root cause",
+            "action": "Synthesize findings into a testable fix with implementation steps and rollback plan",
+            "tool": null,
             "input": "Root cause confirmation from Step 5",
-            "expected_output": "Primary root cause, proposed solution, implementation steps, rollback plan, success criteria",
-            "validation": "Solution addresses root cause, implementation steps clear, success criteria measurable, rollback plan defined",
+            "expected_output": "Primary root cause, fix, implementation steps, rollback plan, success criteria",
+            "validation": "Fix addresses root cause, steps clear, success criteria measurable, rollback defined",
             "status": "completed",
-            "actual_output": {
-              "root_cause": "Database connection pool exhaustion",
-              "solution": "Increase connection pool size from 10 to 25",
-              "implementation_steps": [
-                "Update api/config/database.yml",
-                "Set connection_pool.size=25",
-                "Set connection_pool.timeout=30000",
-                "Restart API service (during low-traffic period)",
-                "Monitor error rate for 30 minutes"
-              ],
-              "rollback_plan": "Revert to connection_pool.size=20 if errors persist",
-              "success_criteria": "Error rate < 0.1% for 24 hours"
-            },
-            "fallback": "If solution unclear, propose diagnostic steps to gather more information",
+            "actual_output": "Increase connection pool from 10 to 25 in api/config/database.yml, restart after 9PM, monitor error rate for 30 minutes. Rollback: revert to pool size 20.",
+            "next_step": null,
+            "fallback": "If the fix is unclear, propose further diagnostic steps instead of guessing",
             "complexity": "MEDIUM"
           }
         ],
-        
-        "key_findings": [
-          {
-            "id": "finding_1",
-            "description": "80% of 500 errors are database connection timeouts",
-            "impact": "HIGH",
-            "confidence": 9.5
-          },
-          {
-            "id": "finding_2",
-            "description": "Connection pool was reduced from 20 to 10 in deployment v2.3.4",
-            "impact": "HIGH",
-            "confidence": 9.0
-          },
-          {
-            "id": "finding_3",
-            "description": "Current active connections (15) exceed pool size (10)",
-            "impact": "HIGH",
-            "confidence": 10.0
-          }
+        "intermediate_results": [
+          "Step 1: 5% error rate, ~500 errors/hour, POST /api/orders affected",
+          "Step 2: 850 x 500 errors on POST /api/orders in 24h",
+          "Step 3: 80% of errors are database connection timeouts",
+          "Step 4: deployment v2.3.4 reduced pool 20 -> 10, spike began 5 minutes later",
+          "Step 5: pool size 10, active connections 15"
         ],
-        
+        "key_findings": [
+          { "id": "finding_1", "description": "80% of 500 errors are database connection timeouts", "impact": "HIGH", "confidence": 9.5 },
+          { "id": "finding_2", "description": "Deployment v2.3.4 reduced the connection pool from 20 to 10", "impact": "HIGH", "confidence": 9.0 },
+          { "id": "finding_3", "description": "Active connections (15) exceed the pool size (10)", "impact": "HIGH", "confidence": 10.0 }
+        ],
         "recommendations": [
           {
             "id": "rec_1",
             "action": "Increase database connection pool size from 10 to 25",
             "priority": "HIGH",
             "impact": "Should resolve 80% of 500 errors",
-            "effort": "LOW",
-            "implementation": [
-              "Update api/config/database.yml",
-              "Set connection_pool.size=25",
-              "Set connection_pool.timeout=30000"
-            ]
+            "implementation": ["Update api/config/database.yml", "Set connection_pool.size=25", "Restart API after 9PM"]
           },
           {
             "id": "rec_2",
-            "action": "Monitor error rate after change",
+            "action": "Monitor error rate for 24 hours after the change",
             "priority": "HIGH",
             "impact": "Verify fix effectiveness",
-            "effort": "LOW",
-            "implementation": ["Monitor for 24 hours", "Alert if error rate > 0.5%"]
+            "implementation": ["Alert if error rate > 0.5%"]
           },
           {
             "id": "rec_3",
-            "action": "Investigate payment gateway timeouts (50 errors)",
+            "action": "Investigate the payment gateway timeouts (50 errors)",
             "priority": "MEDIUM",
-            "impact": "Resolve remaining 6% of errors",
-            "effort": "MEDIUM",
-            "implementation": ["Check payment gateway logs", "Review integration code"]
+            "impact": "Resolve the remaining 6% of errors",
+            "implementation": ["Check payment gateway logs", "Review integration timeouts"]
           }
         ],
-        
         "execution_summary": {
           "steps_completed": 6,
-          "steps_pending": 0,
-          "steps_failed": 0,
-          "tools_used": ["file_read", "grep", "bash"],
-          "tool_call_count": 4,
-          "duration_estimated": "8 minutes",
-          "system_effect": "HIGH"
+          "tools_used": ["filesystem-read", "code-search", "shell-execution"],
+          "tool_call_count": 4
         },
-        
         "quality_metrics": {
           "confidence_level": "High (9.2/10)",
-          "system_simulation_quality": "9.5/10",
-          "tool_utilization": "100% (4/4 steps that needed tools)",
-          "step_completion_rate": "100%",
-          "actionability_score": "9.8/10"
+          "reasoning_quality": "9.5/10",
+          "step_completion": "100%",
+          "actionability": "9.8/10",
+          "tool_utilization": "100% (4/4 steps that needed tools)"
+        },
+        "meta": {
+          "generated_by": "cot-reasoning v5.0.0",
+          "pattern": "ReAct",
+          "notes": "Root cause verified against live configuration before proposing the fix"
         }
       },
-      
       "lessons_learned": [
-        "ANY MODEL can effectively perform multi-step debugging when provided with clear step structure",
-        "Tool integration enables data collection and verification",
-        "Self-dialogue in each step makes the reasoning process transparent",
-        "Fallback paths ensure robustness even when some tools fail",
-        "Intermediate result tracking creates audit trail for debugging"
-      ],
-      
-      "why_this_works": [
-        "Each step has a single, clear purpose",
-        "Tool calls are explicit with exact parameters",
-        "Expected outputs are clearly defined",
-        "Fallbacks provide alternative paths if tools fail",
-        "Self-dialogue explains the reasoning behind each action",
-        "Intermediate results build upon each other"
+        "Tool calls at evidence-gathering steps turn hypotheses into verified findings",
+        "Correlating the error spike with the deployment record narrowed the search space immediately",
+        "Verifying the live pool size before proposing the fix prevented a wrong recommendation"
       ]
     },
+
     {
-      "id": "system-vision-image-analysis",
-      "title": "Image-Based Bug Detection",
-      "description": "Using image understanding with system flow for visual debugging",
-      "system_mode": "STANDARD",
-      "complexity": "MEDIUM",
-      "tools_used": ["file_read", "web_search"],
-      "thinking_type": "ANALYTICAL",
-      "cot_pattern": "Zero-Shot",
-      
-      "input": {
-        "user_request": "This UI component has a layout issue. Analyze the screenshot and identify the problem. Available Tools: file_read, web_search.",
-        "context": "Web application screenshot showing misaligned form elements",
-        "constraints": ["Must provide specific, actionable feedback", "Reference design system if possible"],
-        "goal": "Identify layout issue and propose CSS fix"
-      }
-    },
-    {
-      "id": "no-tools-business-plan",
-      "title": "Business Plan Analysis Without Tools",
-      "description": "System flow for models without tool-calling capability",
-      "system_mode": "BASIC",
-      "complexity": "HIGH",
-      "tools_used": [],
+      "id": "architecture-decision-metrics-store",
+      "title": "Architecture Decision: Time-Series Store for Metrics Workload",
+      "description": "ENHANCED-mode architecture decision for a strong native reasoner: full structure and validation, no fabricated self-dialogue display",
+      "scenario_type": "architecture-decision",
+      "mode": "ENHANCED",
       "thinking_type": "STRATEGIC",
-      "cot_pattern": "Tree-of-Thoughts"
+      "complexity": "HIGH",
+      "pattern": "Tree of Thoughts",
+
+      "input": {
+        "user_request": "Decide which time-series store we should adopt for our metrics workload: PostgreSQL with TimescaleDB, Cassandra, or VictoriaMetrics. We ingest 50k metrics/sec and dashboards query 30-day windows.",
+        "context": "Team of 8 engineers, existing PostgreSQL operational experience, Kubernetes on AWS. Write-heavy ingest, read pattern is aggregated dashboard queries over 30-day windows.",
+        "constraints": ["Must fit the current ops team's skills", "Budget cap on AWS spend", "Dashboards must load under 3 seconds"],
+        "goal": "A justified architecture decision with an adoption roadmap"
+      },
+
+      "flow": {
+        "flow_id": "flow_20260930_arch_002",
+        "timestamp": "2026-09-30T11:00:00Z",
+        "configuration": {
+          "domain": "technical",
+          "intent": "DECIDE"
+        },
+        "problem_analysis": {
+          "core_problem": "Select a time-series store for a 50k metrics/sec write-heavy workload with 30-day aggregated dashboard reads",
+          "key_entities": {
+            "workload": "50k metrics/sec ingest, 30-day query windows",
+            "options": "TimescaleDB, Cassandra, VictoriaMetrics",
+            "team": "8 engineers with PostgreSQL experience"
+          },
+          "success_criteria": [
+            "Chosen option sustains the ingest rate with headroom - Priority: High",
+            "Dashboard queries return under 3 seconds - Priority: High",
+            "Operable by the current team - Priority: Medium"
+          ],
+          "constraints": {
+            "hard": "AWS budget cap; 3-second dashboard SLA",
+            "soft": "Prefer leveraging existing PostgreSQL experience"
+          }
+        },
+        "steps": [
+          {
+            "step_number": 1,
+            "name": "Define Evaluation Criteria",
+            "why": "A decision without weighted criteria is an opinion; the criteria make the comparison auditable",
+            "action": "Derive weighted criteria from the constraints: write throughput, 30-day query latency, operational fit, cost, migration risk",
+            "tool": null,
+            "input": "User request and constraints",
+            "expected_output": "Weighted criteria table covering all stated constraints",
+            "validation": "Every stated constraint maps to a criterion; weights sum to 1.0",
+            "status": "completed",
+            "actual_output": "Criteria: write throughput 0.25, query latency 0.30, operational fit 0.20, cost 0.15, migration risk 0.10",
+            "next_step": 2,
+            "fallback": "Ask the user to confirm the weights if the constraints are ambiguous",
+            "complexity": "MEDIUM"
+          },
+          {
+            "step_number": 2,
+            "name": "Gather Current Benchmarks",
+            "why": "Vendor claims are not evidence; published benchmarks for this workload shape ground the comparison",
+            "action": "Search for third-party benchmarks of the three stores at comparable ingest rates and query patterns",
+            "tool": "web-search",
+            "tool_parameters": { "query": "TimescaleDB vs Cassandra vs VictoriaMetrics benchmark 50k metrics/sec ingest" },
+            "input": "Criteria from Step 1",
+            "expected_output": "Benchmark data per option for throughput and 30-day window queries",
+            "validation": "Benchmarks cover all three options and a comparable workload shape",
+            "status": "completed",
+            "actual_output": "VictoriaMetrics: highest compression and lowest resource cost at this scale. TimescaleDB: strong at 30-day aggregated queries, familiar ops model. Cassandra: high write throughput but higher ops burden and weaker aggregated-window queries.",
+            "next_step": 3,
+            "fallback": "Run a one-day proof-of-concept ingest test if benchmarks are inconclusive",
+            "complexity": "MEDIUM"
+          },
+          {
+            "step_number": 3,
+            "name": "Evaluate Options Against Criteria",
+            "why": "Scoring each option against the weighted criteria makes the trade-offs explicit and comparable",
+            "action": "Score each option 0-10 per criterion and compute weighted totals",
+            "tool": null,
+            "input": "Criteria from Step 1 and benchmark data from Step 2",
+            "expected_output": "Weighted score per option with the dominant trade-off identified",
+            "validation": "Scores traceable to benchmark data or stated team constraints",
+            "status": "completed",
+            "actual_output": "TimescaleDB 8.1 (ops fit and query latency dominate), VictoriaMetrics 7.9 (cost and compression dominate), Cassandra 6.4 (ops burden and weaker window queries dominate).",
+            "next_step": 4,
+            "fallback": "Re-score with sensitivity analysis if the top two are within 0.5",
+            "complexity": "HIGH"
+          },
+          {
+            "step_number": 4,
+            "name": "Stress Test the Leading Option",
+            "why": "The top two scores are close; the decision must survive the failure modes of each",
+            "action": "Check the leading option against the hard constraints and the worst-case growth scenario (2x ingest)",
+            "tool": null,
+            "input": "Scores from Step 3",
+            "expected_output": "Confirmation or rejection of the leader under 2x growth and the budget cap",
+            "validation": "Leader satisfies all hard constraints at 2x ingest within budget",
+            "status": "completed",
+            "actual_output": "TimescaleDB sustains 2x ingest with hypertable partitioning and stays within budget; dashboard SLA holds with continuous aggregates. VictoriaMetrics remains the fallback if cost pressure grows.",
+            "next_step": 5,
+            "fallback": "If the leader fails the stress test, promote the runner-up and re-test",
+            "complexity": "HIGH"
+          },
+          {
+            "step_number": 5,
+            "name": "Formulate Decision and Roadmap",
+            "why": "The decision must ship with an adoption path and a reversal condition, not just a name",
+            "action": "Write the decision record with the roadmap and the exit condition",
+            "tool": null,
+            "input": "Stress test result from Step 4",
+            "expected_output": "Decision record: chosen store, justification, roadmap, reversal condition",
+            "validation": "Justification cites the weighted scores; roadmap has dated phases; reversal condition is measurable",
+            "status": "completed",
+            "actual_output": "Adopt TimescaleDB: pilot on one service for 30 days, migrate dashboards, then cut over. Reversal condition: dashboard p95 > 3s or ingest lag at 1.5x load during the pilot.",
+            "next_step": null,
+            "fallback": "If the team rejects the pilot, fall back to VictoriaMetrics with the same pilot structure",
+            "complexity": "MEDIUM"
+          }
+        ],
+        "intermediate_results": [
+          "Step 1: weighted criteria, all constraints mapped",
+          "Step 2: benchmark evidence for all three options",
+          "Step 3: TimescaleDB 8.1, VictoriaMetrics 7.9, Cassandra 6.4",
+          "Step 4: leader survives 2x growth stress test"
+        ],
+        "key_findings": [
+          { "id": "finding_1", "description": "TimescaleDB leads on the weighted criteria mainly through operational fit and 30-day query latency", "impact": "HIGH", "confidence": 8.5 },
+          { "id": "finding_2", "description": "VictoriaMetrics is the cost leader and a credible fallback", "impact": "MEDIUM", "confidence": 8.0 },
+          { "id": "finding_3", "description": "Cassandra's ops burden outweighs its write-throughput advantage for this team", "impact": "HIGH", "confidence": 8.0 }
+        ],
+        "recommendations": [
+          {
+            "id": "rec_1",
+            "action": "Adopt TimescaleDB via a 30-day pilot on one service",
+            "priority": "HIGH",
+            "impact": "Leverages team experience while validating the decision on real load",
+            "implementation": ["Deploy pilot service", "Migrate its dashboards", "Measure p95 and ingest lag"]
+          },
+          {
+            "id": "rec_2",
+            "action": "Define the reversal condition before the pilot starts",
+            "priority": "HIGH",
+            "impact": "Caps the cost of a wrong decision",
+            "implementation": ["Dashboard p95 > 3s or ingest lag at 1.5x load ends the pilot"]
+          },
+          {
+            "id": "rec_3",
+            "action": "Keep VictoriaMetrics as the documented fallback",
+            "priority": "MEDIUM",
+            "impact": "Preserves the second-best option with its evidence base",
+            "implementation": ["Record the benchmark evidence in the decision record"]
+          }
+        ],
+        "execution_summary": {
+          "steps_completed": 5,
+          "tools_used": ["web-search"],
+          "tool_call_count": 1
+        },
+        "quality_metrics": {
+          "confidence_level": "High (8.4/10)",
+          "reasoning_quality": "9.0/10",
+          "step_completion": "100%",
+          "actionability": "9.5/10",
+          "tool_utilization": "20% (1/5 steps; remaining steps were pure evaluation)"
+        },
+        "meta": {
+          "generated_by": "cot-reasoning v5.0.0",
+          "pattern": "Tree of Thoughts",
+          "notes": "ENHANCED mode: structure and validation retained, simulated self-dialogue display omitted for a natively-reasoning model"
+        }
+      },
+      "lessons_learned": [
+        "Weighted criteria turn an architecture debate into an auditable comparison",
+        "A decision is not complete until it has a reversal condition",
+        "ENHANCED mode keeps the contract without paying the self-dialogue token cost"
+      ]
     },
+
     {
-      "id": "system-code-review",
-      "title": "Automated Code Review",
-      "description": "Using system reasoning to perform structured code review with tool assistance",
-      "system_mode": "STANDARD",
-      "complexity": "MEDIUM",
-      "tools_used": ["file_read", "grep", "code_analyzer"],
+      "id": "code-review-risk-assessment",
+      "title": "Code Review: Risk Assessment of a PR Without Tools",
+      "description": "BASIC-mode code review and risk assessment, fully functional with no tools: the diff is provided in the request context",
+      "scenario_type": "code-review-risk-assessment",
+      "mode": "BASIC",
       "thinking_type": "CRITICAL",
-      "cot_pattern": "ReAct"
-    }
-  ],
-  
-  "system_mode_distribution": {
-    "STANDARD": 2,
-    "BASIC": 1,
-    "ENHANCED": 0,
-    "MINIMAL": 0
-  },
-  
-  "compatibility": {
-    "cot-reasoning": {
-      "total_examples": 4,
-      "recommended_mode": "STANDARD or BASIC based on tool availability",
-      "expected_improvement": "Better structured reasoning for compatible models",
-      "notes": "Works with compatible models - provides reasoning framework guidance"
-    }
-  },
-  
-  "best_practices_demonstrated": [
-    "Always decompose complex problems into steps",
-    "Use tools whenever data is needed",
-    "Include self-dialogue for transparency",
-    "Provide explicit fallbacks for every step",
-    "Track intermediate results",
-    "Validate each step's output",
-    "Prioritize findings by severity/impact",
-    "Generate actionable recommendations",
-    "State assumptions clearly when data unavailable"
-  ],
-  
-  "quality_benchmarks": {
-    "expected_improvements": {
-      "with_tools": "Significant improvement in structured reasoning and tool utilization",
-      "no_tools": "Moderate improvement in reasoning organization and clarity"
+      "complexity": "MEDIUM",
+      "pattern": "Few-Shot CoT",
+
+      "input": {
+        "user_request": "Review this pull request for security and reliability risks. The diff adds a new endpoint that accepts a user-supplied filename, reads the file from disk, and returns its contents: async function handler(req) { const path = '/data/' + req.query.filename; return await fs.readFile(path); }",
+        "context": "Express service in a monorepo. The /data directory holds user uploads. Two similar past incidents: a 2024 path traversal leak and a 2025 unhandled promise rejection outage.",
+        "constraints": ["No tools available in this environment", "Review must be specific to the diff, not generic advice"],
+        "goal": "A prioritized risk assessment with concrete fixes"
+      },
+
+      "flow": {
+        "problem_analysis": {
+          "core_problem": "Assess the security and reliability risks of a new endpoint that reads a user-supplied filename from disk",
+          "key_entities": {
+            "endpoint": "Reads /data/ + req.query.filename and returns file contents",
+            "threat": "User-controlled path component",
+            "history": "Prior path traversal leak (2024) and unhandled rejection outage (2025)"
+          },
+          "success_criteria": [
+            "Every risk tied to a specific line of the diff - Priority: High",
+            "Each risk has a concrete fix - Priority: High",
+            "Risks prioritized by severity - Priority: Medium"
+          ],
+          "constraints": {
+            "hard": "No tools; analysis must come from the provided diff and context",
+            "soft": "Match the review style of the two prior incident write-ups"
+          }
+        },
+        "steps": [
+          {
+            "step_number": 1,
+            "name": "Identify What the Diff Actually Does",
+            "thought": "Before judging risk I need the precise data flow: user input enters as req.query.filename, is concatenated into a path, and the file contents are returned. Every risk will hang off one of those three links.",
+            "why": "Risk assessment must be grounded in the actual data flow, not in a generic checklist",
+            "action": "Trace the data flow from input to output in the provided diff",
+            "tool": null,
+            "input": "The diff from the user request",
+            "expected_output": "Data flow: query param -> path concatenation -> disk read -> response",
+            "validation": "Every element of the diff is accounted for in the trace",
+            "status": "completed",
+            "actual_output": "Input: req.query.filename (fully user-controlled). Concatenation: '/data/' + filename, no normalization or allowlist. Output: raw file contents returned to the caller.",
+            "next_step": 2,
+            "fallback": "Ask the user for the surrounding middleware if the trace is incomplete"
+          },
+          {
+            "step_number": 2,
+            "name": "Enumerate Failure Modes",
+            "thought": "The prior incidents are the strongest signal: path traversal happened before in this codebase, and unhandled rejections caused an outage. I should test this diff against both, then look for what else the data flow permits.",
+            "why": "Known incident classes in this codebase come first; novel failure modes come second",
+            "action": "Enumerate failure modes: path traversal, unhandled rejection, information disclosure, resource exhaustion",
+            "tool": null,
+            "input": "Data flow from Step 1 and the incident history",
+            "expected_output": "Candidate risk list with the mechanism of each",
+            "validation": "Each risk names the exact line or operation that enables it",
+            "status": "completed",
+            "actual_output": "1) Path traversal: '../' in filename escapes /data (repeat of the 2024 incident). 2) Unhandled rejection: fs.readFile rejects on missing files; no try/catch (repeat of the 2025 class). 3) Information disclosure: any readable file on disk is a target. 4) Resource exhaustion: filename can point at arbitrarily large files.",
+            "next_step": 3,
+            "fallback": "Consult the two incident write-ups for additional classes if the list feels incomplete"
+          },
+          {
+            "step_number": 3,
+            "name": "Assess Severity and Likelihood",
+            "thought": "Not all four risks are equal. Traversal is a confirmed repeat with high impact; the unhandled rejection is a certain crash under normal use (any 404 becomes a 500 or a hung request); disclosure rides on traversal; exhaustion is real but lower likelihood.",
+            "why": "Prioritization makes the review actionable instead of a flat list",
+            "action": "Score each risk on impact and likelihood using the incident history as calibration",
+            "tool": null,
+            "input": "Risk list from Step 2",
+            "expected_output": "Severity-ranked risk table with justification",
+            "validation": "Ranking is consistent with the two prior incidents' impact",
+            "status": "completed",
+            "actual_output": "Traversal: Critical (repeat incident, data exfiltration). Unhandled rejection: High (any missing file triggers it). Disclosure: High (rides on traversal). Exhaustion: Medium.",
+            "next_step": 4,
+            "fallback": "Ask the team to confirm the blast radius if /data contents are unclear"
+          },
+          {
+            "step_number": 4,
+            "name": "Recommend Fixes",
+            "thought": "Each fix must map to one risk and be concrete enough to apply without a follow-up question. The traversal fix is an allowlist plus path normalization; the rejection fix is error handling with a 404 mapping.",
+            "why": "A review without concrete fixes leaves the risk in place",
+            "action": "Write a concrete fix per risk, ordered by the severity ranking",
+            "tool": null,
+            "input": "Severity ranking from Step 3",
+            "expected_output": "One actionable fix per risk, highest severity first",
+            "validation": "Each fix names the risk it removes and is specific to this diff",
+            "status": "completed",
+            "actual_output": "1) Resolve and allowlist: normalize with path.resolve, verify the result starts with /data/, and map user IDs to server-side paths instead of accepting raw filenames. 2) Wrap the read in try/catch, return 404 on ENOENT, log other errors. 3) Cap the file size before reading. 4) Add a regression test with '../' payloads referencing the 2024 incident.",
+            "next_step": null,
+            "fallback": "If a fix is unclear, recommend blocking the PR and requesting a design pass"
+          }
+        ],
+        "key_findings": [
+          { "id": "finding_1", "description": "The endpoint is a direct repeat of the 2024 path traversal incident: user input is concatenated into a filesystem path with no normalization or allowlist", "impact": "HIGH", "confidence": 9.5 },
+          { "id": "finding_2", "description": "fs.readFile rejection is unhandled, repeating the 2025 outage class: any request for a missing file becomes an unhandled rejection", "impact": "HIGH", "confidence": 9.0 },
+          { "id": "finding_3", "description": "The endpoint can return any file the process can read, and imposes no size cap", "impact": "MEDIUM", "confidence": 8.0 }
+        ],
+        "recommendations": [
+          {
+            "id": "rec_1",
+            "action": "Block the PR until path traversal is fixed: normalize with path.resolve and verify the result is inside /data/, or map identifiers to server-side paths",
+            "priority": "HIGH",
+            "impact": "Removes the Critical repeat-incident risk",
+            "implementation": ["path.resolve + prefix check", "regression test with '../' payloads"]
+          },
+          {
+            "id": "rec_2",
+            "action": "Handle the readFile rejection: try/catch, 404 on ENOENT, log other errors",
+            "priority": "HIGH",
+            "impact": "Removes the crash-on-404 failure mode",
+            "implementation": ["try/catch around the read", "error-to-status mapping"]
+          },
+          {
+            "id": "rec_3",
+            "action": "Cap the readable file size and reject oversized requests before reading",
+            "priority": "MEDIUM",
+            "impact": "Removes the resource exhaustion vector",
+            "implementation": ["stat before read", "size limit constant"]
+          }
+        ],
+        "quality_metrics": {
+          "confidence_level": "High (9.0/10)",
+          "reasoning_quality": "9.0/10",
+          "step_completion": "100%",
+          "actionability": "9.5/10"
+        }
+      },
+      "lessons_learned": [
+        "BASIC mode is fully functional with no tools: the diff and incident history in the request context are the evidence",
+        "Calibrating severity against this codebase's own incident history makes the ranking defensible",
+        "Every risk was tied to a specific line of the diff, not to a generic checklist"
+      ]
     },
-    "note": "Actual quality depends on model capabilities, task complexity, and input quality"
+
+    {
+      "id": "minimal-trivial-config-choice",
+      "title": "MINIMAL: Trivial Configuration Choice",
+      "description": "MINIMAL-mode flow for a trivial question: core structure only, within the hard boilerplate budget",
+      "scenario_type": "trivial-decision",
+      "mode": "MINIMAL",
+      "thinking_type": "ANALYTICAL",
+      "complexity": "LOW",
+      "pattern": "Zero-Shot CoT",
+
+      "input": {
+        "user_request": "Should our new internal tool use JSON or YAML for its config file?",
+        "context": "Small internal CLI tool, config edited by hand by 3 developers.",
+        "constraints": [],
+        "goal": "A one-line justified choice"
+      },
+
+      "flow": {
+        "steps": [
+          {
+            "step_number": 1,
+            "name": "Choose Format",
+            "action": "Compare hand-editing ergonomics for a small config: comments, error messages, tooling",
+            "expected_output": "A format choice with a one-line justification",
+            "validation": "Choice fits the stated context (hand-edited, small, internal)"
+          },
+          {
+            "step_number": 2,
+            "name": "State the Recommendation",
+            "action": "Recommend YAML with a comment explaining the trade-off",
+            "expected_output": "Recommendation: YAML, because comments in config matter for hand-edited files",
+            "validation": "Recommendation is actionable with no follow-up needed"
+          }
+        ],
+        "key_findings": [
+          { "id": "finding_1", "description": "For hand-edited config, comments outweigh JSON's stricter tooling", "impact": "LOW", "confidence": 8.0 }
+        ],
+        "recommendations": [
+          { "id": "rec_1", "action": "Use YAML for the config file", "priority": "LOW", "impact": "Better hand-editing ergonomics for 3 developers" }
+        ]
+      },
+      "lessons_learned": [
+        "A trivial question gets a 2-step flow and no Flow ID, timestamps, or metrics",
+        "The MINIMAL boilerplate budget keeps the framework lighter than the question"
+      ]
+    }
+  ],
+
+  "mode_distribution": {
+    "MINIMAL": 1,
+    "BASIC": 1,
+    "STANDARD": 1,
+    "ENHANCED": 1
   },
-  
-  "usage_tips": {
-    "general": [
-      "Describe problem clearly and specifically",
-      "List all available tools",
-      "Provide relevant context and constraints",
-      "State desired outcome explicitly",
-      "Review output for completeness and accuracy"
-    ]
-  }
+
+  "best_practices_demonstrated": [
+    "Match the mode to the problem: full contract for incidents, core only for trivial questions",
+    "Plan tools by category, then bind to the host environment's tools",
+    "BASIC and MINIMAL are fully functional with no tools at all",
+    "Verify hypotheses with evidence before recommending fixes",
+    "Tie every review finding to a specific line of the diff",
+    "Give every architecture decision a reversal condition"
+  ]
 }
