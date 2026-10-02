@@ -1,7 +1,6 @@
 ---
 name: cot-reasoning
 description: "Structured chain-of-thought reasoning framework for complex, multi-step problems: decomposes the problem into auditable steps with self-dialogue, environment-neutral tool integration, and result tracking, then validates the output flow. Use for production incident investigation, root cause analysis, debugging that requires evidence before conclusions, architecture and design decisions, code review and risk assessment, and trade-off or option comparison. NOT for: greetings and small talk; simple factual or single-word questions; trivial tasks with a direct answer; formatting, rewriting, or translation; domain-fact lookup - route those to the relevant domain skill, only the reasoning procedure routes here. Activate only when the request genuinely needs multi-step analysis, not merely because it contains a word like analyze or fix."
-compatibility: ["mistral-vibe", "crewai", "autogen", "langchain", "llama-index"]
 metadata:
   author: DanteUkraine
   version: "5.0.0"
