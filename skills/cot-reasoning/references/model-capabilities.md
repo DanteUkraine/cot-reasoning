@@ -1,5 +1,8 @@
 # cot-reasoning Capabilities Reference
 
+Tier 3 reference of cot-reasoning — loaded by step 2 (Mode Selection) of SKILL.md when
+the mode choice needs the capability-scaled selection algorithm.
+
 ## Overview
 
 This document describes the cot-reasoning framework's approach to enhancing model reasoning capabilities.
@@ -23,18 +26,22 @@ cot-reasoning v5.0.0 provides a **structured reasoning framework** that works wi
 
 ### Mode Selection Algorithm (capability-scaled)
 
+<mode_selection_algorithm>
+
 Ceremony scales to model capability:
 - IF the problem is trivial (2-3 obvious steps, no evidence gathering) → **MINIMAL**
 - ELSE IF no tools exist in the environment → **BASIC** (fully functional without tools)
 - ELSE IF the model reasons natively and strongly → **ENHANCED** (structure and validation
   retained; the fabricated self-dialogue display is omitted — see the anti-patterns in
-  SKILL.md's output contract)
+  `references/output-contract.md`)
 - ELSE → **STANDARD** (full structure; the self-dialogue scaffold carries the reasoning)
 
 **Why capability scaling matters:** for a strong native reasoner, a simulated
 [Thought]/[Question]/[Answer] display adds tokens and can misrepresent the actual
 computation. For a weak reasoner, that same scaffold is load-bearing. The mode choice
 moves the ceremony to where it pays for itself.
+
+</mode_selection_algorithm>
 
 ---
 
