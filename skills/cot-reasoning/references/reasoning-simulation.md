@@ -1,5 +1,8 @@
 # Reasoning Framework - cot-reasoning
 
+Tier 3 reference of cot-reasoning — loaded by step 3 (Step Generation) of SKILL.md when
+flow generation needs the framework's core principles and the four pillars.
+
 **Version:** 5.0.0
 **Last Updated:** 2026-08-22
 
@@ -19,6 +22,8 @@
 ---
 
 ## cot-reasoning Framework
+
+<framework_pillars>
 
 ### Core Principle
 
@@ -70,3 +75,5 @@ User Request
     ↓
 Structured Answer with Full Traceability
 ```
+
+</framework_pillars>

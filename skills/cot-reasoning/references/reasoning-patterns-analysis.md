@@ -1,5 +1,8 @@
 # Reasoning Patterns - cot-reasoning
 
+Tier 3 reference of cot-reasoning — loaded by step 3 (Step Generation) of SKILL.md when
+the pattern choice needs detailed guidance.
+
 ## Overview
 
 In cot-reasoning, **patterns are optional organizing principles**. The core mechanism is step-by-step execution with self-dialogue. Patterns provide useful structures for organizing reasoning steps in specific scenarios.
@@ -9,6 +12,8 @@ In cot-reasoning, **patterns are optional organizing principles**. The core mech
 ---
 
 ## Pattern Selection Guidelines
+
+<pattern_selection>
 
 ### When to Use Each Pattern
 
@@ -88,6 +93,8 @@ In cot-reasoning, **the step-by-step execution framework is what truly enables e
 Patterns are useful but not essential. Focus on the step structure first, then consider patterns as optional enhancements.
 
 ---
+
+</pattern_selection>
 
 ## Version Information
 

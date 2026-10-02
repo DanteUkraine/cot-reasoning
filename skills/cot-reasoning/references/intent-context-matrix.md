@@ -1,5 +1,8 @@
 # Intent-Context-Thinking Type Matrix
 
+Tier 3 reference of cot-reasoning — loaded by step 3 (Step Generation) of SKILL.md when
+the thinking-type choice is not obvious.
+
 ## Overview
 
 This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.0.0.
@@ -100,6 +103,8 @@ def detect_domain(user_input, intent):
 ---
 
 ## Thinking Type System
+
+<thinking_type_matrix>
 
 ### Core Thinking Type Definitions
 
@@ -341,6 +346,8 @@ def is_compatible(intent, domain):
 ```
 
 ---
+
+</thinking_type_matrix>
 
 ## Version Information
 
