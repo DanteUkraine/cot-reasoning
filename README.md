@@ -16,6 +16,7 @@
 - **🔌 Tool Integration**: Seamless integration with available tools
 - **🎨 Multiple Thinking Types**: Analytical, Creative, Critical, Systematic, Ethical, Strategic
 - **🌳 Reasoning Patterns**: Zero-Shot CoT, Few-Shot CoT, Auto-CoT, Tree of Thoughts, ReAct
+- **🧭 Externalized Reasoning Disciplines**: Contract Formalization, Typed Step Outputs, Verification Loops, Confidence Gates, Edge Coverage
 
 ## 📦 Installation
 
@@ -139,6 +140,34 @@ self-dialogue via ENHANCED; weak reasoners get the full structure via STANDARD.
 | **Tree of Thoughts** | Complex decisions | Medium-High |
 | **ReAct** | Tool-intensive tasks | High |
 
+### Reasoning Disciplines (v5.2.0)
+
+Five externalized disciplines replace capabilities a weak reasoner lacks — ambiguity
+tolerance, self-correction, metacognition, completeness intuition — with external
+procedure. They are procedural discipline for existing steps, not new ontology, and
+they are mode-conditional: none applies in MINIMAL.
+
+| Discipline | Replaces | MINIMAL | BASIC | STANDARD | ENHANCED |
+|------------|-----------|---------|-------|----------|----------|
+| **Contract Formalization** | ambiguity tolerance | — | — | yes | yes |
+| **Typed Step Outputs** | free-form drift control | — | yes | yes | yes |
+| **Verification Loop** | one-shot fallback | — | — | yes | yes |
+| **Confidence Gate** | metacognition | — | yes | yes | yes |
+| **Edge Coverage** | completeness intuition | — | — | yes | yes |
+
+- **Contract Formalization** — an open-ended problem statement is converted into a
+  closed contract (entities, constraints, measurable success criteria) before
+  decomposition begins.
+- **Typed Step Outputs** — a step's expected output is a typed structure, not prose;
+  a structure violation is fed back and the output is regenerated.
+- **Verification Loop** — a failed verification iterates on captured raw evidence
+  with a declared budget (`Max Iterations`, `Exit Criteria`, `Escalation Policy`);
+  a repeated failure changes the strategy, not just the parameters.
+- **Confidence Gate** — the confidence metric is a gate (default threshold 7.0/10),
+  not a report; below it, the flow iterates, escalates, or asks. No silent pass.
+- **Edge Coverage** — when the problem has states and transitions, validation cases
+  are derived by covering the graph, not by intuition.
+
 ## ✅ Validation
 
 Every reasoning flow can be checked against the skill's output contract with the
@@ -160,7 +189,7 @@ cd $(npx skills path cot-reasoning)
 ## 📜 Version
 
 **v5.2.0** — the version is stated consistently in the skill frontmatter, the
-validator, the templates, and the output contract.
+validator, the templates, the references, and the output contract.
 
 ## 📜 License
 

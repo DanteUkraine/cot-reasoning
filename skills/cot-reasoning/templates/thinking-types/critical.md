@@ -94,6 +94,15 @@ Evaluate the supporting information.
 
 **Evidence Quality Score:** [X/10]
 
+**Validation Case Derivation (STANDARD/ENHANCED):** when the subject contains states
+and transitions — a process, protocol, workflow, lifecycle — do not list validation
+cases from intuition. Derive them by covering the graph: every state, every
+transition, every guard both ways, every terminal state, plus the failure paths
+(timeout, wrong-state event). The procedure and the mapping table are in
+`templates/system-flows/step-execution-template.md` (Edge-Case Derivation). A case
+list is complete when the mapping has no empty cells — completeness is checked
+against the graph, not against confidence.
+
 ---
 
 ### Phase 4: Logical Analysis

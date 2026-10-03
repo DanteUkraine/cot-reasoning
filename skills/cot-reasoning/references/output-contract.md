@@ -60,6 +60,7 @@ never skip the contract for a hard incident.
 
 ### Quality Metrics                                 <- BASIC, STANDARD, ENHANCED
 - **Confidence Level:** [High:8-10 | Medium:5-7.9 | Low:<5] ([X.X/10])
+- **Confidence Gate:** [PASS | FAIL → iterate|escalate|ask] (threshold: 7.0/10 unless the user set one)
 - **Reasoning Quality:** [X/10]
 - **Step Completion:** [X%]
 - **Actionability:** [X/10]
@@ -73,12 +74,17 @@ never skip the contract for a hard incident.
 
 **Tier summary:**
 
-| Mode | Sections required | Step fields required | Boilerplate budget |
-|------|-------------------|----------------------|--------------------|
-| MINIMAL | Core only | Action, Expected Output, Validation | Hard cap: at most 12 structural (non-content) lines and at most 3 steps |
-| BASIC | Core + Problem Analysis + Quality Metrics | Thought, Why, Action, Expected Output, Validation, Next Step, Fallback | None beyond core |
-| STANDARD | Core + all Extended sections | All step fields (incl. Tool, Input, Status, Dependencies, Complexity) | None |
-| ENHANCED | Core + all Extended sections | All step fields except Thought (optional — native reasoning) | None |
+| Mode | Sections required | Step fields required | Disciplines (see SKILL.md <reasoning_disciplines>) | Boilerplate budget |
+|------|-------------------|----------------------|---------------------------------------------------|--------------------|
+| MINIMAL | Core only | Action, Expected Output, Validation | None | Hard cap: at most 12 structural (non-content) lines and at most 3 steps |
+| BASIC | Core + Problem Analysis + Quality Metrics | Thought, Why, Action, Expected Output, Validation, Next Step, Fallback | Typed Step Outputs, Confidence Gate | None beyond core |
+| STANDARD | Core + all Extended sections | All step fields (incl. Tool, Input, Status, Dependencies, Complexity) | All five disciplines | None |
+| ENHANCED | Core + all Extended sections | All step fields except Thought (optional — native reasoning) | All five disciplines | None |
+
+**Optional step fields (every mode above MINIMAL):** `Output Schema` — the typed
+structure of the step's Expected Output. Verification steps in STANDARD/ENHANCED
+additionally declare `Max Iterations`, `Exit Criteria`, and `Escalation Policy`
+(always as a set — a loop budget without exit criteria is an anti-pattern).
 
 **MINIMAL hard boilerplate budget:** a MINIMAL flow must not exceed **12 structural
 lines** (headings and header-field labels — lines that exist even with empty content)
@@ -90,5 +96,7 @@ and **3 steps**. If the problem needs more, it is not a MINIMAL problem; select 
 |---------------|--------------|------------|
 | Emitting the full STANDARD contract (Flow ID, timestamps, metrics, meta) for a trivial question | Fixed ceremony cost swamps the content; users stop reading the output; the framework feels heavier than the problem | Use MINIMAL: core only, at most 12 structural lines and 3 steps |
 | Fabricating a [Thought]/[Question]/[Answer] reasoning display for a model that reasons natively | Simulated dialogue theater adds tokens, can misrepresent the actual computation, and adds no explanatory value | Use ENHANCED: keep structure, validation, and tracking; omit the fabricated dialogue display |
+| Recording a confidence value below the threshold and proceeding anyway | A reported-but-unenforced metric is decoration; the flow advances on evidence it does not trust | The Confidence Gate is a gate: below threshold, name the action — iterate, escalate, or ask |
+| Retrying a failed verification without Max Iterations, Exit Criteria, or a strategy change | Unbounded retry burns budget on the same failing approach; repetition is not repair | Declare the loop budget; on repeated failure escalate the strategy per <reasoning_disciplines> |
 
 </output_contract>

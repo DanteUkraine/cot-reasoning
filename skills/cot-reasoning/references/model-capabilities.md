@@ -74,6 +74,25 @@ fallback: GRACEFUL
 | Limited context understanding | Explicit context analysis in early steps |
 | Poor tool integration | Structured tool calls with complete parameters |
 
+### Operating Rules for Models with Limited Native Reasoning
+
+Two rules make explicit what the framework already assumes for weak reasoners:
+
+1. **Instantiate the closed vocabulary — do not improvise.** A weak reasoner selects
+   from the framework's closed vocabulary (step types, thinking types, patterns,
+   templates) rather than inventing novel reasoning structures. Improvising
+   low-level moves is to reasoning what chaining dozens of utility classes is to
+   styling: it multiplies the search space and mutates on every retry. The semantic
+   vocabulary (Step Types, Thinking Types, Patterns) keeps the structure stable
+   across attempts.
+
+2. **Plan the whole sequence, then execute (plan-then-execute).** The workflow already
+   plans tool calls (step 5) before assembling the chain (step 6). For a weak reasoner
+   this ordering is load-bearing: planning the full sequence up front avoids
+   interleaved plan/execute context thrash, keeps the reasoning chain short, and makes
+   dependencies explicit before any step runs. Interleaved reasoning-and-acting pays
+   off for strong models; for weak ones, the upfront plan is the scaffold.
+
 ---
 
 ## Tool-Calling Capabilities

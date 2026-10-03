@@ -56,16 +56,16 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 | Step 3 — flow generation needs the framework's core principles and the four pillars | `references/reasoning-simulation.md` (§ framework_pillars) |
 | Step 3 — a thinking-type framework template is loaded for the chosen type | `templates/thinking-types/` (analytical, creative, critical, systematic, ethical, strategic) |
 | Step 4 — worked self-dialogue examples for debugging, design, and decision domains | `templates/system-flows/self-dialogue-template.md` |
-| Step 6 — worked step examples for assembling flows in a new domain | `templates/system-flows/step-execution-template.md` |
+| Step 6 — worked step examples for assembling flows in a new domain, plus the Formalization Step, Verification Loop Step, and Edge-Case Derivation patterns | `templates/system-flows/step-execution-template.md` |
 | Step 6 — the universal adaptive reasoning flow with pattern configuration | `templates/adaptive-flows/unified-reasoning-flow.md` |
-| Step 7 — the full tiered output contract: core and extended templates, per-tier requirements, MINIMAL budget, anti-patterns | `references/output-contract.md` (§ output_contract) |
+| Step 7 — the full tiered output contract: core and extended templates, per-tier requirements, MINIMAL budget, Confidence Gate, anti-patterns | `references/output-contract.md` (§ output_contract) |
 | Step 8 — validate a produced flow, a flow directory, or the example suite | `scripts/validate-system-flow.sh` |
 | Step 8 — engineering example flows (incident, architecture, code review) to run the validator against | `assets/system-examples.json` |
 </references>
 
 <workflow>
 0. Input Analysis — parse the request, extract the problem, determine reasoning needs ✓ <step_gates> r0 → <activation_rules>, <input_output_system>
-1. Problem Decomposition — break the complex problem into logical, executable components ✓ <step_gates> r1 → <step_structure_system>
+1. Problem Decomposition — break the complex problem into logical, executable components; formalize an open-ended statement into a closed contract first (STANDARD/ENHANCED) ✓ <step_gates> r1 → <step_structure_system>, <reasoning_disciplines>
 2. Mode Selection — pick MINIMAL/BASIC/STANDARD/ENHANCED per the mode rules in <reasoning_modes> ✓ <step_gates> r2 → <reasoning_modes>
 3. Step Generation — create the structured reasoning flow with dependencies, thinking type, and pattern ✓ <step_gates> r3 → <thinking_type_system>, <reasoning_pattern_system>
 4. Self-Dialogue Integration — add transparent reasoning context to each step (mode-dependent) ✓ <step_gates> r4 → <self_dialogue_system>
@@ -87,6 +87,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | Unrunnable is UNVERIFIED | A check that cannot run here is labelled `UNVERIFIED` with the reason and the command that would settle it. It is never recorded as passed |
   | No silent advance | Failing a step gate stops the step. Fix, or record the failure and say what it invalidates downstream — never proceed quietly |
   | A gate never reads its own subject | A check whose expected value comes from the artifact it validates passes at every value of that artifact, including the broken one |
+  | Ambiguous validation is failed validation | A check that could pass under more than one interpretation of success has checked nothing; it is recorded as failed, never as passed |
   </step_gate_protocol>
 
   <step_gates>
@@ -96,7 +97,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | After step | Check | Evidence | Fails if | Fallback |
   |------------|-------|----------|----------|----------|
   | 0 | Request is non-trivial, multi-step, and not excluded by the NOT-conditions | the parsed problem statement with the activation verdict | the request is trivial, single-answer, or excluded | do not activate; answer directly or route to the domain skill |
-  | 1 | Decomposition matches the complexity tier | the step list with its complexity label | step count outside the tier guideline | re-decompose per the complexity table in <step_structure_system> |
+  | 1 | Decomposition matches the complexity tier; an open-ended statement was formalized into a closed contract first (STANDARD/ENHANCED) | the step list with its complexity label, plus the formalized contract when the statement was open-ended | step count outside the tier guideline, or an open-ended statement decomposed without formalization | re-decompose per the complexity table in <step_structure_system>; formalize per <reasoning_disciplines> |
   | 2 | Mode matches complexity, tool availability, and model capability | the mode decision naming the selection rule that fired | the algorithm was applied out of order or the mode mismatches | re-run the mode selection algorithm in <reasoning_modes> |
   | 3 | Flow carries tier-required step fields, a chosen thinking type, and a chosen pattern | the generated step list | a required field, type, or pattern is missing | regenerate per <step_structure_system>, <thinking_type_system>, <reasoning_pattern_system> |
   | 4 | Self-dialogue is relevant and logical (STANDARD/BASIC only) | the dialogue exchanges per step | restatement instead of insight | rewrite per the quality criteria in <self_dialogue_system> |
@@ -151,7 +152,60 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   STANDARD, where the self-dialogue scaffold carries the reasoning. See
   `references/model-capabilities.md` for the capability table and selection algorithm.
 
+  **Discipline tiering (v5.2.0):** the externalized reasoning disciplines in
+  <reasoning_disciplines> are mode-conditional — Contract Formalization, Verification
+  Loop, and Edge Coverage apply in STANDARD/ENHANCED; Typed Step Outputs and the
+  Confidence Gate apply from BASIC up; none applies in MINIMAL.
+
   </reasoning_modes>
+
+  <reasoning_disciplines>
+  **Externalized reasoning disciplines.** These replace capabilities a weak reasoner
+  lacks — ambiguity tolerance, self-correction, metacognition, completeness intuition —
+  with external procedure. They are procedural discipline for existing steps, not new
+  ontology: no new thinking types, patterns, or tool categories. None applies in MINIMAL.
+
+  | Discipline | Replaces | MINIMAL | BASIC | STANDARD | ENHANCED |
+  |------------|-----------|---------|-------|----------|----------|
+  | Contract Formalization | ambiguity tolerance | — | — | yes | yes |
+  | Typed Step Outputs | free-form drift control | — | yes | yes | yes |
+  | Verification Loop | one-shot fallback | — | — | yes | yes |
+  | Confidence Gate | metacognition | — | yes | yes | yes |
+  | Edge Coverage | completeness intuition | — | — | yes | yes |
+
+  1. **Contract Formalization (STANDARD/ENHANCED).** Before decomposing an open-ended
+  problem statement, convert it into a closed contract: named entities, hard and soft
+  constraints, measurable success criteria, and an explicit list of what must NOT be
+  interpreted freely. Decomposing an open-ended statement directly is a formalization
+  failure, not a style choice — ambiguity is where a weak reasoner derails first.
+  Worked example: `templates/system-flows/step-execution-template.md` (Formalization Step).
+
+  2. **Typed Step Outputs (BASIC/STANDARD/ENHANCED).** A step's Expected Output is a
+  typed structure — fields, enums, ranges — not prose. Declare it in the optional
+  **Output Schema** step field. If a produced output violates its declared structure,
+  feed the violation back into the step and regenerate the output: the cheapest
+  correction loop, fired before any fallback.
+
+  3. **Verification Loop (STANDARD/ENHANCED).** A verification step that fails does not
+  fall back once — it iterates. Capture the RAW failure evidence (error output, observed
+  values — never a paraphrase), feed it into the next attempt, and on a REPEATED failure
+  change the strategy, not just the parameters. Every loop declares **Max Iterations**,
+  **Exit Criteria**, and **Escalation Policy**; a loop without a budget is an
+  anti-pattern, not persistence. Worked example: `templates/system-flows/step-execution-template.md`
+  (Verification Loop Step).
+
+  4. **Confidence Gate (BASIC/STANDARD/ENHANCED).** The Quality Metrics confidence value
+  is a GATE, not a report. Default threshold: 7.0/10 unless the user set one. Below the
+  threshold the step or flow is NOT done: iterate, escalate, or ask — and name which.
+  A check that could match more than one interpretation of success is a FAILED check,
+  never a passed one. No silent pass.
+
+  5. **Edge Coverage (STANDARD/ENHANCED).** When the problem contains states and
+  transitions — any process, protocol, workflow, lifecycle — validation cases are
+  DERIVED by covering the graph: every state, every transition, every guard. A weak
+  reasoner generates the happy path; the coverage procedure supplies the rest externally.
+  Procedure: `templates/system-flows/step-execution-template.md` (Edge-Case Derivation).
+  </reasoning_disciplines>
 
   <thinking_type_system>
   Select optimal thinking type for the problem domain.
@@ -236,10 +290,14 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   **Tool Parameters:** [Exact parameters if a tool is used]
   **Input:** [Data/parameters coming into this step]
   **Expected Output:** [What this step should produce]
+  **Output Schema:** [Optional, BASIC and up: the typed structure of the expected output — fields, enums, ranges]
   **Validation:** [Objective criteria to verify step success]
   **Dependencies:** [What this step needs from previous steps]
   **Next Step:** [What step comes after this one]
   **Fallback:** [Alternative approach if this step fails]
+  **Max Iterations:** [Verification steps, STANDARD/ENHANCED: the verification loop budget — see <reasoning_disciplines>]
+  **Exit Criteria:** [Verification steps: conditions that end the loop — all checks pass, or budget exhausted]
+  **Escalation Policy:** [Verification steps: what changes on a repeated failure — strategy, not just parameters]
   **Complexity:** [LOW/MEDIUM/HIGH - step difficulty]
   ```
 
@@ -320,6 +378,9 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | Every step carries its tier-required fields | the generated step list | a required field is missing |
   | Self-dialogue is relevant and logical (STANDARD/BASIC only) | the dialogue exchanges per step | restatement instead of insight |
   | Tools are planned by category only | the tool call list | a concrete invented tool name appears |
+  | Open-ended statements were formalized before decomposition (STANDARD/ENHANCED) | the formalized contract next to the step list | an open-ended statement was decomposed directly |
+  | Confidence meets the action threshold | the Confidence Gate verdict in the metrics block (default 7.0/10) | the verdict is absent, below threshold, or FAIL without a named action |
+  | Validation cases cover the state/transition graph when one exists (STANDARD/ENHANCED) | the derived case list mapped to states, transitions, and guards | a graph exists and the cases cover only the happy path |
   | Output format satisfies the tier contract | `scripts/validate-system-flow.sh` output on the produced flow | required sections missing or the MINIMAL budget exceeded |
   | Quality metrics are computed for the tier | the metrics block of the flow | a required metric is absent |
 
