@@ -6,9 +6,10 @@ the development environment.
 
 ## Before publishing
 
-- [ ] **CI green on GitHub**: after pushing this branch, confirm the Actions
-  workflow passes on GitHub runners (locally verified; the GitHub run itself
-  is UNVERIFIED until the first push)
+- [x] **CI green on GitHub**: the Actions workflow passed on GitHub runners for
+  this branch (push runs and the PR run, 2026-10-03). Advisory annotations:
+  shellcheck findings (non-blocking by design) and the actions/checkout@v4
+  Node-20 deprecation notice — consider bumping to @v5 in a follow-up
 - [x] **Install command**: `npx skills add DanteUkraine/cot-reasoning@cot-reasoning`
   verified from a clean directory (non-interactive form: `--agent '*' -y`); the
   registry currently serves the published main version (5.1.0) — it will serve
