@@ -49,6 +49,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 **Input:** {{USER_REQUEST}}, {{CONTEXT}}, {{CONSTRAINTS}}
 
 **Expected Output:**
+**Output Schema:** {"core_problem": "string", "affected_systems": ["string"], "success_criteria": ["string"], "constraints": {"hard": ["string"], "soft": ["string"]}, "stakeholders": ["string"]}
 - **Core Problem:** [One-sentence problem statement]
 - **Affected Systems/Components:** [List of impacted areas]
 - **Success Criteria:** [Measurable outcomes that define success]
@@ -106,6 +107,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 **Input:** None (or data from Step 1 if applicable)
 
 **Expected Output:**
+**Output Schema:** {"sources": [{"name": "string", "data": "any", "quality": "complete|incomplete"}]}
 - Raw data from all identified sources
 - Data organized by source/type
 - Timestamps and metadata preserved
@@ -167,6 +169,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 **Input:** Data from Step 2
 
 **Expected Output:**
+**Output Schema:** {"key_findings": ["string"], "patterns": ["string"], "anomalies": ["string"], "correlations": [{"pair": "string", "strength": "number"}]}
 - **Key Findings:** [Major insights from data]
 - **Patterns Identified:** [Recurring themes or trends]
 - **Anomalies:** [Outliers or unexpected values]
@@ -229,6 +232,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 **Input:** Analysis from Step 3
 
 **Expected Output:**
+**Output Schema:** {"root_causes": [{"cause": "string", "evidence": "string", "impact": "string", "confidence": "number"}], "contributing_factors": ["string"]}
 - **Root Cause 1:** [Primary cause with evidence]
   - Evidence: [Supporting data/patterns]
   - Impact: [How it affects the problem]
@@ -287,6 +291,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 **Input:** Root causes from Step 4
 
 **Expected Output:**
+**Output Schema:** {"solutions": [{"description": "string", "addresses": ["string"], "pros": ["string"], "cons": ["string"], "success_probability": "number", "risk": "Low|Medium|High"}]}
 - **Solution 1:** [Primary recommended solution]
   - Description: [How it works]
   - Addresses: [Which root causes it fixes]
@@ -373,6 +378,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 **Input:** Selected solution from Step 5
 
 **Expected Output:**
+**Output Schema:** {"verification": "Pass|Fail", "edge_case_results": [{"case": "string", "result": "string"}], "risks": ["string"]}
 - **Solution Verification:** [Does solution meet all success criteria?]
 - **Edge Case Testing:** [Results for various scenarios]
 - **Risk Assessment:** [Updated risk analysis]
@@ -478,6 +484,7 @@ recommended_for: business-analysis,technical-problems,strategic-planning,debuggi
 
 ### Quality Metrics
 - **Confidence Level:** {{CONFIDENCE_LEVEL}} ({{SCORE}}/10)
+- **Confidence Gate:** {{CONFIDENCE_GATE}} (threshold: 7.0/10 unless user-set; below it the flow is NOT done)
 - **System Simulation Quality:** {{AGENTIC_QUALITY}}/10
 - **Tool Utilization:** {{UTILIZATION}}%
 - **Step Completion Rate:** 100%

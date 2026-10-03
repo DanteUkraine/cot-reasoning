@@ -228,6 +228,8 @@ validate_step_block() {
         else
             local joined; IFS=","; joined="${missing_loop_fields[*]}"; log_error "Step $step_number: Max Iterations declared without ${joined} (loop fields are declared as a set)"
         fi
+    elif grep -q "\*\*Exit Criteria:\*\*" <<< "$block" || grep -q "\*\*Escalation Policy:\*\*" <<< "$block"; then
+        log_warning "Step $step_number: orphan loop fields (Exit Criteria / Escalation Policy without Max Iterations)"
     fi
 
     # Output Schema: recommended in STANDARD/ENHANCED (warning only)
@@ -502,6 +504,8 @@ validate_json_step() {
         else
             local joined_keys; IFS=","; joined_keys="${missing_loop_keys[*]}"; log_error "Step $((index + 1)): max_iterations declared without ${joined_keys} (loop fields are declared as a set)"
         fi
+    elif json_has_key "$file" "$step_path" "exit_criteria" || json_has_key "$file" "$step_path" "escalation_policy"; then
+        log_warning "Step $((index + 1)): orphan loop fields (exit_criteria / escalation_policy without max_iterations)"
     fi
 
     # Output Schema: recommended in STANDARD/ENHANCED (warning only)

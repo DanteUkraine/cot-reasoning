@@ -43,6 +43,10 @@ response processing, and error recovery (see the tool taxonomy in <tool_integrat
 the Result Tracking System tracks every step's input, output, status, and validation,
 carries intermediate results forward, and applies objective checks at each step.
 
+The externalized reasoning disciplines (v5.2.0) are procedural rules layered over
+these four components — not a fifth component and not new ontology; see
+<reasoning_disciplines>.
+
 This is a reasoning framework that enhances model capabilities, not a replacement for native reasoning.
 </purpose>
 
@@ -57,7 +61,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 | Step 3 — a thinking-type framework template is loaded for the chosen type | `templates/thinking-types/` (analytical, creative, critical, systematic, ethical, strategic) |
 | Step 4 — worked self-dialogue examples for debugging, design, and decision domains | `templates/system-flows/self-dialogue-template.md` |
 | Step 6 — worked step examples for assembling flows in a new domain, plus the Formalization Step, Verification Loop Step, and Edge-Case Derivation patterns | `templates/system-flows/step-execution-template.md` |
-| Step 6 — the universal adaptive reasoning flow with pattern configuration | `templates/adaptive-flows/unified-reasoning-flow.md` |
+| Step 6 — the universal adaptive reasoning flow with pattern configuration, aligned with the v5.2.0 disciplines (formalized contract, verification loop discipline, confidence gate, edge coverage) | `templates/adaptive-flows/unified-reasoning-flow.md` |
 | Step 7 — the full tiered output contract: core and extended templates, per-tier requirements, MINIMAL budget, Confidence Gate, anti-patterns | `references/output-contract.md` (§ output_contract) |
 | Step 8 — validate a produced flow, a flow directory, or the example suite | `scripts/validate-system-flow.sh` |
 | Step 8 — engineering example flows (incident, architecture, code review) to run the validator against | `assets/system-examples.json` |
@@ -86,7 +90,8 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | Evidence, not assertion | A gate is discharged by output you paste, an artifact you name, or a judgment you state in the report. "Verified" on its own discharges nothing |
   | Unrunnable is UNVERIFIED | A check that cannot run here is labelled `UNVERIFIED` with the reason and the command that would settle it. It is never recorded as passed |
   | No silent advance | Failing a step gate stops the step. Fix, or record the failure and say what it invalidates downstream — never proceed quietly |
-  | A gate never reads its own subject | A check whose expected value comes from the artifact it validates passes at every value of that artifact, including the broken one |
+  | A gate never reads its own subject | A check whose expected value comes from the artifact it validates passes at every value of that artifact, including the broken one. The same holds for produced artifacts: expected values derive from the original contract (the formalized contract of step 1), never from the artifact being validated |
+  | Verify the computed result, not the written text | Validation criteria reference the observable result of executing the step — tool output, pasted artifact, measured value — never the step's own description of its output. Re-reading the produced text is not verification |
   | Ambiguous validation is failed validation | A check that could pass under more than one interpretation of success has checked nothing; it is recorded as failed, never as passed |
   </step_gate_protocol>
 
@@ -191,8 +196,10 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   values — never a paraphrase), feed it into the next attempt, and on a REPEATED failure
   change the strategy, not just the parameters. Every loop declares **Max Iterations**,
   **Exit Criteria**, and **Escalation Policy**; a loop without a budget is an
-  anti-pattern, not persistence. Worked example: `templates/system-flows/step-execution-template.md`
-  (Verification Loop Step).
+  anti-pattern, not persistence. A check that stalls or depends on unavailable data
+  fails fast and hands its partial evidence to the loop — the iteration budget is
+  never spent waiting on a hanging check. Worked example:
+  `templates/system-flows/step-execution-template.md` (Verification Loop Step).
 
   4. **Confidence Gate (BASIC/STANDARD/ENHANCED).** The Quality Metrics confidence value
   is a GATE, not a report. Default threshold: 7.0/10 unless the user set one. Below the
@@ -303,7 +310,8 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 
   **Design principles:** single responsibility per step; explicit dependencies;
   objective validation; graceful degradation (every step has a fallback); transparency
-  (self-dialogue explains each action; assumptions are stated).
+  (self-dialogue explains each action; assumptions are stated); behavior-first
+  validation (verify the semantic or behavioral state first, surface properties second).
 
   **Complexity guidelines:**
 
@@ -353,6 +361,17 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   **Input requirements:** 
   - Minimum: 10+ characters, a clear problem or question
   - Optimal: [Context/Background] [Problem/Question] [Available Tools] [Constraints] [Goal]
+
+  **Instruction-type taxonomy (step 0):** classify the request before reasoning begins.
+
+  | Type | Signal | Handling |
+  |------|--------|----------|
+  | Direct | Explicit constraints, measurable goal, one allowed reading | Reason directly; do not inflate ceremony |
+  | Task-specific | Narrow goal, may benefit from examples | Standard flow; Few-Shot/Auto-CoT when examples help |
+  | Open-ended | Vague scope, unmeasurable success, terms left to interpretation | STANDARD/ENHANCED: triggers Contract Formalization (<reasoning_disciplines>) before decomposition; BASIC: ask the open questions |
+
+  An open-ended request decomposed without formalization is a step-1 gate failure,
+  not a style choice.
 
   **Output contract (compact):** the output contract is COST-TIERED. Every mode emits the
   CORE structure; extended sections are conditional on mode. Never pay full ceremony for a

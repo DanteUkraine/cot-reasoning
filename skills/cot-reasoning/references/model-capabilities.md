@@ -62,6 +62,8 @@ tool_usage: AS_NEEDED
 step_granularity: MODERATE (5-7 steps)
 validation: STRICT
 fallback: GRACEFUL
+confidence_threshold: 7.0
+disciplines: MODE_CONDITIONAL  # see the tier matrix in SKILL.md <reasoning_disciplines>
 ```
 
 ### How cot-reasoning Enhances Model Capabilities

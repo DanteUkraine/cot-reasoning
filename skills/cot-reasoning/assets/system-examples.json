@@ -2,8 +2,8 @@
   "metadata": {
     "skill": "cot-reasoning",
     "version": "5.2.0",
-    "last_updated": "2026-09-30",
-    "purpose": "Commercial engineering scenarios demonstrating the cot-reasoning output contract across all four modes",
+    "last_updated": "2026-10-03",
+    "purpose": "Engineering scenarios demonstrating the cot-reasoning output contract across all four modes, including a full walkthrough of the five externalized reasoning disciplines",
     "tool_taxonomy": "environment-neutral categories: filesystem-read, filesystem-write, shell-execution, web-search, code-search"
   },
   "examples": [

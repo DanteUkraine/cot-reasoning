@@ -190,6 +190,39 @@ Develop systematic solutions.
 
 **Selected Solution:** [Chosen solution with justification]
 
+**Verification Loop (STANDARD/ENHANCED):** the selected solution is verified in a
+budgeted loop, not a single check. Worked example:
+
+```markdown
+### Verify the Selected Solution
+
+**Thought:** "The solution is designed but unproven. A failed check must not end in a one-shot fallback."
+
+**Why:** One-shot fallback under-uses failure evidence; a budgeted loop converts each failure into a better next attempt
+
+**Action:** Run the objective checks against the expected impact metrics. On failure: capture the RAW evidence, feed it into the next attempt. On a REPEATED failure, change the strategy, not just the parameters.
+
+**Tool:** shell-execution
+
+**Input:** Selected solution, expected impact metrics from Phase 5
+
+**Expected Output:** Verdict (Pass|Fail) with per-iteration raw evidence
+
+**Output Schema:** {"verdict": "Pass|Fail", "iterations_used": "number", "evidence": [{"iteration": "number", "raw_output": "string", "strategy_changed": "boolean"}]}
+
+**Validation:** Every failed iteration captured raw evidence; a repeated failure changed the strategy; the loop stopped on exit criteria
+
+**Fallback:** Budget exhausted → record FAIL with all captured evidence and state what it invalidates downstream
+
+**Max Iterations:** 3
+
+**Exit Criteria:** All impact metrics confirmed, OR budget exhausted, OR evidence shows the solution hypothesis is wrong
+
+**Escalation Policy:** Iteration 1: fix parameters. Iteration 2: change the approach. Iteration 3: change the hypothesis; if it fails, the verdict is FAIL
+
+**Complexity:** HIGH
+```
+
 **Implementation Steps:**
 
 **Preparation Phase:**
