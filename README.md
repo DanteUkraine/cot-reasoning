@@ -2,6 +2,8 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+[English](README.md) | [Українська](README.uk.md)
+
 **The Universal Reasoning Framework for ANY Large Language Model**.
 
 **Chain-of-thought Reasoning** is a **model-agnostic reasoning skill** that enables **ANY** Large Language Model to perform complex, multi-step reasoning by providing a complete thinking framework.
@@ -16,12 +18,22 @@
 - **🔌 Tool Integration**: Seamless integration with available tools
 - **🎨 Multiple Thinking Types**: Analytical, Creative, Critical, Systematic, Ethical, Strategic
 - **🌳 Reasoning Patterns**: Zero-Shot CoT, Few-Shot CoT, Auto-CoT, Tree of Thoughts, ReAct
+- **🧭 Externalized Reasoning Disciplines**: Contract Formalization, Typed Step Outputs, Verification Loops, Confidence Gates, Edge Coverage
 
 ## 📦 Installation
 
 ```bash
 npx skills add DanteUkraine/cot-reasoning@cot-reasoning
 ```
+
+The command is interactive (it asks which agents to install to). For scripts
+and CI, use the non-interactive form:
+
+```bash
+npx skills add DanteUkraine/cot-reasoning@cot-reasoning --agent '*' -y
+```
+
+`jq` is not required for installation — only for the validation tooling below.
 
 ## 🚀 Usage
 
@@ -61,6 +73,32 @@ Code, OpenCode, and others):
 | Description-based activation | The skill's frontmatter description (with explicit NOT-conditions) routes multi-step reasoning requests to it automatically |
 | Explicit invocation phrasing | Naming "cot-reasoning" in the request activates it directly, e.g. "Use cot-reasoning to ..." |
 | Configuration through input | State the desired mode/pattern/thinking type in the request text, e.g. "Use STANDARD mode with the ReAct pattern to debug this issue" |
+
+### Command Examples: Modes and Patterns
+
+The commands below use the Vibe slash form. In any other environment, replace
+`/cot-reasoning` with "Use cot-reasoning to ..." — the rest of the line is
+identical. Stating a mode or pattern in the request pins it; omitting it lets
+the skill select automatically.
+
+#### Reasoning modes
+
+| Mode | Example command | Designed for |
+|------|-----------------|--------------|
+| **MINIMAL** | `/cot-reasoning decide: tabs or spaces for a small hand-edited internal config` | Trivial problems answerable in 2-3 simple steps — the skill must not inflate ceremony |
+| **BASIC** | `/cot-reasoning review this change for risks, BASIC mode: replacing the in-memory session store with Redis, single node, no fallback yet` | Environments with no tools: the full reasoning scaffold with pure analysis |
+| **STANDARD** | `/cot-reasoning investigate why our API returns 500 errors for 5% of requests since yesterday's deploy` | The default for most problems: evidence gathering, tool use, full contract |
+| **ENHANCED** | `/cot-reasoning decide between PostgreSQL, MongoDB, and a time-series database for 50M metrics points per day, ENHANCED mode` | Models with strong native reasoning: structure and validation without the simulated dialogue display |
+
+#### Reasoning patterns
+
+| Pattern | Example command | Designed for |
+|---------|-----------------|--------------|
+| **Zero-Shot CoT** | `/cot-reasoning analyze why our queue depth spikes every Monday morning, Zero-Shot CoT` | Simple problems needing direct step-by-step reasoning — no examples, no tools |
+| **Few-Shot CoT** | `/cot-reasoning triage these three new incidents following the two example post-mortems below, Few-Shot CoT` | Problems where provided examples clarify the expected reasoning shape |
+| **Auto-CoT** | `/cot-reasoning design an on-call rotation policy for a four-person team, Auto-CoT` | Novel problems with no provided examples — the skill generates its own first |
+| **Tree of Thoughts** | `/cot-reasoning compare self-hosted email, SendGrid, and AWS SES for 200k emails per month, Tree of Thoughts` | Multi-option decisions: branches scored independently, leading branch stress-tested |
+| **ReAct** | `/cot-reasoning debug why checkout takes 8 seconds on every tenth request, ReAct` | Tool-intensive investigation: action-observation loops, evidence before conclusions |
 
 ## 🎯 When to Use
 
@@ -105,6 +143,7 @@ Code, OpenCode, and others):
 4. **Result Tracking System**
    - Maintains audit trail of reasoning process
    - Tracks intermediate results and validation
+   - Step outputs are typed structures (v5.2.0), not free-form prose
 
 ### Reasoning Modes
 
@@ -139,7 +178,38 @@ self-dialogue via ENHANCED; weak reasoners get the full structure via STANDARD.
 | **Tree of Thoughts** | Complex decisions | Medium-High |
 | **ReAct** | Tool-intensive tasks | High |
 
+### Reasoning Disciplines (v5.2.0)
+
+Five externalized disciplines replace capabilities a weak reasoner lacks — ambiguity
+tolerance, self-correction, metacognition, completeness intuition — with external
+procedure. They are procedural discipline for existing steps, not new ontology, and
+they are mode-conditional: none applies in MINIMAL.
+
+| Discipline | Replaces | MINIMAL | BASIC | STANDARD | ENHANCED |
+|------------|-----------|---------|-------|----------|----------|
+| **Contract Formalization** | ambiguity tolerance | — | — | yes | yes |
+| **Typed Step Outputs** | free-form drift control | — | yes | yes | yes |
+| **Verification Loop** | one-shot fallback | — | — | yes | yes |
+| **Confidence Gate** | metacognition | — | yes | yes | yes |
+| **Edge Coverage** | completeness intuition | — | — | yes | yes |
+
+- **Contract Formalization** — an open-ended problem statement is converted into a
+  closed contract (entities, constraints, measurable success criteria) before
+  decomposition begins.
+- **Typed Step Outputs** — a step's expected output is a typed structure, not prose;
+  a structure violation is fed back and the output is regenerated.
+- **Verification Loop** — a failed verification iterates on captured raw evidence
+  with a declared budget (`Max Iterations`, `Exit Criteria`, `Escalation Policy`);
+  a repeated failure changes the strategy, not just the parameters.
+- **Confidence Gate** — the confidence metric is a gate (default threshold 7.0/10),
+  not a report; below it, the flow iterates, escalates, or asks. No silent pass.
+- **Edge Coverage** — when the problem has states and transitions, validation cases
+  are derived by covering the graph, not by intuition.
+
 ## ✅ Validation
+
+**Prerequisite:** [`jq`](https://jqlang.github.io/jq/) must be installed for JSON
+validation (the validator prints the install command if it is missing).
 
 Every reasoning flow can be checked against the skill's output contract with the
 bundled validator (tier-aware: it checks the sections the flow's mode requires):
@@ -157,10 +227,52 @@ cd $(npx skills path cot-reasoning)
 ./scripts/validate-system-flow.sh -d ./flows/
 ```
 
+### Regression suite
+
+The validator itself is protected by 22 regression cases (17 fixtures with an
+expectations manifest plus 5 built-in CLI cases), covering 99% of its check
+templates:
+
+```bash
+./scripts/run-test-flows.sh
+```
+
+### Consistency lint
+
+Version alignment, frontmatter validity, cross-references, and a universality
+guard that rejects domain-specific terms in skill content:
+
+```bash
+./scripts/lint-consistency.sh
+```
+
+### Behavioral eval
+
+The mechanical layers prove the contract checker works; the behavioral eval
+proves the product claim — that a model executing the skill emits conformant
+flows with the right reasoning profile. Ten reference prompts, a scorer, and a
+results matrix:
+
+```bash
+./scripts/run-behavioral-eval.sh <flows_dir> "<model label>"
+```
+
+See `assets/behavioral-eval/README.md` for the protocol and the measured
+results to date. Current data point: Mistral Vibe agent (Mistral Large) —
+validator 10/10, profile 10/10.
+
+### CI
+
+All three verification layers (example validation, regression suite, lint) run
+in GitHub Actions on every push and pull request — see
+`.github/workflows/ci.yml`.
+
 ## 📜 Version
 
-**v5.0.0** — the version is stated consistently in the skill frontmatter, the
-validator, the templates, and the output contract.
+**v5.2.0** — the version is stated consistently in the skill frontmatter, the
+validator, the templates, the references, and the output contract, and is
+enforced by the consistency lint. See [CHANGELOG.md](CHANGELOG.md) for the
+release history.
 
 ## 📜 License
 

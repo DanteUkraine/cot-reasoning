@@ -1,6 +1,6 @@
 ---
 template_id: self-dialogue-template
-version: "5.0.0"
+version: "5.2.0"
 category: system-core
 recommended_for: reasoning-transparency
 domain: universal
@@ -197,6 +197,32 @@ This template provides **structured internal monologue patterns** that create **
 [Conclusion]: "{{OPTION_X}} is optimal based on {{REASONING}}"
 [Decision]: "Recommend {{OPTION_X}} with implementation plan"
 ```
+
+---
+
+### Verification Loop Iteration (STANDARD/ENHANCED)
+
+**Pattern:** Raw Evidence → Failure Analysis → Strategy Question → Strategy vs Parameters → Next Attempt
+
+Run this dialogue once per failed iteration of a Verification Loop Step. The raw
+evidence is quoted, never paraphrased — the next attempt learns from the actual
+failure output, not from a summary of it.
+
+```
+[Thought]: "Iteration {{N}} of {{MAX_ITERATIONS}} failed. Raw evidence: {{RAW_FAILURE_OUTPUT}}"
+[Analysis]: "The check expected {{EXPECTED_VALUE}} but observed {{OBSERVED_VALUE}}. The failure is in {{WHERE}}"
+[Question]: "Why did the previous strategy not produce the expected result?"
+[Answer]: "{{ROOT_OF_FAILURE}} — the assumption {{ASSUMPTION}} does not hold under this evidence"
+[Question]: "Is this a parameter problem or a strategy problem?"
+[Answer]: "{{FIRST_FAILURE ? 'First failure: adjust parameters' : 'Repeated failure: the strategy itself must change'}}"
+[Consideration]: "Budget: {{N}} of {{MAX_ITERATIONS}} used. If the hypothesis itself is contradicted, stop early — do not spend the budget on a dead hypothesis"
+[Conclusion]: "Next attempt: {{CHANGED_APPROACH}}, informed by the raw evidence above"
+[Decision]: "Run iteration {{N+1}} with {{SPECIFIC_CHANGE}}; if it fails, apply the Escalation Policy"
+```
+
+**Quality bar for loop dialogue:** the [Answer] to "parameter or strategy?" must
+name which one and why — a loop that only ever adjusts parameters is repetition,
+not repair. The [Consideration] must account for the remaining budget.
 
 ---
 

@@ -1,0 +1,38 @@
+{
+  "metadata": {"skill": "cot-reasoning", "version": "9.9.9"},
+  "examples": [
+    {
+      "id": "broken-probe",
+      "mode": "SUPERMODE",
+      "thinking_type": "WEIRD",
+      "complexity": "HUGE",
+      "pattern": "Magic",
+      "flow": {
+        "steps": [
+          {"action": "a", "tool": "invented-tool"},
+          {"thought": "t", "why": "w", "action": "a", "tool": null, "input": "i", "expected_output": "o", "validation": "v", "status": "done", "next_step": null, "fallback": "f", "max_iterations": 3}
+        ],
+        "key_findings": [],
+        "recommendations": [],
+        "quality_metrics": {"confidence_level": "x"}
+      }
+    },
+    {
+      "id": "minimal-over-budget",
+      "mode": "MINIMAL",
+      "thinking_type": "ANALYTICAL",
+      "complexity": "LOW",
+      "pattern": "Zero-Shot CoT",
+      "flow": {
+        "steps": [
+          {"action": "a", "expected_output": "o", "validation": "v"},
+          {"action": "a", "expected_output": "o", "validation": "v"},
+          {"action": "a", "expected_output": "o", "validation": "v"},
+          {"action": "a", "expected_output": "o", "validation": "v"}
+        ],
+        "key_findings": [{"finding": "f", "impact": "Low"}],
+        "recommendations": [{"action": "a", "priority": "Low", "impact": "i"}]
+      }
+    }
+  ]
+}

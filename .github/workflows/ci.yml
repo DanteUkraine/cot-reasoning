@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Make scripts executable
+        run: chmod +x skills/cot-reasoning/scripts/*.sh
+
+      - name: Validate example suite
+        run: skills/cot-reasoning/scripts/validate-system-flow.sh -j skills/cot-reasoning/assets/system-examples.json
+
+      - name: Run regression fixtures
+        run: skills/cot-reasoning/scripts/run-test-flows.sh
+
+      - name: Consistency lint
+        run: skills/cot-reasoning/scripts/lint-consistency.sh
+
+      - name: Shellcheck (advisory)
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y shellcheck
+          shellcheck skills/cot-reasoning/scripts/*.sh

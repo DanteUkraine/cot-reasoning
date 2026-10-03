@@ -1,6 +1,6 @@
 ---
 template_id: unified-reasoning-flow
-version: "5.0.0"
+version: "5.2.0"
 category: adaptive-flow
 recommended_for: all-problems
 ---
@@ -87,6 +87,10 @@ Core Problem: [Extracted primary issue from {{USER_REQUEST}}]
   - Original Statement: "{{USER_REQUEST}}"
   - Paraphrased: [Problem restated in own words]
   
+Instruction Type: [Direct | Task-specific | Open-ended]
+  - Signal: [What made the classification clear]
+  - Open-ended handling (STANDARD/ENHANCED): formalize before decomposing — see below
+
 Intent Classification: {{INTENT}}
   - Primary Intent: [Main user goal]
   - Secondary Intents: [Additional detected intents, if any]
@@ -104,6 +108,16 @@ Complexity Assessment: {{COMPLEXITY}}
     - Interdependencies: [Number of relationships]
     - Constraints: [Number of limitations]
     - Open-endedness: [High/Medium/Low]
+```
+
+### Formalized Contract (STANDARD/ENHANCED, open-ended requests only)
+```
+Entities: [Named actors/systems/data involved]
+Hard Constraints: [Cannot be violated]
+Soft Constraints: [Should be respected, with flexibility]
+Success Criteria: [Measurable, prioritized]
+Not Open to Interpretation: [Terms with exactly one allowed meaning]
+Open Questions: [Genuinely underspecified — ask, do not assume]
 ```
 
 ### Success Criteria Definition
@@ -347,6 +361,12 @@ Following the extracted pattern:
 **Max Iterations:** {{MAX_ITERATIONS}}
 **Tool Budget:** {{TOOL_BUDGET}}
 
+**Verification loop discipline (STANDARD/ENHANCED):** a failed verification iterates
+on RAW captured evidence (never a paraphrase) with a declared budget — Max Iterations,
+Exit Criteria, Escalation Policy as a set. On a repeated failure, change the strategy,
+not just the parameters. A stalled check fails fast and hands partial evidence to the
+loop.
+
 **Iteration 1:**
 ```
 Thought: [Current reasoning state]
@@ -406,6 +426,7 @@ Reasoning: [Analysis]
 - [ ] **Constraints:** All hard constraints respected, soft constraints considered
 - [ ] **Assumptions:** All assumptions identified and validated or noted
 - [ ] **Information Gaps:** All critical gaps acknowledged or filled
+- [ ] **Edge Coverage:** When the problem contains states and transitions, validation cases were derived by covering the graph (every state, transition, guard both ways, terminal states, failure paths) — not by intuition
 
 ### Quality Check
 - [ ] **Logical Consistency:** No contradictions in reasoning
@@ -424,6 +445,8 @@ Reasoning: [Analysis]
 | **Total** | - | **1.0** | **[X.X/10]** |
 
 **Confidence Level:** [High: 8.0-10.0 / Medium: 5.0-7.9 / Low: < 5.0]
+
+**Confidence Gate:** [PASS | FAIL → iterate|escalate|ask] (threshold: 7.0/10 unless the user set one; below it the flow is NOT done)
 
 ### Risk Assessment
 **Primary Risks:**
@@ -481,6 +504,7 @@ Pattern Applied: {{COT_PATTERN}}
 Thinking Type: {{THINKING_TYPE}}
 
 Confidence Level: [High/Medium/Low]
+Confidence Gate: [PASS | FAIL → iterate|escalate|ask] (threshold: 7.0/10 unless user-set)
 Estimated Accuracy Improvement: +[X]%
 Token Usage: [Actual tokens] / [Budget tokens]
 Execution Time: [Time taken]

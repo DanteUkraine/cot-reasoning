@@ -78,6 +78,11 @@ def select_pattern(complexity, tools_available):
 5. **Use Zero-Shot CoT** for simple, direct problems
 6. **Always use step structure** regardless of pattern
 7. **Include self-dialogue** in every step for transparency (STANDARD/BASIC modes)
+8. **Extend ReAct with the Verification Loop** for weak reasoners: a failed
+   verification iterates on raw captured evidence with a declared budget
+   (Max Iterations, Exit Criteria, Escalation Policy) — see `<reasoning_disciplines>`
+   in SKILL.md and the Verification Loop Step in
+   `templates/system-flows/step-execution-template.md`
 
 ---
 
@@ -98,6 +103,6 @@ Patterns are useful but not essential. Focus on the step structure first, then c
 
 ## Version Information
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2026-08-22
-**Compatibility:** cot-reasoning v5.0.0+
+**Compatibility:** cot-reasoning v5.2.0+

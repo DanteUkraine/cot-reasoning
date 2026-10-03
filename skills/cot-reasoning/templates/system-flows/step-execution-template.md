@@ -1,6 +1,6 @@
 ---
 template_id: step-execution-template
-version: "5.0.0"
+version: "5.2.0"
 category: system-core
 recommended_for: all-problems
 ---
@@ -28,10 +28,14 @@ This template defines the **standard structure for all reasoning steps** in the 
 | `{{TOOL_PARAMS}}` | Parameters for tool call | No | - |
 | `{{INPUT}}` | Data/parameters for this step | No | - |
 | `{{EXPECTED_OUTPUT}}` | What should be produced | Yes | - |
+| `{{OUTPUT_SCHEMA}}` | Typed structure of the expected output (BASIC and up) | No | - |
 | `{{VALIDATION}}` | How to verify this step succeeded | Yes | - |
 | `{{DEPENDENCIES}}` | What this step needs from previous steps | No | None |
 | `{{NEXT_STEP}}` | What step comes next | No | Next sequential |
 | `{{FALLBACK}}` | Alternative if step fails | Yes | - |
+| `{{MAX_ITERATIONS}}` | Verification loop budget (verification steps, STANDARD/ENHANCED) | No | - |
+| `{{EXIT_CRITERIA}}` | Conditions that end the verification loop | No | - |
+| `{{ESCALATION_POLICY}}` | What changes on repeated failure | No | - |
 | `{{COMPLEXITY}}` | Step complexity (LOW/MEDIUM/HIGH) | No | MEDIUM |
 
 ---
@@ -58,6 +62,8 @@ This template defines the **standard structure for all reasoning steps** in the 
 
 **Expected Output:** {{EXPECTED_OUTPUT}}
 
+**Output Schema:** {{OUTPUT_SCHEMA}}
+
 **Validation:** {{VALIDATION}}
 
 **Dependencies:** {{DEPENDENCIES}}
@@ -65,6 +71,12 @@ This template defines the **standard structure for all reasoning steps** in the 
 **Next Step:** {{NEXT_STEP}}
 
 **Fallback:** {{FALLBACK}}
+
+**Max Iterations:** {{MAX_ITERATIONS}}
+
+**Exit Criteria:** {{EXIT_CRITERIA}}
+
+**Escalation Policy:** {{ESCALATION_POLICY}}
 
 **Complexity:** {{COMPLEXITY}}
 ```
@@ -357,6 +369,135 @@ Self-dialogue and explanations make the reasoning process understandable.
 **Complexity:** HIGH
 ```
 
+### Type 6: Contract Formalization Step (STANDARD/ENHANCED)
+**Use Case:** The problem statement is open-ended — vague scope, unmeasurable success, terms left to interpretation. Formalize BEFORE decomposing.
+
+```markdown
+### Step 1: Formalize the Problem Contract
+
+**Thought:** "The request is open-ended. Decomposing it now would bake ambiguity into every downstream step."
+
+**Why:** Ambiguity is where a weak reasoner derails first; a closed contract removes the interpretations before any reasoning starts
+
+**Action:** Convert the statement into a closed contract: named entities, hard constraints (cannot violate), soft constraints (should respect), measurable success criteria, and an explicit list of terms that must NOT be interpreted freely. Where the statement is genuinely underspecified, list the clarification questions — do not silently pick an interpretation.
+
+**Tool:** None
+
+**Input:** User request, context, constraints
+
+**Expected Output:**
+- **Formalized Contract:**
+  - Entities: [named actors/systems/data involved]
+  - Hard Constraints: [cannot be violated]
+  - Soft Constraints: [should be respected, with flexibility]
+  - Success Criteria: [measurable, prioritized]
+  - Not Open to Interpretation: [terms with exactly one allowed meaning]
+  - Open Questions: [what is genuinely underspecified]
+
+**Output Schema:**
+```
+{ "entities": [string], "hard_constraints": [string], "soft_constraints": [string],
+  "success_criteria": [{"criterion": string, "priority": "High|Medium|Low"}],
+  "not_open_to_interpretation": [string], "open_questions": [string] }
+```
+
+**Validation:**
+- [ ] Every success criterion is measurable
+- [ ] No term in the contract admits two readings
+- [ ] Genuinely missing information is listed as open questions, not assumed
+
+**Dependencies:** None
+
+**Next Step:** Step 2
+
+**Fallback:** If the statement cannot be closed without the user, ask the open questions and stop
+
+**Complexity:** MEDIUM
+```
+
+### Type 7: Verification Loop Step (STANDARD/ENHANCED)
+**Use Case:** Verify a produced result against objective checks. On failure, iterate — do not fall back once.
+
+```markdown
+### Step 5: Verify the Fix Against the Contract
+
+**Thought:** "The fix is implemented but unproven. A single failed check must not end in a one-shot fallback."
+
+**Why:** One-shot fallback under-uses failure evidence; a budgeted loop converts each failure into a better next attempt
+
+**Action:** Run the objective checks. On failure: capture the RAW failure evidence (error output, observed values — never a paraphrase), feed it into the next attempt, re-run. On a REPEATED failure, change the strategy, not just the parameters.
+
+**Tool:** shell-execution
+
+**Tool Parameters:**
+```json
+{ "command": "[the verification command]", "timeout_seconds": 120 }
+```
+
+**Input:** Result from Step 4, checks from the formalized contract
+
+**Expected Output:**
+- Verification Result: Pass, or Fail with captured evidence per iteration
+- Iterations Used: [N] of [Max Iterations]
+- Final Verdict: Pass | Fail (budget exhausted)
+
+**Output Schema:**
+```
+{ "verdict": "Pass|Fail", "iterations_used": number,
+  "evidence": [{"iteration": number, "raw_output": string, "strategy_changed": boolean}] }
+```
+
+**Validation:**
+- [ ] Every failed iteration captured raw evidence, not a paraphrase
+- [ ] A repeated failure changed the strategy, not only the parameters
+- [ ] The loop stopped on Exit Criteria, never mid-check without a verdict
+
+**Dependencies:** Step 4 output, formalized contract
+
+**Next Step:** Step 6
+
+**Fallback:** Budget exhausted → record FAIL with all captured evidence and state what it invalidates downstream
+
+**Max Iterations:** 3
+
+**Exit Criteria:** All checks pass, OR budget exhausted, OR evidence shows the hypothesis itself is wrong (stop early — do not spend the budget on a dead hypothesis)
+
+**Escalation Policy:** Iteration 1: fix parameters. Iteration 2: change the approach. Iteration 3: change the hypothesis; if it fails, the step verdict is FAIL
+
+**Complexity:** HIGH
+```
+
+**Loop discipline:** Max Iterations, Exit Criteria, and Escalation Policy are declared
+as a set. A loop without a budget is an anti-pattern, not persistence. Raw evidence —
+not paraphrase — is what the next iteration learns from.
+
+### Edge-Case Derivation (STANDARD/ENHANCED)
+**Use Case:** The problem contains states and transitions — a process, protocol, workflow, or lifecycle. Derive validation cases by covering the graph, not by intuition.
+
+**Procedure:**
+1. **Extract the graph:** list every state, every transition (from-state, event, to-state), and every guard condition.
+2. **Derive cases by coverage:**
+   - Every state is reachable and observable in at least one case
+   - Every transition is exercised by at least one case
+   - Every guard is tested both ways: condition true and condition false
+   - Every terminal state has at least one case reaching it
+3. **Add the failure paths:** for each transition, one case where the event never arrives (timeout/stall) and one where it arrives in the wrong state.
+4. **Map cases to checks:** each derived case becomes an objective Validation entry on the step that owns the behavior.
+
+**Why external:** a weak reasoner generates the happy path and stops; the coverage
+procedure supplies the rest mechanically. The case list is complete when the mapping
+table has no empty cells — completeness is checked against the graph, not against
+intuition.
+
+**Example mapping (excerpt):**
+
+| Graph element | Derived case |
+|---------------|--------------|
+| idle → running (start event) | Start from idle; assert running |
+| running → idle (stop event) | Stop from running; assert idle |
+| guard: input valid | Valid input → accepted; invalid input → rejected, state unchanged |
+| running → error (timeout) | Stall the process; assert error state reached |
+
 ---
 
 ## Common Step Patterns
@@ -457,10 +598,14 @@ Step 1: Baseline → Step 2: Measure → Step 3: Identify Bottlenecks → Step 4
 | Tool Parameters | If tool used | Exact parameters |
 | Input | No | Data for this step |
 | Expected Output | Yes | Success criteria |
+| Output Schema | No (BASIC and up) | Typed structure of the expected output |
 | Validation | Yes | Quality check |
 | Dependencies | No | Prerequisites |
 | Next Step | No | Flow continuity |
 | Fallback | Yes | Error recovery |
+| Max Iterations | Verification steps (STANDARD/ENHANCED) | Verification loop budget |
+| Exit Criteria | Verification steps | What ends the loop |
+| Escalation Policy | Verification steps | What changes on repeated failure |
 | Complexity | No | Step difficulty |
 
 ---
