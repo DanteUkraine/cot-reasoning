@@ -159,7 +159,7 @@ cd $(npx skills path cot-reasoning)
 
 ## 📜 Version
 
-**v5.0.0** — the version is stated consistently in the skill frontmatter, the
+**v5.2.0** — the version is stated consistently in the skill frontmatter, the
 validator, the templates, and the output contract.
 
 ## 📜 License

@@ -5,7 +5,7 @@ the thinking-type choice is not obvious.
 
 ## Overview
 
-This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.0.0.
+This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.2.0.
 
 ---
 
@@ -351,7 +351,7 @@ def is_compatible(intent, domain):
 
 ## Version Information
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2026-08-22
 **Maintainer:** System Reasoning Consortium
-**Compatibility:** cot-reasoning v5.0.0+
+**Compatibility:** cot-reasoning v5.2.0+

@@ -1,6 +1,6 @@
 ---
 template_id: critical-thinking
-version: "5.0.0"
+version: "5.2.0"
 category: thinking-type
 recommended_for: all-problems
 domain: critical

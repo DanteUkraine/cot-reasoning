@@ -98,6 +98,6 @@ Patterns are useful but not essential. Focus on the step structure first, then c
 
 ## Version Information
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2026-08-22
-**Compatibility:** cot-reasoning v5.0.0+
+**Compatibility:** cot-reasoning v5.2.0+

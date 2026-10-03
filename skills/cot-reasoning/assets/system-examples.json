@@ -1,7 +1,7 @@
 {
   "metadata": {
     "skill": "cot-reasoning",
-    "version": "5.0.0",
+    "version": "5.2.0",
     "last_updated": "2026-09-30",
     "purpose": "Commercial engineering scenarios demonstrating the cot-reasoning output contract across all four modes",
     "tool_taxonomy": "environment-neutral categories: filesystem-read, filesystem-write, shell-execution, web-search, code-search"
@@ -199,7 +199,7 @@
           "tool_utilization": "100% (4/4 steps that needed tools)"
         },
         "meta": {
-          "generated_by": "cot-reasoning v5.0.0",
+          "generated_by": "cot-reasoning v5.2.0",
           "pattern": "ReAct",
           "notes": "Root cause verified against live configuration before proposing the fix"
         }
@@ -377,7 +377,7 @@
           "tool_utilization": "20% (1/5 steps; remaining steps were pure evaluation)"
         },
         "meta": {
-          "generated_by": "cot-reasoning v5.0.0",
+          "generated_by": "cot-reasoning v5.2.0",
           "pattern": "Tree of Thoughts",
           "notes": "ENHANCED mode: structure and validation retained, simulated self-dialogue display omitted for a natively-reasoning model"
         }

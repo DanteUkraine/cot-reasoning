@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# System Flow Validator for cot-reasoning v5.0.0
+# System Flow Validator for cot-reasoning v5.2.0
 #
 # Purpose: Validate that reasoning flows conform to the cot-reasoning output
 #          contract, including the cost-tiered requirements per mode
@@ -34,7 +34,7 @@ set -uo pipefail
 # =============================================================================
 
 SCRIPT_NAME="validate-system-flow.sh"
-VERSION="5.0.0"
+VERSION="5.2.0"
 SKILL_NAME="cot-reasoning"
 GENERATED_BY="cot-reasoning v${VERSION}"
 

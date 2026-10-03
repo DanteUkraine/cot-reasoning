@@ -1,6 +1,6 @@
 ---
 template_id: strategic-thinking
-version: "5.0.0"
+version: "5.2.0"
 category: thinking-type
 recommended_for: long-term-planning,business-strategy,competitive-positioning,roadmapping
 domain: strategic

@@ -7,7 +7,7 @@ the mode choice needs the capability-scaled selection algorithm.
 
 This document describes the cot-reasoning framework's approach to enhancing model reasoning capabilities.
 
-cot-reasoning v5.0.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
+cot-reasoning v5.2.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
 
 **Key Principle:** The skill provides a reasoning structure that guides the model's native capabilities; the model processes and enhances this structure using its own reasoning abilities.
 
