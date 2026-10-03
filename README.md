@@ -2,6 +2,8 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+[English](README.md) | [Українська](README.uk.md)
+
 **The Universal Reasoning Framework for ANY Large Language Model**.
 
 **Chain-of-thought Reasoning** is a **model-agnostic reasoning skill** that enables **ANY** Large Language Model to perform complex, multi-step reasoning by providing a complete thinking framework.
@@ -23,6 +25,15 @@
 ```bash
 npx skills add DanteUkraine/cot-reasoning@cot-reasoning
 ```
+
+The command is interactive (it asks which agents to install to). For scripts
+and CI, use the non-interactive form:
+
+```bash
+npx skills add DanteUkraine/cot-reasoning@cot-reasoning --agent '*' -y
+```
+
+`jq` is not required for installation — only for the validation tooling below.
 
 ## 🚀 Usage
 
@@ -106,6 +117,7 @@ Code, OpenCode, and others):
 4. **Result Tracking System**
    - Maintains audit trail of reasoning process
    - Tracks intermediate results and validation
+   - Step outputs are typed structures (v5.2.0), not free-form prose
 
 ### Reasoning Modes
 
@@ -220,12 +232,21 @@ results matrix:
 ```
 
 See `assets/behavioral-eval/README.md` for the protocol and the measured
-results to date.
+results to date. Current data point: Mistral Vibe agent (Mistral Large) —
+validator 10/10, profile 10/10.
+
+### CI
+
+All three verification layers (example validation, regression suite, lint) run
+in GitHub Actions on every push and pull request — see
+`.github/workflows/ci.yml`.
 
 ## 📜 Version
 
 **v5.2.0** — the version is stated consistently in the skill frontmatter, the
-validator, the templates, the references, and the output contract.
+validator, the templates, the references, and the output contract, and is
+enforced by the consistency lint. See [CHANGELOG.md](CHANGELOG.md) for the
+release history.
 
 ## 📜 License
 

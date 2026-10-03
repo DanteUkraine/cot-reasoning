@@ -59,11 +59,13 @@ n=$(jq -r --arg v "cot-reasoning v$VERSION" '[.examples[].flow.meta.generated_by
 t=$(jq -r '[.examples[].flow.meta.generated_by] | map(select(. != null)) | length' "$SKILL_DIR/assets/system-examples.json")
 [[ "$n" == "$t" && "$t" != "0" ]] && pass "examples generated_by: $n/$t consistent" || fail "examples generated_by: only $n of $t match v$VERSION"
 
-if grep -q "\*\*v$VERSION\*\*" "$SKILL_DIR/../../README.md"; then
-    pass "README states v$VERSION"
-else
-    fail "README does not state **v$VERSION**"
-fi
+for readme in README.md README.uk.md; do
+    if grep -q "\*\*v$VERSION\*\*" "$SKILL_DIR/../../$readme"; then
+        pass "$readme states v$VERSION"
+    else
+        fail "$readme does not state **v$VERSION**"
+    fi
+done
 
 # ---- 2. Frontmatter validity ----
 echo ""
