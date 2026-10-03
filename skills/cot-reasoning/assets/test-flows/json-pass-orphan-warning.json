@@ -1,0 +1,49 @@
+{
+  "mode": "STANDARD",
+  "thinking_type": "SYSTEMATIC",
+  "complexity": "MEDIUM",
+  "pattern": "ReAct",
+  "flow": {
+    "flow_id": "orphan-warning-probe-20261003",
+    "timestamp": "2026-10-03T06:00:00Z",
+    "configuration": {"pattern": "ReAct", "domain": "technical", "intent": "SOLVE"},
+    "problem_analysis": {
+      "core_problem": "Probe flow protecting the orphan loop-field warning path",
+      "key_entities": "validator, fixtures",
+      "success_criteria": "flow passes with a warning, not an error",
+      "constraints": "Hard: none; Soft: none"
+    },
+    "steps": [
+      {
+        "step_number": 1,
+        "name": "Probe Step",
+        "thought": "t",
+        "why": "w",
+        "action": "a",
+        "tool": null,
+        "input": "i",
+        "expected_output": "o",
+        "output_schema": {"result": "string"},
+        "validation": "v",
+        "status": "completed",
+        "next_step": null,
+        "fallback": "f",
+        "exit_criteria": "orphan probe: present without max_iterations",
+        "escalation_policy": "orphan probe: present without max_iterations",
+        "complexity": "LOW"
+      }
+    ],
+    "intermediate_results": {"step_1_output": "o"},
+    "key_findings": [{"finding": "Probe", "impact": "Low"}],
+    "recommendations": [{"action": "Probe", "priority": "Low", "impact": "probe"}],
+    "execution_summary": {"steps_completed": "1/1", "tools_used": [], "tool_call_count": 0},
+    "quality_metrics": {
+      "confidence_level": "High (9.0/10)",
+      "confidence_gate": "PASS (9.0/10 >= 7.0 threshold)",
+      "reasoning_quality": "9.0/10",
+      "step_completion": "100%",
+      "actionability": "9.0/10"
+    },
+    "meta": {"generated_by": "cot-reasoning v5.2.0", "pattern": "ReAct", "notes": "orphan warning probe"}
+  }
+}

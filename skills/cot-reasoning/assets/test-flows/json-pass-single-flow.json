@@ -1,0 +1,15 @@
+{
+  "mode": "BASIC",
+  "thinking_type": "CRITICAL",
+  "complexity": "LOW",
+  "pattern": "Few-Shot CoT",
+  "flow": {
+    "steps": [
+      {"thought": "t", "why": "w", "action": "a", "expected_output": "o", "validation": "v", "next_step": null, "fallback": "f", "tool": null}
+    ],
+    "key_findings": [{"finding": "f", "impact": "Low"}],
+    "recommendations": [{"action": "a", "priority": "Low", "impact": "i"}],
+    "problem_analysis": {"core_problem": "p"},
+    "quality_metrics": {"confidence_level": "High (8/10)", "confidence_gate": "PASS", "reasoning_quality": "8/10", "step_completion": "100%", "actionability": "8/10"}
+  }
+}

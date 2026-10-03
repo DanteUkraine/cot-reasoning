@@ -1,0 +1,14 @@
+{
+  "mode": "BASIC",
+  "thinking_type": "CRITICAL",
+  "complexity": "LOW",
+  "pattern": "Few-Shot CoT",
+  "flow": {
+    "steps": [
+      {"thought": "t", "why": "w", "action": "a", "expected_output": "o", "validation": "v", "next_step": null, "fallback": "f", "tool": null}
+    ],
+    "key_findings": [{"finding": "f", "impact": "Low"}],
+    "recommendations": [{"action": "a", "priority": "Low", "impact": "i"}],
+    "problem_analysis": {"core_problem": "p"}
+  }
+}
