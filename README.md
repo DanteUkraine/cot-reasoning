@@ -170,6 +170,9 @@ they are mode-conditional: none applies in MINIMAL.
 
 ## ✅ Validation
 
+**Prerequisite:** [`jq`](https://jqlang.github.io/jq/) must be installed for JSON
+validation (the validator prints the install command if it is missing).
+
 Every reasoning flow can be checked against the skill's output contract with the
 bundled validator (tier-aware: it checks the sections the flow's mode requires):
 
@@ -185,6 +188,39 @@ cd $(npx skills path cot-reasoning)
 # Validate all flows in a directory
 ./scripts/validate-system-flow.sh -d ./flows/
 ```
+
+### Regression suite
+
+The validator itself is protected by 22 regression cases (17 fixtures with an
+expectations manifest plus 5 built-in CLI cases), covering 99% of its check
+templates:
+
+```bash
+./scripts/run-test-flows.sh
+```
+
+### Consistency lint
+
+Version alignment, frontmatter validity, cross-references, and a universality
+guard that rejects domain-specific terms in skill content:
+
+```bash
+./scripts/lint-consistency.sh
+```
+
+### Behavioral eval
+
+The mechanical layers prove the contract checker works; the behavioral eval
+proves the product claim — that a model executing the skill emits conformant
+flows with the right reasoning profile. Ten reference prompts, a scorer, and a
+results matrix:
+
+```bash
+./scripts/run-behavioral-eval.sh <flows_dir> "<model label>"
+```
+
+See `assets/behavioral-eval/README.md` for the protocol and the measured
+results to date.
 
 ## 📜 Version
 
