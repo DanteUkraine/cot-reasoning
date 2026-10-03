@@ -74,6 +74,32 @@ Code, OpenCode, and others):
 | Explicit invocation phrasing | Naming "cot-reasoning" in the request activates it directly, e.g. "Use cot-reasoning to ..." |
 | Configuration through input | State the desired mode/pattern/thinking type in the request text, e.g. "Use STANDARD mode with the ReAct pattern to debug this issue" |
 
+### Command Examples: Modes and Patterns
+
+The commands below use the Vibe slash form. In any other environment, replace
+`/cot-reasoning` with "Use cot-reasoning to ..." — the rest of the line is
+identical. Stating a mode or pattern in the request pins it; omitting it lets
+the skill select automatically.
+
+#### Reasoning modes
+
+| Mode | Example command | Designed for |
+|------|-----------------|--------------|
+| **MINIMAL** | `/cot-reasoning decide: tabs or spaces for a small hand-edited internal config` | Trivial problems answerable in 2-3 simple steps — the skill must not inflate ceremony |
+| **BASIC** | `/cot-reasoning review this change for risks, BASIC mode: replacing the in-memory session store with Redis, single node, no fallback yet` | Environments with no tools: the full reasoning scaffold with pure analysis |
+| **STANDARD** | `/cot-reasoning investigate why our API returns 500 errors for 5% of requests since yesterday's deploy` | The default for most problems: evidence gathering, tool use, full contract |
+| **ENHANCED** | `/cot-reasoning decide between PostgreSQL, MongoDB, and a time-series database for 50M metrics points per day, ENHANCED mode` | Models with strong native reasoning: structure and validation without the simulated dialogue display |
+
+#### Reasoning patterns
+
+| Pattern | Example command | Designed for |
+|---------|-----------------|--------------|
+| **Zero-Shot CoT** | `/cot-reasoning analyze why our queue depth spikes every Monday morning, Zero-Shot CoT` | Simple problems needing direct step-by-step reasoning — no examples, no tools |
+| **Few-Shot CoT** | `/cot-reasoning triage these three new incidents following the two example post-mortems below, Few-Shot CoT` | Problems where provided examples clarify the expected reasoning shape |
+| **Auto-CoT** | `/cot-reasoning design an on-call rotation policy for a four-person team, Auto-CoT` | Novel problems with no provided examples — the skill generates its own first |
+| **Tree of Thoughts** | `/cot-reasoning compare self-hosted email, SendGrid, and AWS SES for 200k emails per month, Tree of Thoughts` | Multi-option decisions: branches scored independently, leading branch stress-tested |
+| **ReAct** | `/cot-reasoning debug why checkout takes 8 seconds on every tenth request, ReAct` | Tool-intensive investigation: action-observation loops, evidence before conclusions |
+
 ## 🎯 When to Use
 
 ### ✅ Use cot-reasoning for:

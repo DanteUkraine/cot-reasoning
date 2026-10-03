@@ -76,6 +76,32 @@ Vibe, Claude Code, OpenCode та інші):
 | Явна формулювання виклику | Згадка "cot-reasoning" у запиті активує навичку напряму, напр. "Використай cot-reasoning, щоб ..." |
 | Конфігурація через ввід | Зазначте бажаний режим/патерн/тип мислення в тексті запиту, напр. "Використай режим STANDARD з патерном ReAct для дебагу цієї проблеми" |
 
+### Приклади команд: режими і патерни
+
+Команди нижче — у слеш-формі Vibe. У будь-якому іншому середовищі замініть
+`/cot-reasoning` на "Використай cot-reasoning, щоб ..." — решта рядка
+ідентична. Зазначений у запиті режим чи патерн фіксує його; без зазначення
+навичка обирає автоматично.
+
+#### Режими міркування
+
+| Режим | Приклад команди | Для чого призначений |
+|-------|-----------------|----------------------|
+| **MINIMAL** | `/cot-reasoning decide: tabs or spaces for a small hand-edited internal config` | Тривіальні задачі, розв'язувані у 2-3 прості кроки — навичка не повинна роздувати церемонії |
+| **BASIC** | `/cot-reasoning review this change for risks, BASIC mode: replacing the in-memory session store with Redis, single node, no fallback yet` | Середовища без інструментів: повне риштування міркування з чистим аналізом |
+| **STANDARD** | `/cot-reasoning investigate why our API returns 500 errors for 5% of requests since yesterday's deploy` | Дефолт для більшості задач: збір evidence, робота з інструментами, повний контракт |
+| **ENHANCED** | `/cot-reasoning decide between PostgreSQL, MongoDB, and a time-series database for 50M metrics points per day, ENHANCED mode` | Моделі зі сильним нативним міркуванням: структура і валідація без імітації діалогу |
+
+#### Патерни міркування
+
+| Патерн | Приклад команди | Для чого призначений |
+|--------|-----------------|----------------------|
+| **Zero-Shot CoT** | `/cot-reasoning analyze why our queue depth spikes every Monday morning, Zero-Shot CoT` | Прості задачі з прямим покроковим міркуванням — без прикладів і інструментів |
+| **Few-Shot CoT** | `/cot-reasoning triage these three new incidents following the two example post-mortems below, Few-Shot CoT` | Задачі, де надані приклади прояснюють очікувану форму міркування |
+| **Auto-CoT** | `/cot-reasoning design an on-call rotation policy for a four-person team, Auto-CoT` | Нові задачі без наданих прикладів — навичка спершу генерує власні |
+| **Tree of Thoughts** | `/cot-reasoning compare self-hosted email, SendGrid, and AWS SES for 200k emails per month, Tree of Thoughts` | Рішення з кількома варіантами: гілки оцінюються незалежно, ведуча — стрес-тестується |
+| **ReAct** | `/cot-reasoning debug why checkout takes 8 seconds on every tenth request, ReAct` | Насичені інструментами розслідування: цикли дія-спостереження, evidence перед висновками |
+
 ## 🎯 Коли використовувати
 
 ### ✅ Використовуйте cot-reasoning для:
