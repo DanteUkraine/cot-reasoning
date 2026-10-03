@@ -1,0 +1,99 @@
+{
+  "metadata": {
+    "purpose": "Behavioral evaluation prompts for cot-reasoning: each prompt states the expected activation profile (mode, thinking type, pattern, disciplines). A model executing the skill should emit a flow that passes the validator AND matches the expected profile.",
+    "protocol": "For each prompt: run the skill in the target model, save the emitted flow as <id>.md in a flows directory, then run scripts/run-behavioral-eval.sh <flows_dir>. The scorer validates each flow and compares the actual profile against the expected one.",
+    "version": "5.2.0"
+  },
+  "prompts": [
+    {
+      "id": "incident-500-errors",
+      "prompt": "Use cot-reasoning to investigate why our API started returning 500 errors for 5% of requests after yesterday's deployment, and find the root cause.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "SYSTEMATIC",
+      "expected_pattern": "ReAct",
+      "expected_disciplines": ["typed_outputs", "confidence_gate"],
+      "notes": "Classic incident investigation: tool-capable environment, evidence chaining before conclusions."
+    },
+    {
+      "id": "trivial-config-choice",
+      "prompt": "Use cot-reasoning to decide: tabs or spaces for a small hand-edited internal config file.",
+      "expected_mode": "MINIMAL",
+      "expected_thinking_type": "ANALYTICAL",
+      "expected_pattern": "any",
+      "expected_disciplines": [],
+      "notes": "Trivial decision: the skill must NOT inflate ceremony. A full STANDARD contract here is a failure of cost tiering."
+    },
+    {
+      "id": "no-tools-risk-review",
+      "prompt": "Use cot-reasoning, BASIC mode, to review this change for risks: we are replacing our in-memory session store with Redis, single node, no fallback configured yet.",
+      "expected_mode": "BASIC",
+      "expected_thinking_type": "CRITICAL",
+      "expected_pattern": "any",
+      "expected_disciplines": ["typed_outputs", "confidence_gate"],
+      "notes": "No-tools environment: BASIC must be fully functional without tools; risk review is the CRITICAL domain."
+    },
+    {
+      "id": "architecture-metrics-store",
+      "prompt": "Apply the cot-reasoning framework to decide between PostgreSQL, MongoDB, and a dedicated time-series database for our metrics storage. We write 50 million points per day, query mostly last-24h aggregates, and the team knows SQL well.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "STRATEGIC",
+      "expected_pattern": "Tree of Thoughts",
+      "expected_disciplines": ["typed_outputs", "confidence_gate"],
+      "notes": "Multi-option architecture decision: Tree of Thoughts branching evaluation."
+    },
+    {
+      "id": "code-review-unauth-endpoint",
+      "prompt": "Use cot-reasoning to review this change for security vulnerabilities and performance issues: a new endpoint takes a user ID from the query string and returns that user's email address, with no authentication check and a per-request database lookup.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "CRITICAL",
+      "expected_pattern": "any",
+      "expected_disciplines": ["typed_outputs", "confidence_gate"],
+      "notes": "Code review / risk assessment: CRITICAL thinking, flaw detection."
+    },
+    {
+      "id": "open-ended-deploy-process",
+      "prompt": "Use cot-reasoning to make our deployment process better.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "any",
+      "expected_pattern": "any",
+      "expected_disciplines": ["formalization", "typed_outputs", "confidence_gate"],
+      "notes": "Open-ended statement: must trigger Contract Formalization before decomposition (step-1 gate)."
+    },
+    {
+      "id": "stateful-order-workflow",
+      "prompt": "Use cot-reasoning to design the validation cases for our order workflow. States: created, paid, shipped, delivered, cancelled, refunded. Customers complain that refunds sometimes get stuck after cancellation.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "any",
+      "expected_pattern": "any",
+      "expected_disciplines": ["edge_coverage", "typed_outputs", "confidence_gate"],
+      "notes": "Stateful problem: validation cases must be derived by covering the state/transition graph, not by intuition."
+    },
+    {
+      "id": "verify-race-fix",
+      "prompt": "Use cot-reasoning to verify a fix: we added a lock to our job scheduler to resolve a race condition, but we are not sure it holds under load.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "any",
+      "expected_pattern": "any",
+      "expected_disciplines": ["verification_loop", "typed_outputs", "confidence_gate"],
+      "notes": "Verification task: a failed check must iterate in a budgeted loop (Max Iterations / Exit Criteria / Escalation Policy), not fall back once."
+    },
+    {
+      "id": "tradeoff-notification-pipeline",
+      "prompt": "Use cot-reasoning to compare three options for our notification pipeline: self-hosted email, SendGrid, and AWS SES. Cost and deliverability matter most; we send 200k emails per month.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "ANALYTICAL",
+      "expected_pattern": "any",
+      "expected_disciplines": ["typed_outputs", "confidence_gate"],
+      "notes": "Trade-off comparison with explicit criteria."
+    },
+    {
+      "id": "debug-intermittent-latency",
+      "prompt": "Use cot-reasoning to debug why our checkout page takes 8 seconds to load intermittently, roughly every tenth request.",
+      "expected_mode": "STANDARD",
+      "expected_thinking_type": "SYSTEMATIC",
+      "expected_pattern": "ReAct",
+      "expected_disciplines": ["typed_outputs", "confidence_gate"],
+      "notes": "Intermittent debugging: evidence gathering with tools, ReAct profile."
+    }
+  ]
+}
