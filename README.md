@@ -78,6 +78,46 @@ Code, OpenCode, and others):
 | Explicit invocation phrasing | Naming "cot-reasoning" in the request activates it directly, e.g. "Use cot-reasoning to ..." |
 | Configuration through input | State the desired mode/pattern/thinking type in the request text, e.g. "Use STANDARD mode with the ReAct pattern to debug this issue" |
 
+### Project-Level Integration (AGENTS.md)
+
+Description-based activation is probabilistic: the model decides per request whether
+the skill applies, and nothing in the reply proves it fired. To make the routing
+deterministic and the activation visible, paste this block into your project's
+`AGENTS.md` (create the file in the repo root if you don't have one):
+
+```markdown
+## Reasoning routing — cot-reasoning
+
+Route these requests through the cot-reasoning skill (never answer in a single pass):
+production incident investigation, debugging and root-cause analysis, architecture
+or design decisions with options, code review, risk assessment, trade-off comparison.
+
+Do not use the skill for: greetings and small talk, simple factual questions,
+trivial tasks (formatting, rewriting, translation), domain-fact lookups —
+route those to the relevant domain skill.
+
+When in doubt, do not activate; the user can invoke explicitly:
+"Use cot-reasoning to ...".
+
+### Activation disclosure — required every time
+
+- If you use cot-reasoning, the first line of your reply is:
+  `cot-reasoning: <MODE> mode, <PATTERN> pattern, verification gate <PASS | FAIL | UNVERIFIED>`
+- If a request plausibly matches the routing boundary but you decline it, add:
+  `cot-reasoning: not used — <one-line reason>`
+- A missing status line means the skill was not used. Never claim the skill
+  was used without emitting its reasoning flow and the status line.
+```
+
+The block gives you a deterministic detection rule: no status line in the reply —
+the skill was not used; a status line — it was, with the mode, pattern, and the
+verification-gate verdict on raw evidence.
+
+If your agent harness reads a different memory file (for example `CLAUDE.md` in
+Claude Code), paste the same block there. The wording is environment-neutral: it
+names no tools, no versions, and no model-specific reasoning formats, so it works
+unchanged across Mistral Vibe, Claude Code, OpenCode, and others.
+
 ### Command Examples: Modes and Patterns
 
 The commands below use the Vibe slash form. In any other environment, replace

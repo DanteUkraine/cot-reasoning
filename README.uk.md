@@ -80,6 +80,47 @@ Vibe, Claude Code, OpenCode та інші):
 | Явна формулювання виклику | Згадка "cot-reasoning" у запиті активує навичку напряму, напр. "Використай cot-reasoning, щоб ..." |
 | Конфігурація через ввід | Зазначте бажаний режим/патерн/тип мислення в тексті запиту, напр. "Використай режим STANDARD з патерном ReAct для дебагу цієї проблеми" |
 
+### Інтеграція на рівні проєкту (AGENTS.md)
+
+Активація за описом — імовірнісна: модель вирішує на кожен запит, чи застосовувати
+навичку, і в відповіді немає доказу, що вона спрацювала. Щоб зробити маршрутизацію
+детермінованою, а активацію видимою, вставте цей блок у `AGENTS.md` вашого проєкту
+(створіть файл у корені репозиторію, якщо його немає). Блок нижче англійською —
+вставляйте як є, щоб артефакт був ідентичним для всіх користувачів:
+
+```markdown
+## Reasoning routing — cot-reasoning
+
+Route these requests through the cot-reasoning skill (never answer in a single pass):
+production incident investigation, debugging and root-cause analysis, architecture
+or design decisions with options, code review, risk assessment, trade-off comparison.
+
+Do not use the skill for: greetings and small talk, simple factual questions,
+trivial tasks (formatting, rewriting, translation), domain-fact lookups —
+route those to the relevant domain skill.
+
+When in doubt, do not activate; the user can invoke explicitly:
+"Use cot-reasoning to ...".
+
+### Activation disclosure — required every time
+
+- If you use cot-reasoning, the first line of your reply is:
+  `cot-reasoning: <MODE> mode, <PATTERN> pattern, verification gate <PASS | FAIL | UNVERIFIED>`
+- If a request plausibly matches the routing boundary but you decline it, add:
+  `cot-reasoning: not used — <one-line reason>`
+- A missing status line means the skill was not used. Never claim the skill
+  was used without emitting its reasoning flow and the status line.
+```
+
+Блок дає детерміноване правило виявлення: немає статус-рядка у відповіді —
+навичка не використана; є статус-рядок — використана, із зазначенням режиму,
+патерну і вердикту гейту верифікації на сирих evidence.
+
+Якщо ваш агентний харнес читає інший файл пам'яті (наприклад `CLAUDE.md` у
+Claude Code), вставте той самий блок туди. Формулювання середовище-нейтральне:
+без імен інструментів, без версій і без модель-специфічних форматів міркування,
+тож працює без змін у Mistral Vibe, Claude Code, OpenCode та інших.
+
 ### Приклади команд: режими і патерни
 
 Команди нижче — у слеш-формі Vibe. У будь-якому іншому середовищі замініть
