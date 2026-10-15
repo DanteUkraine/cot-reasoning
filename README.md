@@ -13,7 +13,7 @@
 - **🧠 Universal Compatibility**: Works with ANY LLM framework (Mistral Vibe, Claude Code, OpenCode, etc.)
 - **🎯 Model-Agnostic**: No model-specific adaptations required
 - **⚙️ FSM Routing**: Strict observe → reason → act → verify state machine; the ReAct loop preserved as four distinct, uncompressed states
-- **🧠 Native Think Symbiosis**: All live reasoning delegated to the model's native `<|think|>` channel — no custom thought tags
+- **🧠 Native Reasoning Symbiosis**: All live reasoning delegated to the model's native reasoning channel (think tags, extended thinking, or hidden CoT — whatever the host exposes) — no custom thought tags
 - **🔧 System-Level Reasoning**: Enables complex engineering tasks for any model
 - **📋 Structured Step Execution**: Every problem decomposed into executable steps
 - **💬 Self-Dialogue (mode-conditional)**: Transparent display scaffold for weak reasoners (BASIC/STANDARD); omitted for native reasoners
@@ -137,7 +137,7 @@ the skill select automatically.
    - Every transition names its mandatory gate; no state is merged or skipped
 
 2. **Native Cognition Delegation**
-   - All live reasoning — FSM rule processing, next-state transition planning, analysis — runs in the model's native `<|think|>` channel
+   - All live reasoning — FSM rule processing, next-state transition planning, analysis — runs in the model's native reasoning channel: think tags, extended thinking, or hidden CoT, whatever the host model exposes
    - No custom thought tags; no fabricated dialogue for native reasoners
    - The `**Thought:**` step field in the flow document is an audit artifact, not a reasoning channel
    - The self-dialogue display remains available as a mode-conditional scaffold for weak reasoners (BASIC/STANDARD) via the self-dialogue template

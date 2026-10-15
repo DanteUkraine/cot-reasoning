@@ -13,8 +13,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is se
   logic unfolds
 - **Native cognition delegation**: a `<cognitive_protocol>` unit routes all
   live reasoning — FSM rule processing and next-state transition planning —
-  into the model's native `<|think|>` channel; the skill defines no custom
-  thought tags. The simulated self-dialogue monologue is no longer defined in
+  into the model's native reasoning channel (think tags, extended thinking,
+  or hidden CoT — whatever the host model exposes); the skill defines no
+  custom thought tags. The simulated self-dialogue monologue is no longer defined in
   SKILL.md; it remains a mode-conditional display scaffold in the
   self-dialogue template (BASIC/STANDARD). The `**Thought:**` step field is
   documented as an audit artifact (still required by the validator in
@@ -33,8 +34,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is se
 ### Fixed
 - Reference headers that cited numbered workflow steps ("step 2/3/7 of
   SKILL.md") now cite FSM states
-- Literal `<|think|>` pipes inside markdown table cells escaped as `<\|think\|>`
-  so the tables remain parseable
 
 ## [5.2.0] — 2026-10-03
 

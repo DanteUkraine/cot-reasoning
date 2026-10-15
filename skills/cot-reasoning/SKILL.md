@@ -15,12 +15,12 @@ metadata:
 
 <purpose>
 CoT-reasoning: a structured reasoning framework for complex, multi-step
-problem-solving, built as a symbiosis between the model's native `<|think|>`
+problem-solving, built as a symbiosis between the model's native reasoning
 channel and an explicit Finite State Machine (FSM) router.
 
 CORE VALUE PROPOSITION:
 - For models with tool-calling: the FSM's observe/act states drive effective data gathering;
-- For models with native reasoning: the `<|think|>` channel does the live reasoning; the skill adds routing, structure, and validation;
+- For models with native reasoning: the native reasoning channel does the live reasoning; the skill adds routing, structure, and validation;
 - For all compatible models: enhanced multi-step performance through guided, auditable reasoning chains.
 
 cot-reasoning = FSM Routing + Native Think + Tool Integration + Result Tracking
@@ -29,7 +29,7 @@ MODEL + cot-reasoning = Enhanced Reasoning Capability
 Its four components: the FSM Router (see <workflow>) moves work through four
 uncompressed states — observe, reason, act, verify — preserving the ReAct loop
 explicitly; Native Cognition Delegation (see <cognitive_protocol>) runs all
-live reasoning in the model's built-in `<|think|>` channel — the skill defines
+live reasoning in the model's native reasoning channel — the skill defines
 no custom thought tags; the Tool Integration Layer plans tools category-first
 with explicit parameters, response processing, and error recovery (see
 <tool_integration_layer>); the Result Tracking System tracks every step's
@@ -62,17 +62,20 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 </references>
 
 <cognitive_protocol>
-All live reasoning is delegated to the model's native built-in `<|think|>`
-channel. This skill defines no custom thought tags and emits no simulated
-thought framework; the `<|think|>` channel is the single reasoning engine.
+All live reasoning is delegated to the model's native reasoning channel —
+whatever mechanism the host model exposes for private reasoning: a think-tag
+channel (for example `<|think|>` or `<think>`), an extended-thinking mode, or
+fully hidden chain-of-thought. This skill defines no custom thought tags and
+emits no simulated thought framework; the native reasoning channel is the
+single reasoning engine.
 
 | Rule | Directive |
 |------|-----------|
-| Native think channel | Every act of reasoning — analyzing evidence, comparing options, planning — runs in the model's native `<\|think\|>` channel, never in custom tags or fabricated dialogue emitted to the transcript |
-| FSM processing | Before every state transition: read the Current State's rows in <workflow>, evaluate their conditions against gathered evidence, and plan the next state transition plus its gate discharge inside `<\|think\|>` — then move |
+| Native reasoning channel | Every act of reasoning — analyzing evidence, comparing options, planning — runs in the model's native reasoning channel, never in custom tags or fabricated dialogue emitted to the transcript |
+| FSM processing | Before every state transition: read the Current State's rows in <workflow>, evaluate their conditions against gathered evidence, and plan the next state transition plus its gate discharge inside the native reasoning channel — then move |
 | No fabricated dialogue | For a model that reasons natively (ENHANCED mode), never fabricate a [Thought]/[Question]/[Answer] display; keep the structure, validation, and result tracking |
 | Display scaffold (BASIC/STANDARD) | Weak-reasoner environments may render the self-dialogue display per `templates/system-flows/self-dialogue-template.md`; depth scales with complexity (LOW 2-3 exchanges up to VERY_HIGH 9+) |
-| Audit artifact | The flow document's `**Thought:**` step field records a summary of the reasoning that produced the step — an audit artifact required by the output contract, not a substitute for the `<\|think\|>` channel |
+| Audit artifact | The flow document's `**Thought:**` step field records a summary of the reasoning that produced the step — an audit artifact required by the output contract, not a substitute for the native reasoning channel |
 </cognitive_protocol>
 
 <workflow>
@@ -262,7 +265,7 @@ the gate named in its row.
   ```markdown
   ### Step [N]: [Descriptive Step Name]
 
-  **Thought:** [Summary of the reasoning that produced this step — audit artifact; the live reasoning ran in the native `<|think|>` channel]
+  **Thought:** [Summary of the reasoning that produced this step — audit artifact; the live reasoning ran in the model's native reasoning channel]
   **Why:** [Explanation of why this step is necessary]
   **Action:** [Specific, executable instruction for this step]
   **Tool:** [Tool category, or "None" if pure reasoning]
