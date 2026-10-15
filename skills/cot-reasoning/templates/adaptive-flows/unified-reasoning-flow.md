@@ -1,6 +1,6 @@
 ---
 template_id: unified-reasoning-flow
-version: "5.2.0"
+version: "6.0.0"
 category: adaptive-flow
 recommended_for: all-problems
 ---

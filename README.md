@@ -12,9 +12,11 @@
 
 - **🧠 Universal Compatibility**: Works with ANY LLM framework (Mistral Vibe, Claude Code, OpenCode, etc.)
 - **🎯 Model-Agnostic**: No model-specific adaptations required
+- **⚙️ FSM Routing**: Strict observe → reason → act → verify state machine; the ReAct loop preserved as four distinct, uncompressed states
+- **🧠 Native Think Symbiosis**: All live reasoning delegated to the model's native `<|think|>` channel — no custom thought tags
 - **🔧 System-Level Reasoning**: Enables complex engineering tasks for any model
 - **📋 Structured Step Execution**: Every problem decomposed into executable steps
-- **💬 Self-Dialogue**: Transparent, auditable reasoning process
+- **💬 Self-Dialogue (mode-conditional)**: Transparent display scaffold for weak reasoners (BASIC/STANDARD); omitted for native reasoners
 - **🔌 Tool Integration**: Seamless integration with available tools
 - **🎨 Multiple Thinking Types**: Analytical, Creative, Critical, Systematic, Ethical, Strategic
 - **🌳 Reasoning Patterns**: Zero-Shot CoT, Few-Shot CoT, Auto-CoT, Tree of Thoughts, ReAct
@@ -45,8 +47,10 @@ multi-step structured reasoning:
 ```
 User: "Our API is returning 500 errors, investigate and find the root cause"
 → cot-reasoning activates automatically (incident investigation signal)
+→ Routes the request through the FSM: observe → reason → act → verify
 → Generates a structured reasoning flow at the right mode
 → Executes with category-first tool integration
+→ Terminal transition blocked until the verification gate passes on raw evidence
 → Returns complete analysis with recommendations
 ```
 
@@ -127,13 +131,16 @@ the skill select automatically.
 
 ### Core Components
 
-1. **Reasoning Flow Generator**
-   - Decomposes complex problems into logical steps
-   - Each step has single responsibility and clear dependencies
+1. **FSM Router**
+   - Strict Finite State Machine: `observe` → `reason` → `act` → `verify` → `report`
+   - The ReAct loop preserved explicitly as four distinct, uncompressed states
+   - Every transition names its mandatory gate; no state is merged or skipped
 
-2. **Self-Dialogue Engine**
-   - Makes reasoning process transparent and followable
-   - Format: Thought → Analysis → Question → Answer → Conclusion → Decision
+2. **Native Cognition Delegation**
+   - All live reasoning — FSM rule processing, next-state transition planning, analysis — runs in the model's native `<|think|>` channel
+   - No custom thought tags; no fabricated dialogue for native reasoners
+   - The `**Thought:**` step field in the flow document is an audit artifact, not a reasoning channel
+   - The self-dialogue display remains available as a mode-conditional scaffold for weak reasoners (BASIC/STANDARD) via the self-dialogue template
 
 3. **Tool Integration Layer**
    - Enables data operations for reasoning
@@ -143,7 +150,21 @@ the skill select automatically.
 4. **Result Tracking System**
    - Maintains audit trail of reasoning process
    - Tracks intermediate results and validation
-   - Step outputs are typed structures (v5.2.0), not free-form prose
+   - Step outputs are typed structures (since v5.2.0), not free-form prose
+   - Blocks every terminal transition behind the verification gate
+
+### Execution Model (FSM)
+
+| Current State | Purpose | Next State | Gate |
+|---------------|---------|------------|------|
+| `observe` | Gather context via read tools; formalize open-ended statements into closed contracts | `reason` | Artifacts named; contract formalized |
+| `reason` | Analyze (ToT/GoT/RCA logic) and plan the flow — no mutation | `act` | Decomposition, mode, thinking type, pattern chosen |
+| `act` | Execute tool calls and mutations; emit the flow at the mode's tier | `verify` | Flow assembled; raw artifacts pasted |
+| `verify` | Shift-Left QA: discharge every verification-gate row on raw evidence | `report` (or loop back to `reason`) | Every gate row passes on raw evidence — CLI exit codes, log outputs, test results |
+| `report` | Hand back the flow, findings, and recommendations | `DONE` | All reporting sections present |
+
+A failed or unrunnable gate row loops `verify → reason` with the raw failure
+evidence — it is never silently passed.
 
 ### Reasoning Modes
 
@@ -178,7 +199,7 @@ self-dialogue via ENHANCED; weak reasoners get the full structure via STANDARD.
 | **Tree of Thoughts** | Complex decisions | Medium-High |
 | **ReAct** | Tool-intensive tasks | High |
 
-### Reasoning Disciplines (v5.2.0)
+### Reasoning Disciplines (since v5.2.0)
 
 Five externalized disciplines replace capabilities a weak reasoner lacks — ambiguity
 tolerance, self-correction, metacognition, completeness intuition — with external
@@ -269,7 +290,7 @@ in GitHub Actions on every push and pull request — see
 
 ## 📜 Version
 
-**v5.2.0** — the version is stated consistently in the skill frontmatter, the
+**v6.0.0** — the version is stated consistently in the skill frontmatter, the
 validator, the templates, the references, and the output contract, and is
 enforced by the consistency lint. See [CHANGELOG.md](CHANGELOG.md) for the
 release history.

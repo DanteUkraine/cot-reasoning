@@ -1,11 +1,11 @@
 # Intent-Context-Thinking Type Matrix
 
-Tier 3 reference of cot-reasoning — loaded by step 3 (Step Generation) of SKILL.md when
+Tier 3 reference of cot-reasoning — loaded by the `reason` state (step generation) of SKILL.md when
 the thinking-type choice is not obvious.
 
 ## Overview
 
-This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v5.2.0.
+This document provides the mapping between user intents, problem contexts, and optimal thinking types for cot-reasoning v6.0.0.
 
 ---
 
@@ -351,7 +351,7 @@ def is_compatible(intent, domain):
 
 ## Version Information
 
-**Version:** 5.2.0
+**Version:** 6.0.0
 **Last Updated:** 2026-08-22
 **Maintainer:** System Reasoning Consortium
-**Compatibility:** cot-reasoning v5.2.0+
+**Compatibility:** cot-reasoning v6.0.0+

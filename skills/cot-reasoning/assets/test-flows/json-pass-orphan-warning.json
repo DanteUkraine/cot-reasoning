@@ -44,6 +44,6 @@
       "step_completion": "100%",
       "actionability": "9.0/10"
     },
-    "meta": {"generated_by": "cot-reasoning v5.2.0", "pattern": "ReAct", "notes": "orphan warning probe"}
+    "meta": {"generated_by": "cot-reasoning v6.0.0", "pattern": "ReAct", "notes": "orphan warning probe"}
   }
 }

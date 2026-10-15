@@ -1,7 +1,7 @@
 {
   "metadata": {
     "skill": "cot-reasoning",
-    "version": "5.2.0",
+    "version": "6.0.0",
     "last_updated": "2026-10-03",
     "purpose": "Engineering scenarios demonstrating the cot-reasoning output contract across all four modes, including a full walkthrough of the five externalized reasoning disciplines",
     "tool_taxonomy": "environment-neutral categories: filesystem-read, filesystem-write, shell-execution, web-search, code-search"
@@ -300,7 +300,7 @@
           "confidence_gate": "PASS (9.2/10 >= 7.0 threshold)"
         },
         "meta": {
-          "generated_by": "cot-reasoning v5.2.0",
+          "generated_by": "cot-reasoning v6.0.0",
           "pattern": "ReAct",
           "notes": "Root cause verified against live configuration before proposing the fix"
         }
@@ -550,7 +550,7 @@
           "confidence_gate": "PASS (8.4/10 >= 7.0 threshold)"
         },
         "meta": {
-          "generated_by": "cot-reasoning v5.2.0",
+          "generated_by": "cot-reasoning v6.0.0",
           "pattern": "Tree of Thoughts",
           "notes": "ENHANCED mode: structure and validation retained, simulated self-dialogue display omitted for a natively-reasoning model"
         }
@@ -1054,7 +1054,7 @@
           "tool_utilization": "50% (3/6 steps)"
         },
         "meta": {
-          "generated_by": "cot-reasoning v5.2.0",
+          "generated_by": "cot-reasoning v6.0.0",
           "pattern": "ReAct",
           "notes": "Demonstrates all five externalized disciplines: formalization (step 1), typed outputs (all steps), verification loop (step 5), confidence gate (quality metrics), edge coverage (step 3)"
         }

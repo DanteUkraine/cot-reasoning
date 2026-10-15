@@ -1,13 +1,13 @@
 # cot-reasoning Capabilities Reference
 
-Tier 3 reference of cot-reasoning — loaded by step 2 (Mode Selection) of SKILL.md when
+Tier 3 reference of cot-reasoning — loaded by the `reason` state (mode selection) of SKILL.md when
 the mode choice needs the capability-scaled selection algorithm.
 
 ## Overview
 
 This document describes the cot-reasoning framework's approach to enhancing model reasoning capabilities.
 
-cot-reasoning v5.2.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
+cot-reasoning v6.0.0 provides a **structured reasoning framework** that works with compatible Large Language Models to improve their effectiveness on complex, multi-step tasks.
 
 **Key Principle:** The skill provides a reasoning structure that guides the model's native capabilities; the model processes and enhances this structure using its own reasoning abilities.
 
@@ -89,7 +89,7 @@ Two rules make explicit what the framework already assumes for weak reasoners:
    across attempts.
 
 2. **Plan the whole sequence, then execute (plan-then-execute).** The workflow already
-   plans tool calls (step 5) before assembling the chain (step 6). For a weak reasoner
+   plans tool calls before assembling the chain (the `reason` state plans; the `act` state executes). For a weak reasoner
    this ordering is load-bearing: planning the full sequence up front avoids
    interleaved plan/execute context thrash, keeps the reasoning chain short, and makes
    dependencies explicit before any step runs. Interleaved reasoning-and-acting pays

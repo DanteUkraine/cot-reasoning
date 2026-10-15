@@ -2,7 +2,7 @@
   "metadata": {
     "purpose": "Behavioral evaluation prompts for cot-reasoning: each prompt states the expected activation profile (mode, thinking type, pattern, disciplines). A model executing the skill should emit a flow that passes the validator AND matches the expected profile.",
     "protocol": "For each prompt: run the skill in the target model, save the emitted flow as <id>.md in a flows directory, then run scripts/run-behavioral-eval.sh <flows_dir>. The scorer validates each flow and compares the actual profile against the expected one.",
-    "version": "5.2.0"
+    "version": "6.0.0"
   },
   "prompts": [
     {
