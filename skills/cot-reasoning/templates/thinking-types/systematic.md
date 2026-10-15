@@ -1,6 +1,6 @@
 ---
 template_id: systematic-thinking
-version: "5.2.0"
+version: "6.0.0"
 category: thinking-type
 recommended_for: all-problems
 domain: systematic

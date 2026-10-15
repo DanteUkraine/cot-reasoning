@@ -3,6 +3,38 @@
 All notable changes to the cot-reasoning skill are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is semantic.
 
+## [6.0.0] — 2026-10-15
+
+### Changed
+- **FSM routing architecture**: the numbered 10-step workflow is replaced by a
+  strict Finite State Machine router (`observe → reason → act → verify →
+  report`) that preserves the ReAct loop as four distinct, uncompressed
+  states; every transition names its mandatory gate and the unit where its
+  logic unfolds
+- **Native cognition delegation**: a `<cognitive_protocol>` unit routes all
+  live reasoning — FSM rule processing and next-state transition planning —
+  into the model's native reasoning channel (think tags, extended thinking,
+  or hidden CoT — whatever the host model exposes); the skill defines no
+  custom thought tags. The simulated self-dialogue monologue is no longer defined in
+  SKILL.md; it remains a mode-conditional display scaffold in the
+  self-dialogue template (BASIC/STANDARD). The `**Thought:**` step field is
+  documented as an audit artifact (still required by the validator in
+  BASIC/STANDARD)
+- **Shift-Left QA**: `<step_gates>` and `<quality_gate>` merged into a single
+  12-row `<verification_gate>`; the `act → report` transition is impossible
+  without every row passing on raw artifact evidence (CLI exit codes, log
+  outputs, test results); unrunnable checks are recorded UNVERIFIED, never
+  passed
+
+### Added
+- `references/reasoning-disciplines.md`: full discipline procedures extracted
+  from SKILL.md (Tier 3 context economy; SKILL.md 433 → 380 lines)
+- `<references>` inventory in the `| When Condition Fires | File Path | Tag Anchor |` format
+
+### Fixed
+- Reference headers that cited numbered workflow steps ("step 2/3/7 of
+  SKILL.md") now cite FSM states
+
 ## [5.2.0] — 2026-10-03
 
 ### Added

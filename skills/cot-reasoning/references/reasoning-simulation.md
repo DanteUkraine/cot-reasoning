@@ -1,9 +1,9 @@
 # Reasoning Framework - cot-reasoning
 
-Tier 3 reference of cot-reasoning — loaded by step 3 (Step Generation) of SKILL.md when
+Tier 3 reference of cot-reasoning — loaded by the `reason` state (step generation) of SKILL.md when
 flow generation needs the framework's core principles and the four pillars.
 
-**Version:** 5.2.0
+**Version:** 6.0.0
 **Last Updated:** 2026-08-22
 
 ## Overview

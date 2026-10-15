@@ -3,7 +3,7 @@ name: cot-reasoning
 description: "Structured chain-of-thought reasoning framework for complex, multi-step problems: decomposes the problem into auditable steps with self-dialogue, environment-neutral tool integration, and result tracking, then validates the output flow. Use for production incident investigation, root cause analysis, debugging that requires evidence before conclusions, architecture and design decisions, code review and risk assessment, and trade-off or option comparison. NOT for: greetings and small talk; simple factual or single-word questions; trivial tasks with a direct answer; formatting, rewriting, or translation; domain-fact lookup - route those to the relevant domain skill, only the reasoning procedure routes here. Activate only when the request genuinely needs multi-step analysis, not merely because it contains a word like analyze or fix."
 metadata:
   author: DanteUkraine
-  version: "5.2.0"
+  version: "6.0.0"
   category: reasoning
   complexity: universal
   maturity: production-ready
@@ -14,104 +14,106 @@ metadata:
 ---
 
 <purpose>
-CoT-reasoning: Provides a structured reasoning framework that enhances model capabilities
-for complex, multi-step problem-solving.
+CoT-reasoning: a structured reasoning framework for complex, multi-step
+problem-solving, built as a symbiosis between the model's native reasoning
+channel and an explicit Finite State Machine (FSM) router.
 
 CORE VALUE PROPOSITION:
-- For models with tool-calling: Enables effective data gathering and analysis;
-- For models with reasoning abilities: Provides structure for better organization and clarity;
-- For all compatible models: Enhances complex task performance through guided reasoning;
+- For models with tool-calling: the FSM's observe/act states drive effective data gathering;
+- For models with native reasoning: the native reasoning channel does the live reasoning; the skill adds routing, structure, and validation;
+- For all compatible models: enhanced multi-step performance through guided, auditable reasoning chains.
 
-RESULT: Compatible models can perform multi-step reasoning tasks more effectively, building
-and analyzing complex systems through structured, auditable reasoning chains.
-
-The framework exists because models vary in their ability to perform complex, multi-step
-reasoning — some struggle to connect ideas, maintain context across steps, or structure
-their thinking. The skill generates step-by-step reasoning chains with self-dialogue, tool
-integration, and result tracking; the model uses its native capabilities to process and
-enhance this structure.
-
-cot-reasoning = Step Structure + Self-Dialogue + Tool Integration + Result Tracking
+cot-reasoning = FSM Routing + Native Think + Tool Integration + Result Tracking
 MODEL + cot-reasoning = Enhanced Reasoning Capability
 
-Its four components: the Reasoning Flow Generator decomposes the problem into ordered,
-executable steps, each with single responsibility and clear dependencies; the Self-Dialogue
-Engine produces a transparent internal monologue in the format
-Thought → Analysis → Question → Answer → Conclusion → Decision, making the chain
-followable; the Tool Integration Layer plans tools category-first with explicit parameters,
-response processing, and error recovery (see the tool taxonomy in <tool_integration_layer>);
-the Result Tracking System tracks every step's input, output, status, and validation,
-carries intermediate results forward, and applies objective checks at each step.
+Its four components: the FSM Router (see <workflow>) moves work through four
+uncompressed states — observe, reason, act, verify — preserving the ReAct loop
+explicitly; Native Cognition Delegation (see <cognitive_protocol>) runs all
+live reasoning in the model's native reasoning channel — the skill defines
+no custom thought tags; the Tool Integration Layer plans tools category-first
+with explicit parameters, response processing, and error recovery (see
+<tool_integration_layer>); the Result Tracking System tracks every step's
+input, output, status, and validation, and blocks every terminal transition
+behind the <verification_gate>.
 
-The externalized reasoning disciplines (v5.2.0) are procedural rules layered over
-these four components — not a fifth component and not new ontology; see
-<reasoning_disciplines>.
+The externalized reasoning disciplines (since v5.2.0) are procedural rules layered
+over these four components — not a fifth component and not new ontology; see
+<reasoning_disciplines> and `references/reasoning-disciplines.md`.
 
 This is a reasoning framework that enhances model capabilities, not a replacement for native reasoning.
 </purpose>
 
 <references>
 
-| When | File |
-|------|------|
-| Step 2 — the mode choice needs the capability-scaled selection algorithm and the model categories | `references/model-capabilities.md` (§ mode_selection_algorithm) |
-| Step 3 — the thinking-type choice is not obvious: intent keywords, scoring matrices, selection algorithm | `references/intent-context-matrix.md` (§ thinking_type_matrix) |
-| Step 3 — the pattern choice needs detailed guidance and worked selection rules | `references/reasoning-patterns-analysis.md` (§ pattern_selection) |
-| Step 3 — flow generation needs the framework's core principles and the four pillars | `references/reasoning-simulation.md` (§ framework_pillars) |
-| Step 3 — a thinking-type framework template is loaded for the chosen type | `templates/thinking-types/` (analytical, creative, critical, systematic, ethical, strategic) |
-| Step 4 — worked self-dialogue examples for debugging, design, and decision domains | `templates/system-flows/self-dialogue-template.md` |
-| Step 6 — worked step examples for assembling flows in a new domain, plus the Formalization Step, Verification Loop Step, and Edge-Case Derivation patterns | `templates/system-flows/step-execution-template.md` |
-| Step 6 — the universal adaptive reasoning flow with pattern configuration, aligned with the v5.2.0 disciplines (formalized contract, verification loop discipline, confidence gate, edge coverage) | `templates/adaptive-flows/unified-reasoning-flow.md` |
-| Step 7 — the full tiered output contract: core and extended templates, per-tier requirements, MINIMAL budget, Confidence Gate, anti-patterns | `references/output-contract.md` (§ output_contract) |
-| Step 8 — validate a produced flow, a flow directory, or the example suite | `scripts/validate-system-flow.sh` |
-| Step 8 — engineering example flows (incident, architecture, code review) to run the validator against | `assets/system-examples.json` |
+| When Condition Fires | File Path | Tag Anchor |
+|----------------------|-----------|------------|
+| The `reason` state needs the capability-scaled mode selection algorithm and the model categories | `references/model-capabilities.md` | mode_selection_algorithm |
+| The thinking-type choice is not obvious: intent keywords, scoring matrices, selection algorithm | `references/intent-context-matrix.md` | thinking_type_matrix |
+| The pattern choice needs detailed guidance and worked selection rules | `references/reasoning-patterns-analysis.md` | pattern_selection |
+| Flow generation needs the framework's core principles and the four pillars | `references/reasoning-simulation.md` | framework_pillars |
+| A discipline's full procedure or worked example is needed (formalization, verification loop, confidence gate, edge coverage) | `references/reasoning-disciplines.md` | discipline_procedures |
+| A thinking-type framework template is loaded for the chosen type | `templates/thinking-types/` | analytical, creative, critical, systematic, ethical, strategic |
+| The self-dialogue display scaffold, component definitions, or depth guidelines are needed (BASIC/STANDARD) | `templates/system-flows/self-dialogue-template.md` | Dialogue Structure |
+| Worked step examples for assembling flows in a new domain, plus the Formalization Step, Verification Loop Step, and Edge-Case Derivation patterns | `templates/system-flows/step-execution-template.md` | Formalization Step |
+| The universal adaptive reasoning flow with pattern configuration is needed | `templates/adaptive-flows/unified-reasoning-flow.md` | Formalized Contract |
+| The `verify` state needs the full tiered output contract: core and extended templates, per-tier requirements, MINIMAL budget, anti-patterns | `references/output-contract.md` | output_contract |
+| A produced flow, a flow directory, or the example suite must be validated | `scripts/validate-system-flow.sh` | — |
+| Engineering example flows (incident, architecture, code review) to run the validator against | `assets/system-examples.json` | — |
 </references>
 
+<cognitive_protocol>
+All live reasoning is delegated to the model's native reasoning channel —
+whatever mechanism the host model exposes for private reasoning: a think-tag
+channel (for example `<|think|>` or `<think>`), an extended-thinking mode, or
+fully hidden chain-of-thought. This skill defines no custom thought tags and
+emits no simulated thought framework; the native reasoning channel is the
+single reasoning engine.
+
+| Rule | Directive |
+|------|-----------|
+| Native reasoning channel | Every act of reasoning — analyzing evidence, comparing options, planning — runs in the model's native reasoning channel, never in custom tags or fabricated dialogue emitted to the transcript |
+| FSM processing | Before every state transition: read the Current State's rows in <workflow>, evaluate their conditions against gathered evidence, and plan the next state transition plus its gate discharge inside the native reasoning channel — then move |
+| No fabricated dialogue | For a model that reasons natively (ENHANCED mode), never fabricate a [Thought]/[Question]/[Answer] display; keep the structure, validation, and result tracking |
+| Display scaffold (BASIC/STANDARD) | Weak-reasoner environments may render the self-dialogue display per `templates/system-flows/self-dialogue-template.md`; depth scales with complexity (LOW 2-3 exchanges up to VERY_HIGH 9+) |
+| Audit artifact | The flow document's `**Thought:**` step field records a summary of the reasoning that produced the step — an audit artifact required by the output contract, not a substitute for the native reasoning channel |
+</cognitive_protocol>
+
 <workflow>
-0. Input Analysis — parse the request, extract the problem, determine reasoning needs ✓ <step_gates> r0 → <activation_rules>, <input_output_system>
-1. Problem Decomposition — break the complex problem into logical, executable components; formalize an open-ended statement into a closed contract first (STANDARD/ENHANCED) ✓ <step_gates> r1 → <step_structure_system>, <reasoning_disciplines>
-2. Mode Selection — pick MINIMAL/BASIC/STANDARD/ENHANCED per the mode rules in <reasoning_modes> ✓ <step_gates> r2 → <reasoning_modes>
-3. Step Generation — create the structured reasoning flow with dependencies, thinking type, and pattern ✓ <step_gates> r3 → <thinking_type_system>, <reasoning_pattern_system>
-4. Self-Dialogue Integration — add transparent reasoning context to each step (mode-dependent) ✓ <step_gates> r4 → <self_dialogue_system>
-5. Tool Call Planning — identify data needs and plan tool operations, category-first (STANDARD/ENHANCED only) ✓ <step_gates> r5 → <tool_integration_layer>
-6. Flow Assembly — combine the steps into a complete executable reasoning chain ✓ <step_gates> r6 → <step_structure_system>
-7. Output Formatting — structure results at the tier the mode requires ✓ <step_gates> r7 → <input_output_system>
-8. Quality Validation — verify completeness, consistency, and actionability ✓ <step_gates> r8 → <quality_gate>
-9. Report — hand back the flow with findings, recommendations, and closing notes ✓ <step_gates> r9 → <reporting_requirements>
+Strict FSM router. The ReAct loop is preserved explicitly as four distinct,
+uncompressed states: `observe` (gather context) → `reason` (analyze without
+mutating) → `act` (execute) → `verify` (validate on raw evidence) → `reason`
+(loop on failure). States are never merged or skipped; every transition fires
+the gate named in its row.
+
+| Current State | Condition | Next State | Mandatory Action / Gate | Unfolds in |
+|--------------|-----------|------------|-------------------------|------------|
+| START | request is non-trivial, multi-step, and not excluded by the NOT-conditions | observe | Parse the request; classify the instruction type; state the activation verdict | <activation_rules>, <input_output_system> |
+| START | request is trivial, single-answer, or excluded | DONE | Do not activate; answer directly or route to the domain skill | <activation_rules> |
+| observe | context gathered via read tools; open-ended statement formalized into a closed contract (STANDARD/ENHANCED) | reason | Name every artifact gathered; formalize per the disciplines before any decomposition | <reasoning_disciplines>, <tool_integration_layer> |
+| observe | required context is missing or unreadable | observe | Re-gather via tool categories; record the gap explicitly; never invent data | <tool_integration_layer> |
+| reason | decomposition, mode, thinking type, and pattern chosen — no mutation performed | act | Emit the planned flow: steps, dependencies, tool categories, typed outputs | <reasoning_modes>, <thinking_type_system>, <reasoning_pattern_system>, <step_structure_system> |
+| reason | planning reveals missing data | observe | Return to gathering; carry the named gap forward | <tool_integration_layer> |
+| act | flow assembled and output emitted at the mode's tier | verify | Paste raw artifacts; discharge every <verification_gate> row — no row may be skipped | <verification_gate>, `references/output-contract.md` |
+| verify | every <verification_gate> row passes on raw evidence | report | Assemble the reporting sections from the evidence already pasted | <reporting_requirements> |
+| verify | any gate row fails or is UNVERIFIED | reason | Feed the RAW failure evidence into the next attempt; on repeated failure change strategy, not parameters | <verification_gate>, <reasoning_disciplines> |
+| report | all reporting sections present | DONE | Hand back the flow, findings, recommendations, and closing notes | <reporting_requirements> |
 </workflow>
 
 <instructions>
 
   <step_gate_protocol>
-  Cross-cutting. This governs every Gate cell in the router, at every step.
+  Cross-cutting. This governs every Gate cell in the FSM router and every row
+  of the <verification_gate>, at every state.
 
   | Rule | Detail |
   |------|--------|
   | Evidence, not assertion | A gate is discharged by output you paste, an artifact you name, or a judgment you state in the report. "Verified" on its own discharges nothing |
   | Unrunnable is UNVERIFIED | A check that cannot run here is labelled `UNVERIFIED` with the reason and the command that would settle it. It is never recorded as passed |
-  | No silent advance | Failing a step gate stops the step. Fix, or record the failure and say what it invalidates downstream — never proceed quietly |
-  | A gate never reads its own subject | A check whose expected value comes from the artifact it validates passes at every value of that artifact, including the broken one. The same holds for produced artifacts: expected values derive from the original contract (the formalized contract of step 1), never from the artifact being validated |
+  | No silent advance | Failing a gate stops the state. Fix, or record the failure and say what it invalidates downstream — never proceed quietly |
+  | A gate never reads its own subject | A check whose expected value comes from the artifact it validates passes at every value of that artifact, including the broken one. The same holds for produced artifacts: expected values derive from the original contract (the formalized contract of the observe state), never from the artifact being validated |
   | Verify the computed result, not the written text | Validation criteria reference the observable result of executing the step — tool output, pasted artifact, measured value — never the step's own description of its output. Re-reading the produced text is not verification |
   | Ambiguous validation is failed validation | A check that could pass under more than one interpretation of success has checked nothing; it is recorded as failed, never as passed |
   </step_gate_protocol>
-
-  <step_gates>
-  One row per step. Do not leave a step until its row passes, under <step_gate_protocol>.
-  Every row carries a fallback: a failed check degrades gracefully, it never ends the work silently.
-
-  | After step | Check | Evidence | Fails if | Fallback |
-  |------------|-------|----------|----------|----------|
-  | 0 | Request is non-trivial, multi-step, and not excluded by the NOT-conditions | the parsed problem statement with the activation verdict | the request is trivial, single-answer, or excluded | do not activate; answer directly or route to the domain skill |
-  | 1 | Decomposition matches the complexity tier; an open-ended statement was formalized into a closed contract first (STANDARD/ENHANCED) | the step list with its complexity label, plus the formalized contract when the statement was open-ended | step count outside the tier guideline, or an open-ended statement decomposed without formalization | re-decompose per the complexity table in <step_structure_system>; formalize per <reasoning_disciplines> |
-  | 2 | Mode matches complexity, tool availability, and model capability | the mode decision naming the selection rule that fired | the algorithm was applied out of order or the mode mismatches | re-run the mode selection algorithm in <reasoning_modes> |
-  | 3 | Flow carries tier-required step fields, a chosen thinking type, and a chosen pattern | the generated step list | a required field, type, or pattern is missing | regenerate per <step_structure_system>, <thinking_type_system>, <reasoning_pattern_system> |
-  | 4 | Self-dialogue is relevant and logical (STANDARD/BASIC only) | the dialogue exchanges per step | restatement instead of insight | rewrite per the quality criteria in <self_dialogue_system> |
-  | 5 | Tools are planned by category only | the tool call list | a concrete invented tool name appears | rebind to category per <tool_integration_layer> |
-  | 6 | The chain is complete: every step's dependencies resolve | the assembled flow | a dependency points at a step that does not exist | re-assemble; fill the gap or re-decompose |
-  | 7 | Output has all tier-required sections; MINIMAL budget respected | the emitted flow document | sections missing or the structural budget exceeded | re-emit per the contract in `references/output-contract.md` |
-  | 8 | `scripts/validate-system-flow.sh` returns 0 on the produced flow | pasted script output | return code 1 (validation errors) or 2 (usage error) | fix the flow per the script output and re-run |
-  | 9 | The reply carries every required reporting section | the reply itself | a required section is missing | complete the missing section and re-check |
-  </step_gates>
 
   <activation_rules>
   **Routing boundary — when this skill activates:**
@@ -157,7 +159,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   STANDARD, where the self-dialogue scaffold carries the reasoning. See
   `references/model-capabilities.md` for the capability table and selection algorithm.
 
-  **Discipline tiering (v5.2.0):** the externalized reasoning disciplines in
+  **Discipline tiering (since v5.2.0):** the externalized reasoning disciplines in
   <reasoning_disciplines> are mode-conditional — Contract Formalization, Verification
   Loop, and Edge Coverage apply in STANDARD/ENHANCED; Typed Step Outputs and the
   Confidence Gate apply from BASIC up; none applies in MINIMAL.
@@ -178,40 +180,13 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | Confidence Gate | metacognition | — | yes | yes | yes |
   | Edge Coverage | completeness intuition | — | — | yes | yes |
 
-  1. **Contract Formalization (STANDARD/ENHANCED).** Before decomposing an open-ended
-  problem statement, convert it into a closed contract: named entities, hard and soft
-  constraints, measurable success criteria, and an explicit list of what must NOT be
-  interpreted freely. Decomposing an open-ended statement directly is a formalization
-  failure, not a style choice — ambiguity is where a weak reasoner derails first.
-  Worked example: `templates/system-flows/step-execution-template.md` (Formalization Step).
-
-  2. **Typed Step Outputs (BASIC/STANDARD/ENHANCED).** A step's Expected Output is a
-  typed structure — fields, enums, ranges — not prose. Declare it in the optional
-  **Output Schema** step field. If a produced output violates its declared structure,
-  feed the violation back into the step and regenerate the output: the cheapest
-  correction loop, fired before any fallback.
-
-  3. **Verification Loop (STANDARD/ENHANCED).** A verification step that fails does not
-  fall back once — it iterates. Capture the RAW failure evidence (error output, observed
-  values — never a paraphrase), feed it into the next attempt, and on a REPEATED failure
-  change the strategy, not just the parameters. Every loop declares **Max Iterations**,
-  **Exit Criteria**, and **Escalation Policy**; a loop without a budget is an
-  anti-pattern, not persistence. A check that stalls or depends on unavailable data
-  fails fast and hands its partial evidence to the loop — the iteration budget is
-  never spent waiting on a hanging check. Worked example:
-  `templates/system-flows/step-execution-template.md` (Verification Loop Step).
-
-  4. **Confidence Gate (BASIC/STANDARD/ENHANCED).** The Quality Metrics confidence value
-  is a GATE, not a report. Default threshold: 7.0/10 unless the user set one. Below the
-  threshold the step or flow is NOT done: iterate, escalate, or ask — and name which.
-  A check that could match more than one interpretation of success is a FAILED check,
-  never a passed one. No silent pass.
-
-  5. **Edge Coverage (STANDARD/ENHANCED).** When the problem contains states and
-  transitions — any process, protocol, workflow, lifecycle — validation cases are
-  DERIVED by covering the graph: every state, every transition, every guard. A weak
-  reasoner generates the happy path; the coverage procedure supplies the rest externally.
-  Procedure: `templates/system-flows/step-execution-template.md` (Edge-Case Derivation).
+  One line each: Contract Formalization converts an open-ended statement into a
+  closed contract before decomposition; Typed Step Outputs declares each step's
+  Expected Output as a typed structure; Verification Loop iterates failed checks
+  on RAW evidence under a declared budget; Confidence Gate makes the confidence
+  value a gate, not a report; Edge Coverage derives validation cases by covering
+  every state, transition, and guard. Full procedures, budgets, and worked
+  examples: `references/reasoning-disciplines.md` (§ discipline_procedures).
   </reasoning_disciplines>
 
   <thinking_type_system>
@@ -261,7 +236,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | web-search | Gather external information | `web_search` (Mistral Vibe), `WebSearch` (Claude Code), search tools (LangChain) |
   | code-search | Find patterns in code and logs | `grep`/`ripgrep` via shell, `Grep` (Claude Code), code search tools |
 
-  **Usage principles:** 
+  **Usage principles:**
   1. Data-driven reasoning — tools gather data; reasoning analyzes it; never pass results through unexamined
   2. Explicit parameters — every tool call states complete, exact parameters
   3. Result processing — extract, validate, and integrate tool outputs into the chain
@@ -290,7 +265,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   ```markdown
   ### Step [N]: [Descriptive Step Name]
 
-  **Thought:** [Internal reasoning - what am I thinking about this step?]
+  **Thought:** [Summary of the reasoning that produced this step — audit artifact; the live reasoning ran in the model's native reasoning channel]
   **Why:** [Explanation of why this step is necessary]
   **Action:** [Specific, executable instruction for this step]
   **Tool:** [Tool category, or "None" if pure reasoning]
@@ -310,8 +285,8 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
 
   **Design principles:** single responsibility per step; explicit dependencies;
   objective validation; graceful degradation (every step has a fallback); transparency
-  (self-dialogue explains each action; assumptions are stated); behavior-first
-  validation (verify the semantic or behavioral state first, surface properties second).
+  (assumptions are stated); behavior-first validation (verify the semantic or behavioral
+  state first, surface properties second).
 
   **Complexity guidelines:**
 
@@ -327,42 +302,12 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   for a new domain.
   </step_structure_system>
 
-  <self_dialogue_system>
-  **Transparent reasoning through structured internal monologue:**
-  ```
-  [Thought]: "Initial observation or question"
-  [Analysis]: "Breakdown of the current situation"
-  [Question]: "Specific inquiry to address"
-  [Answer]: "Direct response to the question"
-  [Consideration]: "Alternative perspective or concern" (optional)
-  [Conclusion]: "Synthesis of findings"
-  [Decision]: "Actionable next step"
-  ```
-
-  **Depth guidelines:**
-
-  | Complexity | Exchanges | Use Case |
-  |------------|----------|----------|
-  | LOW | 2-3 | Simple decisions |
-  | MEDIUM | 4-5 | Standard problems |
-  | HIGH | 6-8 | Complex analysis |
-  | VERY_HIGH | 9+ | Multi-faceted problems |
-
-  **Quality criteria:** relevant to the step, logically flowing, provides insight rather
-  than restatement, ends in a decision or action. Worked dialogue examples for debugging,
-  design, and decision domains are in `templates/system-flows/self-dialogue-template.md`.
-
-  **ENHANCED mode note:** for models that reason natively, do not fabricate a reasoning
-  display. Keep the step structure, validation, and result tracking; omit the simulated
-  dialogue unless it adds genuine explanatory value for the user.
-  </self_dialogue_system>
-
   <input_output_system>
-  **Input requirements:** 
+  **Input requirements:**
   - Minimum: 10+ characters, a clear problem or question
   - Optimal: [Context/Background] [Problem/Question] [Available Tools] [Constraints] [Goal]
 
-  **Instruction-type taxonomy (step 0):** classify the request before reasoning begins.
+  **Instruction-type taxonomy (observe state):** classify the request before reasoning begins.
 
   | Type | Signal | Handling |
   |------|--------|----------|
@@ -370,8 +315,8 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   | Task-specific | Narrow goal, may benefit from examples | Standard flow; Few-Shot/Auto-CoT when examples help |
   | Open-ended | Vague scope, unmeasurable success, terms left to interpretation | STANDARD/ENHANCED: triggers Contract Formalization (<reasoning_disciplines>) before decomposition; BASIC: ask the open questions |
 
-  An open-ended request decomposed without formalization is a step-1 gate failure,
-  not a style choice.
+  An open-ended request decomposed without formalization is an observe-state gate
+  failure, not a style choice.
 
   **Output contract (compact):** the output contract is COST-TIERED. Every mode emits the
   CORE structure; extended sections are conditional on mode. Never pay full ceremony for a
@@ -385,23 +330,28 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
     </canonical_reference>
   </input_output_system>
 
-  <quality_gate>
-  Do not leave step 8 until every row passes, under <step_gate_protocol>. A row that cannot
-  run is reported as UNVERIFIED, never as passed.
+  <verification_gate>
+  **Shift-Left QA for the `verify` state.** The only path from `act` to a terminal state
+  runs through this gate: `verify` → `report` is blocked until every row below is
+  discharged on RAW artifact evidence — pasted CLI exit codes, log outputs, test
+  results — never paraphrase, never silent assumption. A row that cannot run here is
+  recorded `UNVERIFIED` with the reason and the command that would settle it; it is
+  never recorded as passed. Every row is judged under <step_gate_protocol>.
 
-  | Check | Evidence that satisfies it | Fails if |
-  |-------|----------------------------|----------|
-  | Activation held for a non-trivial, non-excluded request | the parsed request against the NOT-conditions in <activation_rules> | the request was trivial or excluded |
-  | Mode matches complexity, tool availability, and model capability | the mode decision naming the selection rule that fired | the algorithm was applied out of order or the mode mismatches |
-  | Decomposition fits the tier | step count against the complexity guidelines in <step_structure_system> | the count is outside the tier guideline |
-  | Every step carries its tier-required fields | the generated step list | a required field is missing |
-  | Self-dialogue is relevant and logical (STANDARD/BASIC only) | the dialogue exchanges per step | restatement instead of insight |
-  | Tools are planned by category only | the tool call list | a concrete invented tool name appears |
-  | Open-ended statements were formalized before decomposition (STANDARD/ENHANCED) | the formalized contract next to the step list | an open-ended statement was decomposed directly |
-  | Confidence meets the action threshold | the Confidence Gate verdict in the metrics block (default 7.0/10) | the verdict is absent, below threshold, or FAIL without a named action |
-  | Validation cases cover the state/transition graph when one exists (STANDARD/ENHANCED) | the derived case list mapped to states, transitions, and guards | a graph exists and the cases cover only the happy path |
-  | Output format satisfies the tier contract | `scripts/validate-system-flow.sh` output on the produced flow | required sections missing or the MINIMAL budget exceeded |
-  | Quality metrics are computed for the tier | the metrics block of the flow | a required metric is absent |
+  | Gate | Check | Raw Evidence Required | Fails if |
+  |------|-------|-----------------------|----------|
+  | activation | request is non-trivial, multi-step, and not excluded | the parsed problem statement with the activation verdict | the request is trivial, single-answer, or excluded |
+  | contract | open-ended statement formalized before decomposition (STANDARD/ENHANCED) | the formalized contract text next to the step list | an open-ended statement was decomposed directly |
+  | decomposition | step count fits the complexity tier | the step list with its complexity label | the count is outside the tier guideline |
+  | mode | mode matches complexity, tool availability, and model capability | the mode decision naming the selection rule that fired | the algorithm was applied out of order or the mode mismatches |
+  | step fields | every step carries its tier-required fields | the generated step list | a required field is missing |
+  | self-dialogue | dialogue is relevant and logical (BASIC/STANDARD only) | the dialogue exchanges per step | restatement instead of insight |
+  | tools | tools are planned by category only | the tool call list | a concrete invented tool name appears |
+  | dependencies | every step's dependencies resolve | the assembled flow | a dependency points at a step that does not exist |
+  | output tier | output has all tier-required sections; MINIMAL budget respected | `scripts/validate-system-flow.sh` exit code 0 with the pasted script output | exit code 1 or 2, required sections missing, or the budget exceeded |
+  | confidence | confidence meets the action threshold (default 7.0/10) | the Confidence Gate verdict in the metrics block | the verdict is absent, below threshold, or FAIL without a named action |
+  | edge coverage | validation cases cover the state/transition graph when one exists (STANDARD/ENHANCED) | the derived case list mapped to states, transitions, and guards | a graph exists and the cases cover only the happy path |
+  | reporting | the reply carries every required reporting section | the reply itself | a required section is missing |
 
   **Commands:**
   ```bash
@@ -418,7 +368,7 @@ This is a reasoning framework that enhances model capabilities, not a replacemen
   Return codes: 0 = all validations passed, 1 = validation errors found, 2 = usage error.
   The validator enforces the tiered output contract, the four modes, the six thinking types,
   the five patterns, and the category-first tool taxonomy.
-  </quality_gate>
+  </verification_gate>
 
   <reporting_requirements>
   Hand back exactly these, in this order, where the reader will see them.

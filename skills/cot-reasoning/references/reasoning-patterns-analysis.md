@@ -1,6 +1,6 @@
 # Reasoning Patterns - cot-reasoning
 
-Tier 3 reference of cot-reasoning — loaded by step 3 (Step Generation) of SKILL.md when
+Tier 3 reference of cot-reasoning — loaded by the `reason` state (step generation) of SKILL.md when
 the pattern choice needs detailed guidance.
 
 ## Overview
@@ -103,6 +103,6 @@ Patterns are useful but not essential. Focus on the step structure first, then c
 
 ## Version Information
 
-**Version:** 5.2.0
+**Version:** 6.0.0
 **Last Updated:** 2026-08-22
-**Compatibility:** cot-reasoning v5.2.0+
+**Compatibility:** cot-reasoning v6.0.0+

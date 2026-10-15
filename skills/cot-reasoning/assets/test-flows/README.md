@@ -15,7 +15,7 @@ Run the suite:
 
 | Fixture | Mode | Expected | What it protects |
 |---------|------|----------|-------------------|
-| `minimal-pass.md` | MINIMAL | exit 0 | MINIMAL untouched by the v5.2.0 disciplines: a flow with no new fields and the 12-line budget still passes |
+| `minimal-pass.md` | MINIMAL | exit 0 | MINIMAL untouched by the externalized reasoning disciplines: a flow with no new fields and the 12-line budget still passes |
 | `basic-pass.md` | BASIC | exit 0 | BASIC contract with the Confidence Gate present passes |
 | `standard-pass.md` | STANDARD | exit 0 | Full STANDARD contract: extended sections, Confidence Gate, Output Schema per step, loop fields declared as a set |
 | `minimal-fail-step-budget.md` | MINIMAL | exit 1 | MINIMAL step budget (>3 steps rejected) |
